@@ -1,3 +1,6 @@
+<h1>Project back in development</h1>
+<p>I have some more time now so I can work on this and add/fix all the features that i Had planned initially.</p>
+
 <h1>This project is still in development</h1>
 <p>Although this page is published and is usable, in its current state it does not represent a finished product. If you have any issue, suggestion, or feature request please post them in the Issues tab</p>
 
