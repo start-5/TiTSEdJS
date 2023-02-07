@@ -11,8 +11,8 @@ class Character {
         this.armFlags = [];
         this.armType = 0;
         this.ass = [];
-        this.ballEfficiency = 0;
-        this.ballFullness = 0;
+        this.Internal_ballEfficiency = 0;
+        this.Internal_ballFullness = 0;
         this.balls = 0;
         this.ballSizeMod = 0;
         this.ballSizeRaw = 0;
@@ -148,7 +148,7 @@ class Character {
         this.tailCumType = 0;
         this.tailCunt = [];
         this.tailFlags = [];
-        this.tailGenital = 0;
+        //this.tailGenital = 0;
         this.tailGenitalArg = 0;
         this.tailGenitalColor = '';
         this.tailGirlCumType = 0;

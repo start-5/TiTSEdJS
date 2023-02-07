@@ -10,7 +10,7 @@ class StorageClass {
         this.value4 = 0;
         this.hidden = true;
         this.iconName = "";
-        this.toolTip = "";
+        this.tooltip = "";
         this.combatOnly = false;
         this.minutesLeft = 0;
         this.iconShade = "var(--textColor)";
