@@ -2,7 +2,7 @@ class StorageContainer {
     constructor(source, obj, key, hasFunc, dataFields) {
         this.root = document.createElement('div');
         this.root.className = 'text-light my-3 w-100';
-        this.root.dataset.bind = 'foreach: $root.' + source;
+        this.root.dataset.bind = 'foreach: ' + source;
 
         const header = document.createElement('div');
         header.className = 'form-check form-switch mt-4';
@@ -20,9 +20,9 @@ class StorageContainer {
         storageName.className = 'form-check-label';
         storageName.dataset.bind = 'text: storageName';
 
-        const tooltip = document.createElement('p');
-        tooltip.className = 'p-sm';
-        tooltip.dataset.bind = "text: $data.tooltip, class: $root." + hasFunc + "($data) ? '' : 'text-muted' ";
+        const toolTip = document.createElement('p');
+        toolTip.className = 'p-sm';
+        toolTip.dataset.bind = "text: $data.toolTip, class: $root." + hasFunc + "($data) ? '' : 'text-muted' ";
 
         const dataContainer = document.createElement('div');
         dataContainer.className = 'ps-2';
@@ -55,7 +55,7 @@ class StorageContainer {
         header.appendChild(storageName);
 
         this.root.appendChild(header);
-        this.root.appendChild(tooltip);
+        this.root.appendChild(toolTip);
         this.root.appendChild(dataContainer);
 
         return this.root;
@@ -65,8 +65,7 @@ class StorageContainer {
 class PerkContainer extends StorageContainer {
     constructor(obj, key) {
         const dataFields = [];
-        //super('getPerks', obj, key, 'hasPerk', dataFields);
-        super('getPerks', obj, key, 'hasPerk', dataFields);
+        super('getPerks()', obj, key, 'hasPerk', dataFields);
 
         //this.root = document.createElement('div');
         //this.root.className = 'text-light my-3 w-100 editor-perk';
@@ -90,7 +89,7 @@ class PerkContainer extends StorageContainer {
 
         //const perkDescription = document.createElement('p');
         //perkDescription.className = 'p-sm';
-        //perkDescription.dataset.bind = "text: $data.tooltip, class: $root.hasPerk($data) ? '' : 'text-muted' ";
+        //perkDescription.dataset.bind = "text: $data.toolTip, class: $root.hasPerk($data) ? '' : 'text-muted' ";
 
         //const dataContainer = document.createElement('div');
         //dataContainer.className = 'ps-2';
@@ -149,10 +148,10 @@ class PerkContainer extends StorageContainer {
 class StatusEffectContainer extends StorageContainer {
     constructor(obj, key) {
         const dataFields = [];
-        //dataFields.push(createStorageField('Minutes Left', 'minutesLeft', 'numberInput'));
-        //dataFields.push(createStorageField('Icon Name', 'iconName', 'textInput'));
-        //dataFields.push(createStorageField('Icon Shade', 'iconShade', 'textInput'));
-        super('getStatusEffects', obj, key, 'hasStatusEffect', dataFields);
+        dataFields.push(createStorageField('Minutes Left', 'minutesLeft', 'numberInput'));
+        dataFields.push(createStorageField('Icon Name', 'iconName', 'textInput'));
+        dataFields.push(createStorageField('Icon Shade', 'iconShade', 'textInput'));
+        super('getStatusEffects()', obj, key, 'hasStatusEffect', dataFields);
 
         //dataFields.push(createStorageField('Minutes Left', 'minutesLeft'));
         //dataFields.push(createStorageField('Minutes Left', 'minutesLeft'));
@@ -178,8 +177,8 @@ class StatusEffectContainer extends StorageContainer {
         //chkLabel.dataset.bind = 'text: storageName';
 
         //const seDesc = document.createElement('p');
-        ////seDesc.dataset.bind = "text: $data.tooltip, class: $root.hasPerk($data) ? '' : 'text-muted' ";
-        //seDesc.dataset.bind = "text: $data.tooltip";
+        ////seDesc.dataset.bind = "text: $data.toolTip, class: $root.hasPerk($data) ? '' : 'text-muted' ";
+        //seDesc.dataset.bind = "text: $data.toolTip";
 
         ////const valueContainer = document.createElement('div');
         ////valueContainer.dataset.bind = 'visible: $root.hasPerk($data)';

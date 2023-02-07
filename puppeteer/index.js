@@ -210,7 +210,7 @@ const fs = require('fs');
             this.value4 = 0;
             this.hidden = true;
             this.iconName = "";
-            this.tooltip = "";
+            this.toolTip = "";
             this.combatOnly = false;
             this.minutesLeft = 0;
             this.iconShade = "var(--textColor)";
@@ -297,7 +297,7 @@ const fs = require('fs');
                     perk.value4 = getPerkVal(match, 4);
 
                     if (nthIndex(match, '"', 3) > 0) {
-                        perk.tooltip = match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, ')', 1) - 1);
+                        perk.toolTip = match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, ')', 1) - 1);
                     }
 
                     perks.push(perk);
@@ -338,14 +338,14 @@ const fs = require('fs');
 
                     if (nthIndex(match, '"', 5) > 0) {
                         if (nthIndex(match, ',', 8) > 0) {
-                            statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, '"', 6));
+                            statusEffect.toolTip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, '"', 6));
                         }
                         else {
                             if (nthIndex(match, ',', 9) > 0) {
-                                statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ',', 9) - 1);
+                                statusEffect.toolTip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ',', 9) - 1);
                             }
                             else {
-                                statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ')', 1) - 1);
+                                statusEffect.toolTip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ')', 1) - 1);
                             }
                         }
                     }

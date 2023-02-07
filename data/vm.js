@@ -43,52 +43,43 @@ var ViewModel = function (data) {
 
     self.isPC = ko.computed(function () {
         return self.selectedCharacter() && self.selectedCharacter().name == 'PC';
-        //return self.selectedCharacter().name == 'PC';
     }, self);
     // #endregion
 
     // #region Perks
-    self.getPerks = ko.computed(function () {
+    self.getPerks = function () {
         if (self.selectedCharacter()) {
             // two things are happening here, one, ensuring that characters don't have objcts that reference each other,
             // second, adding any unknown storage to the pool, i haven't found a better way to do this yet
 
-            //let vmPerks = self.perkList;
-
             let vmPerks = ko.mapping.fromJS(ko.mapping.toJS(self.perkList));
-            //return ko.mapping.fromJS(ko.mapping.toJS(self.perkList));
             let charPerks = self.selectedCharacter().obj.perks;
 
             for (var i = 0; i < charPerks().length; i++) {
-                let charPerk = charPerks()[i];
-                let vmPerk = vmPerks().find(p => p.storageName() === charPerk.storageName());
-                if (!vmPerk) {
-                    let unknownPerk = ko.mapping.fromJS(ko.mapping.toJS(new StorageClass()));
-                    unknownPerk.storageName(charPerk.storageName());
-                    unknownPerk.tooltip(charPerk.tooltip());
-                    self.perkList.push(unknownPerk);
+                let perk = vmPerks().find(p => p.storageName() === charPerks()[i].storageName());
+                if (!perk) {
+                    let cPerk = ko.mapping.fromJS(ko.mapping.toJS(charPerks()[i]));
+                    for (var idx = 1; idx < 5; idx++) {
+                        cPerk['value' + idx](0);
+                    }
+                    self.perkList.push(cPerk);
                 }
                 vmPerks.remove(p => p.storageName() === charPerks()[i].storageName());
             }
 
             return charPerks().concat(vmPerks()).sort((p1, p2) => p1.storageName().localeCompare(p2.storageName()));
         }
-    }, self);
-
-    //}).extend({ deferred: true });
-
-    self.perks = self.selectedCharacter() ? ko.observableArray(self.selectedCharacter().obj.perks.concat(ko.mapping.fromJS(Perks)).sort((p1, p2) => p1.storageName().localeCompare(p2.storageName()))) : ko.observableArray([]);
+    }
 
     self.perkList = ko.mapping.fromJS(Perks);
 
     self.hasPerk = function (data) {
-        //return self.selectedCharacter().obj.perks().includes(data);
-        return self.selectedCharacter().obj.perks().find(p => p.storageName() === data.storageName()) !== undefined;
+        return self.selectedCharacter().obj.perks().includes(data);
     }
     // #endregion
 
     // #region Status Effects
-    self.getStatusEffects = ko.computed(function () {
+    self.getStatusEffects = function () {
         if (self.selectedCharacter()) {
             // two things are happening here, one, ensuring that characters don't have objcts that reference each other,
             // second, adding any unknown storage to the pool, i haven't found a better way to do this yet
@@ -96,20 +87,22 @@ var ViewModel = function (data) {
             let vmStatusEffects = ko.mapping.fromJS(ko.mapping.toJS(self.statusEffectList));
             let charStatusEffects = self.selectedCharacter().obj.statusEffects;
 
-            for (var i = 0; i < charStatusEffects().length; i++) {let charStatusEffect = charStatusEffects()[i];
-                let vmStatusEffect = vmStatusEffects().find(p => p.storageName() === charStatusEffect.storageName());
-                if (!vmStatusEffect) {
-                    let unknownStatusEffect = ko.mapping.fromJS(ko.mapping.toJS(new StorageClass()));
-                    unknownStatusEffect.storageName(charStatusEffect.storageName());
-                    unknownStatusEffect.tooltip(charStatusEffect.tooltip());
-                    self.statusEffectList.push(unknownStatusEffect);
+            for (var i = 0; i < charStatusEffects().length; i++) {
+                let statusEffect = vmStatusEffects().find(p => p.storageName() === charStatusEffects()[i].storageName());
+                if (!statusEffect) {
+                    let sEffect = ko.mapping.fromJS(ko.mapping.toJS(charStatusEffects()[i]));
+                    for (var idx = 1; idx < 5; idx++) {
+                        sEffect['value' + idx](0);
+                    }
+                    sEffect.minutesLeft(0);
+                    self.statusEffectList.push(sEffect);
                 }
                 vmStatusEffects.remove(p => p.storageName() === charStatusEffects()[i].storageName());
             }
 
             return charStatusEffects().concat(vmStatusEffects()).sort((s1, s2) => s1.storageName().localeCompare(s2.storageName()));
         }
-    }, self);
+    }
 
     self.statusEffectList = ko.mapping.fromJS(StatusEffects);
 

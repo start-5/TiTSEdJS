@@ -265,8 +265,8 @@ function displayCrotch() {
                     new FloatField(char, 'ballSizeRaw', 'Ball Size Raw', null, 0),
                     new IntegerField(char, 'ballSizeMod', 'Ball Size Mod', null, 0)
                 ]),
-                new FloatField(char, 'Internal_ballFullness', 'Ball Fullness', null, 0, 100),
-                new FloatField(char, 'Internal_ballEfficiency', 'Ball Efficiency', null, 0),
+                new FloatField(char, 'ballFullness', 'Ball Fullness', null, 0, 100),
+                new FloatField(char, 'ballEfficiency', 'Ball Efficiency', null, 0),
                 new FloatField(char, 'refractoryRate', 'Refractory Rate', null, 0),
                 new SelectField('FluidType', char, 'cumType', 'Cum Type'),
                 new NestedGroup('', [
