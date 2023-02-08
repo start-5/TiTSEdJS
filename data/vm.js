@@ -1,4 +1,8 @@
-window.loadMapping = {
+/** @type {ViewModel} */
+var vm = undefined;
+
+
+const loadMapping = {
     'flags': {
         create: function (options) {
             if (options.data.hasOwnProperty('pathOverrides')) {
@@ -10,6 +14,7 @@ window.loadMapping = {
         }
     }
 }
+
 
 var ViewModel = function (data) {
     var self = this;
@@ -25,13 +30,17 @@ var ViewModel = function (data) {
 
     self.getGlobal = function (path) {
         var obj = GlobalKeys;
+
         for (var i = 0, path = path.split('.'), len = path.length; i < len; i++) {
             obj = obj[path[i]];
         };
+
         return obj;
     };
 
+
     // #region Character
+
     self.selectedCharacter = ko.observable();
 
     self.chars = ko.computed(function () {
@@ -43,11 +52,13 @@ var ViewModel = function (data) {
 
     self.isPC = ko.computed(function () {
         return self.selectedCharacter() && self.selectedCharacter().name == 'PC';
-        //return self.selectedCharacter().name == 'PC';
     }, self);
+
     // #endregion
 
+
     // #region Perks
+
     self.getPerks = ko.computed(function () {
         if (self.selectedCharacter()) {
             // two things are happening here, one, ensuring that characters don't have objcts that reference each other,
@@ -77,17 +88,21 @@ var ViewModel = function (data) {
 
     //}).extend({ deferred: true });
 
-    self.perks = self.selectedCharacter() ? ko.observableArray(self.selectedCharacter().obj.perks.concat(ko.mapping.fromJS(Perks)).sort((p1, p2) => p1.storageName().localeCompare(p2.storageName()))) : ko.observableArray([]);
+    self.perks = self.selectedCharacter()
+        ? ko.observableArray(self.selectedCharacter().obj.perks.concat(ko.mapping.fromJS(Perks)).sort((p1, p2) => p1.storageName().localeCompare(p2.storageName())))
+        : ko.observableArray([]);
 
     self.perkList = ko.mapping.fromJS(Perks);
 
     self.hasPerk = function (data) {
-        //return self.selectedCharacter().obj.perks().includes(data);
         return self.selectedCharacter().obj.perks().find(p => p.storageName() === data.storageName()) !== undefined;
     }
+
     // #endregion
 
+
     // #region Status Effects
+
     self.getStatusEffects = ko.computed(function () {
         if (self.selectedCharacter()) {
             // two things are happening here, one, ensuring that characters don't have objcts that reference each other,
@@ -96,7 +111,8 @@ var ViewModel = function (data) {
             let vmStatusEffects = ko.mapping.fromJS(ko.mapping.toJS(self.statusEffectList));
             let charStatusEffects = self.selectedCharacter().obj.statusEffects;
 
-            for (var i = 0; i < charStatusEffects().length; i++) {let charStatusEffect = charStatusEffects()[i];
+            for (var i = 0; i < charStatusEffects().length; i++) {
+                let charStatusEffect = charStatusEffects()[i];
                 let vmStatusEffect = vmStatusEffects().find(p => p.storageName() === charStatusEffect.storageName());
                 if (!vmStatusEffect) {
                     let unknownStatusEffect = ko.mapping.fromJS(ko.mapping.toJS(new StorageClass()));
@@ -116,6 +132,7 @@ var ViewModel = function (data) {
     self.hasStatusEffect = function (data) {
         return self.selectedCharacter().obj.statusEffects().includes(data);
     }
+
     // #endregion
 
     self.expandStorage = function (data, event) {
@@ -123,6 +140,7 @@ var ViewModel = function (data) {
     }
 
     // #region OnChanged
+
     self.nameChanged = function (data, event) {
         const char = self.selectedCharacter().obj;
         const name = event.target.value;
@@ -153,6 +171,7 @@ var ViewModel = function (data) {
             }
         }
     }
+
     // #endregion
 
     // #region Validation
@@ -218,7 +237,7 @@ var ViewModel = function (data) {
         const i = self.selectedCharacter().obj.breastRows()[index()];
         const count = +i.breasts();
         const rating = +i.breastRatingRaw() + +i.breastRatingMod();
-        return count + ' ' + getCupSize(rating) + ' breast' + (count > 1 ? 's' : '');
+        return count + ' ' + util.getCupSize(rating) + ' breast' + (count > 1 ? 's' : '');
     }
 
     self.addBreastRow = function () {
@@ -232,24 +251,28 @@ var ViewModel = function (data) {
 }
 
 
-// custom handler to write actual numbers and not strings when needed
-ko.bindingHandlers.numberInput = {
-    init: function (element, valueAccessor, allBindingsAccessor) {
-        var underlyingObservable = valueAccessor();
+function koInit() {
 
-        var interceptor = ko.pureComputed({
-            read: underlyingObservable,
-            write: function (value) {
-                underlyingObservable(+value);
-            },
-            owner: this
-        });
+    // Custom handler to write actual numbers and not strings when needed
+    ko.bindingHandlers.numberInput = {
+        init: function (element, valueAccessor, allBindingsAccessor) {
+            var underlyingObservable = valueAccessor();
 
-        ko.bindingHandlers.textInput.init(element, function () {
-            return interceptor
-        }, allBindingsAccessor);
-    },
-    update: function (element, valueAccessor, allBindingsAccessor) {
-        element.value = valueAccessor()();
-    }
-};
+            var interceptor = ko.pureComputed({
+                read: underlyingObservable,
+                write: function (value) {
+                    underlyingObservable(+value);
+                },
+                owner: this
+            });
+
+            ko.bindingHandlers.textInput.init(element, function () {
+                return interceptor
+            }, allBindingsAccessor);
+        },
+        update: function (element, valueAccessor, allBindingsAccessor) {
+            element.value = valueAccessor()();
+        }
+    };
+
+}
