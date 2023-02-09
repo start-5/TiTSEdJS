@@ -3,55 +3,96 @@ const prettier = require('prettier');
 const fs = require('fs');
 
 (async () => {
-    function getElapsedTime(start, end) {
-        var duration = end - start;
-        var ms = Math.floor((duration % 1000) / 1),
-            s = Math.floor((duration / 1000) % 60),
-            m = Math.floor((duration / (1000 * 60)) % 60);
 
-        s = (s < 10 && m > 0) ? "0" + s : s;
+    const util = {
 
-        var result = (m > 0 ? m + ':' : '') + (s > 0 ? s + '.' : '') + ms;
-        if (s > 0 && m < 1) { return result += 's'; }
-        else if (s < 1 && m < 1) { return result += 'ms'; }
-        else { return result; }
+        /**
+        * @param {number} start
+        * @param {number} end
+        */
+        getElapsedTime: function (start, end) {
+
+            const duration = end - start;
+
+            const milli = Math.floor((duration % 1000) / 1);
+            var sec = Math.floor((duration / 1000) % 60);
+            const min = Math.floor((duration / (1000 * 60)) % 60);
+
+            sec = (sec < 10 && min > 0) ? "0" + sec : sec;
+
+            var result = (min > 0 ? min + ':' : '') + (sec > 0 ? sec + '.' : '') + milli;
+
+            if (sec > 0 && min < 1) {
+                return result += 's';
+            }
+            else if (sec < 1 && min < 1) {
+                return result += 'ms';
+            }
+            else {
+                return result;
+            }
+        }
+
     }
 
-    var browser_start = Date.now();
+
+    const operationStart = Date.now();
+
+
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
+
     var urls = [];
     var contents = [];
+
     page.on('response', async (response) => {
+
         const url = response.url();
+
         if (url.endsWith('.js')) {
             urls.push(url);
             contents.push(await response.text());
         }
+
     });
+
 
     try {
         console.log('loading game');
         await page.goto('https://www.fenoxo.com/play/TiTS/release/', { timeout: 0 });
         console.log('game loaded');
     }
-    catch (err) {
-        console.log(err);
+    catch (e) {
+        console.log(e);
         await browser.close();
         return;
     }
 
+
     console.log('urls', urls);
 
+
     var obj;
+
     try {
+
         console.log('beginning scrape');
+
         obj = await page.evaluate(() => {
+
             var log = '';
-            function start(msg) { log += msg + '\n' }
+
+            /**
+            * @param {string} msg
+            */
+            function write(msg) {
+                log += msg + '\n'
+            }
+
 
             try {
+
                 function getObjectRecursive(theObject, keyName) {
                     var result = null;
                     if (theObject instanceof Array) {
@@ -71,6 +112,7 @@ const fs = require('fs');
                     return result;
                 }
 
+
                 function getValidFlagsFor(bodyPart, bodyFlagArr) {
                     var validFlags = [];
                     var propName = 'VALID_' + bodyPart + '_FLAGS';
@@ -81,15 +123,22 @@ const fs = require('fs');
                     return validFlags;
                 }
 
+
                 function getValidTypesFor(bodyPart, bodyPartArr) {
-                    var validTypes = [];
-                    var propName = 'VALID_' + bodyPart + '_TYPES';
-                    var typeArr = getObjectRecursive(window.GLOBAL, propName);
+
+                    const validTypes = [];
+
+                    const propName = 'VALID_' + bodyPart + '_TYPES';
+
+                    const typeArr = getObjectRecursive(window.GLOBAL, propName);
+
                     for (var i = 0; i < typeArr.length; i++) {
                         validTypes.push(bodyPartArr.find(f => f.value == typeArr[i]));
                     }
+
                     return validTypes;
                 }
+
 
                 function getGlobalsByPrefix(prefix) {
                     return Object.keys(window.GLOBAL)
@@ -100,69 +149,75 @@ const fs = require('fs');
                                 .split('_')
                                 .map(str => str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase()).join(' '),
                             value: window.GLOBAL[key]
-                        }));
+                        })).filter(key => key.name != 'Names');
                 }
 
-                start('Generating globals');
+
+
+                write('generating globals');
                 var globalsObj;
                 {
-                    start('getting classes');
+                    write('getting classes');
                     const Class = getGlobalsByPrefix('CLASS_');
 
-                    start('getting body flags');
+                    write('getting body flags');
                     const BodyFlag = getGlobalsByPrefix('FLAG_');
 
-                    start('getting body types');
+                    write('getting body types');
                     const BodyType = getGlobalsByPrefix('TYPE_');
 
-                    start('getting tail genitals');
+                    write('getting tail genitals');
                     const TailGenital = getGlobalsByPrefix('TAIL_GENITAL_');
 
-                    start('getting skin types');
+                    write('getting skin types');
                     const SkinType = getGlobalsByPrefix('SKIN_TYPE_');
 
-                    start('getting nipple types');
+                    write('getting nipple types');
                     const NippleType = getGlobalsByPrefix('NIPPLE_TYPE_');
 
-                    start('getting fluid types');
+                    write('getting fluid types');
                     const FluidType = getGlobalsByPrefix('FLUID_TYPE_');
 
-                    start('getting hair types');
+                    write('getting hair types');
                     const HairType = getGlobalsByPrefix('HAIR_TYPE_');
 
-                    start('getting genital positions');
+                    write('getting genital positions');
                     const GenitalSpot = getGlobalsByPrefix('GENITAL_SPOT_');
 
-                    start('getting item flags');
+                    write('getting item flags');
                     const ItemFlag = getGlobalsByPrefix('ITEM_FLAG_');
 
-                    start('getting sexprefs');
+                    write('getting sexprefs');
                     const SexPref = getGlobalsByPrefix('SEXPREF_');
 
-                    start('getting valid body flags');
+                    write('getting valid body flags');
                     const ValidFlags =
                     {
-                        Face: getValidFlagsFor("FACE", BodyFlag),
-                        Tongue: getValidFlagsFor("TONGUE", BodyFlag),
-                        Arm: getValidFlagsFor("ARM", BodyFlag),
-                        Leg: getValidFlagsFor("LEG", BodyFlag),
-                        Tail: getValidFlagsFor("TAIL", BodyFlag),
-                        Skin: getValidFlagsFor("SKIN", BodyFlag)
+                        Face: getValidFlagsFor('FACE', BodyFlag),
+                        Tongue: getValidFlagsFor('TONGUE', BodyFlag),
+                        Arm: getValidFlagsFor('ARM', BodyFlag),
+                        Leg: getValidFlagsFor('LEG', BodyFlag),
+                        Tail: getValidFlagsFor('TAIL', BodyFlag),
+                        Skin: getValidFlagsFor('SKIN', BodyFlag),
+                        Areola: getValidFlagsFor('AREOLA', BodyFlag),
+                        Cock: getValidFlagsFor("COCK", BodyFlag),
+                        Vagina: getValidFlagsFor("VAGINA", BodyFlag),
+                        Tailcunt: getValidFlagsFor("VAGINA", BodyFlag)
                     };
 
-                    start('getting valid body types');
+                    write('getting valid body types');
                     const ValidTypes =
                     {
-                        Face: getValidTypesFor("FACE", BodyType),
-                        Eye: getValidTypesFor("EYE", BodyType),
-                        Tongue: getValidTypesFor("TONGUE", BodyType),
-                        Ear: getValidTypesFor("EAR", BodyType),
-                        Arm: getValidTypesFor("ARM", BodyType),
-                        Leg: getValidTypesFor("LEG", BodyType),
-                        Antennae: getValidTypesFor("ANTENNAE", BodyType), //kinda random but according to the game "human" is a valid antennae type????
-                        Horn: getValidTypesFor("HORN", BodyType),
-                        Wing: getValidTypesFor("WING", BodyType),
-                        Tail: getValidTypesFor("TAIL", BodyType)
+                        Face: getValidTypesFor('FACE', BodyType),
+                        Eye: getValidTypesFor('EYE', BodyType),
+                        Tongue: getValidTypesFor('TONGUE', BodyType),
+                        Ear: getValidTypesFor('EAR', BodyType),
+                        Arm: getValidTypesFor('ARM', BodyType),
+                        Leg: getValidTypesFor('LEG', BodyType),
+                        Antennae: getValidTypesFor('ANTENNAE', BodyType),
+                        Horn: getValidTypesFor('HORN', BodyType),
+                        Wing: getValidTypesFor('WING', BodyType),
+                        Tail: getValidTypesFor('TAIL', BodyType)
                     };
 
                     //todo stuff
@@ -173,15 +228,19 @@ const fs = require('fs');
                     };
                 }
 
-                start('stringifying global');
+                write('stringifying global');
                 const globals = JSON.stringify(globalsObj);
 
                 return { globals, log };
             }
             catch (err) {
-                return { log, err: err + '' };
+                return {
+                    log,
+                    error: err + ''
+                };
             }
         });
+
         console.log('completed scrape');
     }
     catch (err) {
@@ -192,28 +251,28 @@ const fs = require('fs');
 
     console.log(obj.log);
 
-    if (obj.err) {
-        console.log('Error:' + obj.err + '');
+    if (obj.error) {
+        console.log('Error: ' + obj.error);
         await browser.close();
         return;
     }
 
     class StorageClass {
         constructor() {
-            this.classInstance = "StorageClass";
+            this.classInstance = 'StorageClass';
             this.neverSerialize = false;
             this.version = 1;
-            this.storageName = "";
+            this.storageName = '';
             this.value1 = 0;
             this.value2 = 0;
             this.value3 = 0;
             this.value4 = 0;
             this.hidden = true;
-            this.iconName = "";
-            this.tooltip = "";
+            this.iconName = '';
+            this.tooltip = '';
             this.combatOnly = false;
             this.minutesLeft = 0;
-            this.iconShade = "var(--textColor)";
+            this.iconShade = 'var(--textColor)';
         }
     }
 
@@ -262,7 +321,7 @@ const fs = require('fs');
     gameFlags = gameFlags.filter((value, index, self) => self.indexOf(value) === index && value.toUpperCase() === value).sort();
     gameFlags = gameFlags.reduce((acc, curr) => (acc[curr] = null, acc), {});
     var gameFlags_end = Date.now();
-    console.log('Retrieved game flags, operation took ' + getElapsedTime(gameFlags_start, gameFlags_end) + ' to complete');
+    console.log('Retrieved game flags, operation took ' + util.getElapsedTime(gameFlags_start, gameFlags_end) + ' to complete');
 
 
     // Perks are part of the StorageClass class, from what I saw, they are not globally defined,
@@ -307,7 +366,7 @@ const fs = require('fs');
     }
     perks = perks.filter((v, i, a) => a.findIndex(v2 => (v2.storageName === v.storageName)) === i).sort();
     var perks_end = Date.now();
-    console.log('Retrieved perks, operation took ' + getElapsedTime(perks_start, perks_end) + ' to complete');
+    console.log('Retrieved perks, operation took ' + util.getElapsedTime(perks_start, perks_end) + ' to complete');
 
 
     console.log('\nRetrieving status effects');
@@ -383,7 +442,7 @@ const fs = require('fs');
     }
     statusEffects = statusEffects.filter((v, i, a) => a.findIndex(v2 => (v2.storageName === v.storageName)) === i).sort();
     var statusEffects_end = Date.now();
-    console.log('Retrieved status effects, operation took ' + getElapsedTime(statusEffects_start, statusEffects_end) + ' to complete');
+    console.log('Retrieved status effects, operation took ' + util.getElapsedTime(statusEffects_start, statusEffects_end) + ' to complete');
 
 
     console.log('\nRetrieving codex entries');
@@ -406,7 +465,7 @@ const fs = require('fs');
     }
     codexEntries = codexEntries.filter((v, i, a) => a.findIndex(v2 => (v2 === v)) === i).sort();
     var codexEntries_end = Date.now();
-    console.log('Retrieved codex entries, operation took ' + getElapsedTime(codexEntries_start, codexEntries_end) + ' to complete');
+    console.log('Retrieved codex entries, operation took ' + util.getElapsedTime(codexEntries_start, codexEntries_end) + ' to complete');
 
     const format = str => prettier.format(str, { parser: 'babel', tabWidth: 4 });
 
@@ -418,10 +477,10 @@ const fs = require('fs');
     fs.writeFileSync('../data/status.js', format('const StatusEffects = ' + JSON.stringify(statusEffects)));
     fs.writeFileSync('../data/codex.js', format('const CodexEntries = ' + JSON.stringify(codexEntries)));
     var write_end = Date.now();
-    console.log('File(s) written, operation took ' + getElapsedTime(write_start, write_end) + ' to complete');
+    console.log('File(s) written, operation took ' + util.getElapsedTime(write_start, write_end) + ' to complete');
 
 
     await browser.close();
     var browser_end = Date.now()
-    console.log('\n\nAll operations completed, total time: ' + getElapsedTime(browser_start, browser_end));
+    console.log('\n\nAll operations completed, total time: ' + util.getElapsedTime(operationStart, browser_end));
 })();
