@@ -3,6 +3,9 @@ const prettier = require('prettier');
 const fs = require('fs');
 
 
+/* eslint-disable no-useless-escape */
+
+
 // Observations:
 
 // Perks are part of the StorageClass class, from what I saw, they are not globally defined, they are instantiated and added to characters on demand.
@@ -17,6 +20,36 @@ const fs = require('fs');
 
 
     const util = {
+
+        /**
+        * Format a 'StorageClass' flag array
+        * @param {Array<StorageClass>} arr
+        */
+        formatStorageClassArray: function (arr) {
+            return arr.filter((v, i, a) => a.findIndex(v2 => (v2.storageName === v.storageName)) === i).sort();
+        },
+
+        /**
+        * Format game data when saving to file
+        * @param {string} name
+        * @param {any} data
+        */
+        formatToFile: function (name, data) {
+            const src = `const ${name} = ${JSON.stringify(data)}`;
+
+            return prettier.format(src, {
+                parser: 'babel',
+                tabWidth: 4
+            });
+        },
+
+        /**
+        * Format a valid flag array
+        * @param {Array} arr
+        */
+        formatValidFlagArray: function (arr) {
+            return arr.filter((v, i, a) => a.findIndex(v2 => (v2.value === v.value)) === i).sort();
+        },
 
         /**
         * Get a pretty print time elapsed result based on start and end time
@@ -103,13 +136,20 @@ const fs = require('fs');
 
     var evalResult;
 
-    try {
 
+    try {
         console.log('evaluating game instance');
         const evalGameStart = Date.now();
 
         evalResult = await page.evaluate(() => {
             try {
+
+
+                // Note:
+                // By this point we have started evaluating the page, which means that we are scoped to the browser page and not the file
+
+
+                // #region Funcs
 
                 /* eslint-disable no-inner-declarations */
 
@@ -196,52 +236,67 @@ const fs = require('fs');
 
                 /* eslint-enable no-inner-declarations */
 
-
+                // #endregion
 
 
                 const global = {
-                    Class: getGlobalsByPrefix('CLASS_'),
                     BodyFlag: getGlobalsByPrefix('FLAG_'),
                     BodyType: getGlobalsByPrefix('TYPE_'),
-                    TailGenital: getGlobalsByPrefix('TAIL_GENITAL_'),
-                    SkinType: getGlobalsByPrefix('SKIN_TYPE_'),
-                    NippleType: getGlobalsByPrefix('NIPPLE_TYPE_'),
+                    Class: getGlobalsByPrefix('CLASS_'),
                     FluidType: getGlobalsByPrefix('FLUID_TYPE_'),
-                    HairType: getGlobalsByPrefix('HAIR_TYPE_'),
                     GenitalSpot: getGlobalsByPrefix('GENITAL_SPOT_'),
+                    HairType: getGlobalsByPrefix('HAIR_TYPE_'),
                     ItemFlag: getGlobalsByPrefix('ITEM_FLAG_'),
+                    NippleType: getGlobalsByPrefix('NIPPLE_TYPE_'),
                     SexPref: getGlobalsByPrefix('SEXPREF_'),
+                    SkinType: getGlobalsByPrefix('SKIN_TYPE_'),
+                    TailGenital: getGlobalsByPrefix('TAIL_GENITAL_'),
                     ValidFlags: {},
                     ValidTypes: {}
                 };
+                const bf = global.BodyFlag;
+                const bt = global.BodyType;
 
                 global.ValidFlags = {
-                    Face: getValidFlagsFor('FACE', global.BodyFlag),
-                    Tongue: getValidFlagsFor('TONGUE', global.BodyFlag),
-                    Arm: getValidFlagsFor('ARM', global.BodyFlag),
-                    Leg: getValidFlagsFor('LEG', global.BodyFlag),
-                    Tail: getValidFlagsFor('TAIL', global.BodyFlag),
-                    Skin: getValidFlagsFor('SKIN', global.BodyFlag),
-                    Areola: getValidFlagsFor('AREOLA', global.BodyFlag),
-                    Cock: getValidFlagsFor('COCK', global.BodyFlag),
-                    Vagina: getValidFlagsFor('VAGINA', global.BodyFlag),
-                    Tailcunt: getValidFlagsFor('VAGINA', global.BodyFlag)
+                    Areola: getValidFlagsFor('AREOLA', bf),
+                    Arm: getValidFlagsFor('ARM', bf),
+                    Cock: getValidFlagsFor('COCK', bf),
+                    Face: getValidFlagsFor('FACE', bf),
+                    Leg: getValidFlagsFor('LEG', bf),
+                    Skin: getValidFlagsFor('SKIN', bf),
+                    Tail: getValidFlagsFor('TAIL', bf),
+                    Tailcunt: getValidFlagsFor('VAGINA', bf),
+                    Tongue: getValidFlagsFor('TONGUE', bf),
+                    Vagina: getValidFlagsFor('VAGINA', bf)
                 };
+
+                global.ValidFlags.Tail.push({ name: 'Parasitic', value: 55 });
+                global.ValidFlags.Tailcunt.push({ name: 'Tailcunt', value: 42 });
 
                 global.ValidTypes = {
-                    Face: getValidTypesFor('FACE', global.BodyType),
-                    Eye: getValidTypesFor('EYE', global.BodyType),
-                    Tongue: getValidTypesFor('TONGUE', global.BodyType),
-                    Ear: getValidTypesFor('EAR', global.BodyType),
-                    Arm: getValidTypesFor('ARM', global.BodyType),
-                    Leg: getValidTypesFor('LEG', global.BodyType),
-                    Antennae: getValidTypesFor('ANTENNAE', global.BodyType),
-                    Horn: getValidTypesFor('HORN', global.BodyType),
-                    Wing: getValidTypesFor('WING', global.BodyType),
-                    Tail: getValidTypesFor('TAIL', global.BodyType)
+                    Antennae: getValidTypesFor('ANTENNAE', bt),
+                    Arm: getValidTypesFor('ARM', bt),
+                    Cock: getValidTypesFor('COCK', bt),
+                    Dicknipple: getValidTypesFor('DICKNIPPLE', bt),
+                    Ear: getValidTypesFor('EAR', bt),
+                    Eye: getValidTypesFor('EYE', bt),
+                    Face: getValidTypesFor('FACE', bt),
+                    Horn: getValidTypesFor('HORN', bt),
+                    Leg: getValidTypesFor('LEG', bt),
+                    Tail: getValidTypesFor('TAIL', bt),
+                    TailGenital: getValidFor('TAIL_GENITAL', '_ARGS', bt),
+                    Tongue: getValidTypesFor('TONGUE', bt),
+                    Vagina: getValidTypesFor('VAGINA', bt),
+                    Wing: getValidTypesFor('WING', bt)
                 };
 
-                return { global };
+                const pantyData = {};
+                const pantyDataArr = window.PantyData.toJSON();
+                for (let i = 0; i < pantyDataArr.length; i++) {
+                    pantyData[pantyDataArr[i][0]] = pantyDataArr[i][1].panty;
+                }
+
+                return { global, pantyData };
             }
             catch (e) {
                 return { error: e };
@@ -266,12 +321,19 @@ const fs = require('fs');
     }
 
 
+    const obj = evalResult.global;
+    const pantyData = evalResult.pantyData;
+
+
+    // #region Util
+
     /**
     * Get the index of the nth ocurrence of a value in a string, or -1 if the value is not contained in the target string
     * @param {string} target
     * @param {string} value
     * @param {number} nth
     */
+    // yeah this should go in the util obj to keep consistency but this is used a lot and icba to type util. like 500 times, whos gonna stop me
     function nthIndex(target, value, nth) {
         const len = target.length;
         var index = -1;
@@ -283,6 +345,9 @@ const fs = require('fs');
 
         return index;
     }
+
+
+    // #endregion
 
 
     // #region StorageClass stuff
@@ -331,34 +396,133 @@ const fs = require('fs');
     // #endregion
 
 
-    // #region Flags
+    // #region Valid Body Flags (handle valid body flags that aren't part of GLOBALS)
 
-    console.log('\ngetting game flags');
+
+    // #region Ear
+
+    console.log('\ngetting valid ear flags');
+    const validEarFlagsStart = Date.now();
+
+    var validEarFlags = [];
+
+    (function () {
+        for (var index = 0; index < contents.length; ++index) {
+            var content = contents[index];
+            // const regex = /\.(addEarFlag)\(([\S ][^)]+)\)*/g;
+            const regex = /\.(addEarFlag)\((GLOBAL.FLAG_([\S ][^)]+))\)*/g;
+
+            var m;
+            while ((m = regex.exec(content)) !== null) {
+                if (m.index === regex.lastIndex) {
+                    regex.lastIndex++;
+                }
+
+                m.forEach((match, groupIndex) => {
+                    if (groupIndex == 3) {
+                        const flag = obj.BodyFlag.find((body) => body.name.toLocaleLowerCase() == match.toLocaleLowerCase());
+
+                        validEarFlags.push({
+                            name: flag.name,
+                            value: flag.value
+                        });
+                    }
+                });
+            }
+        }
+    })();
+
+    validEarFlags = util.formatValidFlagArray(validEarFlags);
+
+    obj.ValidFlags.Ear = validEarFlags;
+
+    const validEarFlagsEnd = Date.now();
+    util.printOperationTime('valid ear flags', validEarFlagsStart, validEarFlagsEnd);
+
+    // #endregion
+
+
+    // #region Ass
+
+    console.log('\ngetting valid ass flags');
+    const validAssFlagsStart = Date.now();
+
+    var validAssFlags = [];
+
+    (function () {
+        for (var index = 0; index < contents.length; ++index) {
+            var content = contents[index];
+            const regex = /(ass.flags)[= ]+(\[(GLOBAL.FLAG_[\S ][^)]+)\])/g;
+
+            var m;
+            while ((m = regex.exec(content)) !== null) {
+                if (m.index === regex.lastIndex) {
+                    regex.lastIndex++;
+                }
+
+                m.forEach((match, groupIndex) => {
+                    if (groupIndex == 2) {
+                        var assFlagArray = match.match(/_([\S ])[^\,\]]*/g);
+
+                        assFlagArray.forEach((item, index, arr) => arr[index] = item.slice(1));
+
+                        for (let i = 0; i < assFlagArray.length; i++) {
+                            const flag = obj.BodyFlag.find((body) => body.name.toLocaleLowerCase() == assFlagArray[i].toLocaleLowerCase());
+
+                            validAssFlags.push({
+                                name: flag.name,
+                                value: flag.value
+                            });
+                        }
+                    }
+                });
+            }
+        }
+    })();
+
+    validAssFlags = util.formatValidFlagArray(validAssFlags);
+
+    obj.ValidFlags.Ass = validAssFlags;
+
+    const validAssFlagsEnd = Date.now();
+    util.printOperationTime('valid ass flags', validAssFlagsStart, validAssFlagsEnd);
+
+    // #endregion
+
+
+    // #endregion
+
+
+    // #region State Flags
+
+    console.log('\ngetting game state flags');
     const gameFlagsStart = Date.now();
 
     var gameFlags = [];
 
-    for (var index = 0; index < contents.length; ++index) {
-        var content = contents[index];
+    (function () {
+        for (var index = 0; index < contents.length; ++index) {
+            var content = contents[index];
 
-        var m = content.match(/flags\.[\w_]+/g);
-        if (m && m.length > 0) {
-            gameFlags = gameFlags.concat(m.map((value) => value.substr(6)));
+            var m = content.match(/flags\.[\w_]+/g);
+            if (m && m.length > 0) {
+                gameFlags = gameFlags.concat(m.map((value) => value.substr(6)));
+            }
+
+            m = content.match(/flags\[['"][\w_]+['"]\]/g);
+            if (m && m.length > 0) {
+                gameFlags = gameFlags.concat(m.map((value) => value.substr(7, value.length - 2)));
+            }
+
+            m = content.match(/incFlags\('[\w_]+/g);
+            if (m && m.length > 0) {
+                gameFlags = gameFlags.concat(m.map((value) => value.substr(10)));
+            }
         }
-
-        m = content.match(/flags\[['"][\w_]+['"]\]/g);
-        if (m && m.length > 0) {
-            gameFlags = gameFlags.concat(m.map((value) => value.substr(7, value.length - 2)));
-        }
-
-        m = content.match(/incFlags\('[\w_]+/g);
-        if (m && m.length > 0) {
-            gameFlags = gameFlags.concat(m.map((value) => value.substr(10)));
-        }
-    }
+    })();
 
 
-    // Remove duplicates
+    // Format
     gameFlags = gameFlags.filter((value, index, self) => self.indexOf(value) === index && value.toUpperCase() === value).sort();
 
     // Convert to dictionary, set all values to null
@@ -409,8 +573,7 @@ const fs = require('fs');
         }
     })();
 
-    // Remove duplicates
-    perks = perks.filter((v, i, a) => a.findIndex(v2 => (v2.storageName === v.storageName)) === i).sort();
+    perks = util.formatStorageClassArray(perks);
 
     const perksEnd = Date.now();
     util.printOperationTime('perks', perksStart, perksEnd);
@@ -496,8 +659,7 @@ const fs = require('fs');
         }
     })();
 
-    // Remove duplicates
-    statusEffects = statusEffects.filter((v, i, a) => a.findIndex(v2 => (v2.storageName === v.storageName)) === i).sort();
+    statusEffects = util.formatStorageClassArray(statusEffects);
 
     const statusEffectsEnd = Date.now();
     util.printOperationTime('status effects', statusEffectsStart, statusEffectsEnd);
@@ -530,7 +692,7 @@ const fs = require('fs');
         }
     })();
 
-    // Remove duplicates
+    // Format
     codexEntries = codexEntries.filter((v, i, a) => a.findIndex(v2 => (v2 === v)) === i).sort();
 
     const codexEntriesEnd = Date.now();
@@ -539,23 +701,177 @@ const fs = require('fs');
     // #endregion
 
 
+    // #region Key Items
 
-    function format(str) {
-        return prettier.format(str, {
-            parser: 'babel',
-            tabWidth: 4
-        });
+    console.log('\ngetting key items');
+    const keyItemsStart = Date.now();
+
+    var keyitems = [];
+
+    (function () {
+        for (var index = 0; index < contents.length; ++index) {
+            var content = contents[index];
+            const regex = /\.(create|has)KeyItem\("([\S ][^)]+)\)*/g;
+
+            var m;
+            while ((m = regex.exec(content)) !== null) {
+                if (m.index === regex.lastIndex) {
+                    regex.lastIndex++;
+                }
+
+                m.forEach((match) => {
+                    var keyitem = new StorageClass();
+
+                    if (match.startsWith('.create')) {
+                        keyitem.storageName = match.slice(nthIndex(match, '"', 1) + 1, nthIndex(match, '"', 2));
+                        keyitem.value1 = getStorageClassValue(1, match);
+                        keyitem.value2 = getStorageClassValue(2, match);
+                        keyitem.value3 = getStorageClassValue(3, match);
+                        keyitem.value4 = getStorageClassValue(4, match);
+
+                        if (nthIndex(match, '"', 3) > 0) {
+                            keyitem.tooltip = match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, ')', 1) - 1);
+                        }
+
+                        keyitems.push(keyitem);
+                    }
+                });
+            }
+        }
+    })();
+
+    var panties = [];
+
+    (function () {
+        for (var index = 0; index < contents.length; ++index) {
+            var content = contents[index];
+            const regex = /\.(create|has)KeyItem\((PantyData.get\([\S ][^)]+[\S ][^)]+)\)/g;
+
+            var m;
+            while ((m = regex.exec(content)) !== null) {
+                if (m.index === regex.lastIndex) {
+                    regex.lastIndex++;
+                }
+
+                m.forEach((match) => {
+                    var panty = new StorageClass();
+
+                    if (match.startsWith('.create')) {
+                        panty.storageName = pantyData[(match.slice(nthIndex(match, '"', 1) + 1, nthIndex(match, '"', 2)))];
+                        panty.value1 = getStorageClassValue(1, match);
+                        panty.value2 = getStorageClassValue(2, match);
+                        panty.value3 = getStorageClassValue(3, match);
+                        panty.value4 = getStorageClassValue(4, match);
+
+                        if (nthIndex(match, '"', 3) > 0) {
+                            panty.tooltip = match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, ')', 2) - 1);
+                        }
+
+                        panties.push(panty);
+                    }
+                });
+            }
+        }
+    })();
+
+    keyitems = keyitems.concat(panties);
+
+    keyitems = util.formatStorageClassArray(keyitems);
+
+    const keyItemsEnd = Date.now();
+    util.printOperationTime('key items', keyItemsStart, keyItemsEnd);
+
+    // #endregion
+
+
+    // #region Hair Styles
+
+
+    // #region Data
+
+    class HairClass {
+        constructor() {
+            this.displayName = '';
+            this.name = '';
+            this.desc = '';
+            this.extra = '';
+        }
     }
+
+    function getHairVal(str, num) {
+        var value = 0;
+        if (nthIndex(str, '",', num) > 0) {
+            if (nthIndex(str, '",', num + 1) > 0) {
+                value = str.slice(nthIndex(str, '",', num) + 3, nthIndex(str, '",', num + 1));
+            }
+            else {
+                value = str.slice(nthIndex(str, '",', num) + 3, nthIndex(str, '",', 1));
+            }
+        } else {
+            value = str.slice(nthIndex(str, '"', num) + 2, nthIndex(str, '","', 1));
+        }
+        return value;
+    }
+
+    // #endregion
+
+
+    console.log('\ngetting hair styles');
+    const hairStylesStart = Date.now();
+
+    var hairStyles = [];
+
+    (function () {
+        for (var index = 0; index < contents.length; ++index) {
+            var content = contents[index];
+
+            // only check tavros (cause only ceria is a hairdresser)
+            if (!content.includes('sourceMappingURL=content_tavros')) {
+                continue;
+            }
+            const regex = /\.(push)\(\[([\S ][^)]+[\S ][^)])\]\)/g;
+
+            var m;
+            while ((m = regex.exec(content)) !== null) {
+                if (m.index === regex.lastIndex) {
+                    regex.lastIndex++;
+                }
+
+                m.forEach((match, groupIndex) => {
+                    var hair = new HairClass();
+
+                    if (groupIndex == 2 && (match.match(/\"/g) || []).length == 8 && !match.includes('+') && (match.match(/\,/g) || []).length >= 5) {
+                        hair.name = getHairVal(match, 0);
+                        hair.value = getHairVal(match, 1);
+                        hair.desc = getHairVal(match, 2);
+                        hair.extra = getHairVal(match, 3);
+
+                        hairStyles.push(hair);
+                    }
+                });
+            }
+        }
+    })();
+
+    hairStyles = hairStyles.filter((v, i, a) => a.findIndex(v2 => (v2 === v)) === i).sort();
+
+    obj.HairStyles = hairStyles;
+
+    const hairStylesEnd = Date.now();
+    util.printOperationTime('hair styles', hairStylesStart, hairStylesEnd);
+
+    // #endregion
 
 
     console.log('\nwriting to disk');
     const writeStart = Date.now();
 
-    fs.writeFileSync('../data/global.js', format('const GlobalKeys = ' + JSON.stringify(evalResult.global)));
-    fs.writeFileSync('../data/flags.js', format('const Flags = ' + JSON.stringify(gameFlags)));
-    fs.writeFileSync('../data/perks.js', format('const Perks = ' + JSON.stringify(perks)));
-    fs.writeFileSync('../data/status.js', format('const StatusEffects = ' + JSON.stringify(statusEffects)));
-    fs.writeFileSync('../data/codex.js', format('const CodexEntries = ' + JSON.stringify(codexEntries)));
+    fs.writeFileSync('../data/global.js', util.formatToFile('GlobalKeys', obj));
+    fs.writeFileSync('../data/flags.js', util.formatToFile('Flags', gameFlags));
+    fs.writeFileSync('../data/perks.js', util.formatToFile('Perks', perks));
+    fs.writeFileSync('../data/status.js', util.formatToFile('StatusEffects', statusEffects));
+    fs.writeFileSync('../data/codex.js', util.formatToFile('CodexEntries', codexEntries));
+    fs.writeFileSync('../data/keyitems.js', util.formatToFile('KeyItems', keyitems));
 
     const writeEnd = Date.now();
     util.printOperationTime('written', writeStart, writeEnd, 'files ');
