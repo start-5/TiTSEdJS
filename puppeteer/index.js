@@ -31,7 +31,7 @@ const fs = require('fs');
             var sec = Math.floor((duration / 1000) % 60);
             const min = Math.floor((duration / (1000 * 60)) % 60);
 
-            sec = (sec < 10 && min > 0) ? "0" + sec : sec;
+            sec = (sec < 10 && min > 0) ? '0' + sec : sec;
 
             var result = (min > 0 ? min + ':' : '') + (sec > 0 ? sec + '.' : '') + milli;
 
@@ -58,7 +58,7 @@ const fs = require('fs');
 
         }
 
-    }
+    };
 
 
     const browser = await puppeteer.launch();
@@ -109,18 +109,9 @@ const fs = require('fs');
         const evalGameStart = Date.now();
 
         evalResult = await page.evaluate(() => {
-
-            var log = '';
-
-            /**
-            * @param {string} msg
-            */
-            function write(msg) {
-                log += msg + '\n'
-            }
-
-
             try {
+
+                /* eslint-disable no-inner-declarations */
 
                 /**
                 * Get an object/value with the specified key inside another object, recursively
@@ -174,7 +165,7 @@ const fs = require('fs');
                 * @param {Array} bodyFlagsArray
                 */
                 function getValidFlagsFor(bodyPartName, bodyFlagsArray) {
-                    return getValidFor(bodyPartName, '_FLAGS', bodyFlagsArray)
+                    return getValidFor(bodyPartName, '_FLAGS', bodyFlagsArray);
                 }
 
                 /**
@@ -183,7 +174,7 @@ const fs = require('fs');
                 * @param {Array} bodyPartsArray
                 */
                 function getValidTypesFor(bodyPartName, bodyPartsArray) {
-                    return getValidFor(bodyPartName, '_TYPES', bodyPartsArray)
+                    return getValidFor(bodyPartName, '_TYPES', bodyPartsArray);
                 }
 
                 /**
@@ -203,6 +194,9 @@ const fs = require('fs');
                         .filter(key => key.name != 'Names');
                 }
 
+                /* eslint-enable no-inner-declarations */
+
+
 
 
                 const global = {
@@ -219,7 +213,7 @@ const fs = require('fs');
                     SexPref: getGlobalsByPrefix('SEXPREF_'),
                     ValidFlags: {},
                     ValidTypes: {}
-                }
+                };
 
                 global.ValidFlags = {
                     Face: getValidFlagsFor('FACE', global.BodyFlag),
@@ -229,9 +223,9 @@ const fs = require('fs');
                     Tail: getValidFlagsFor('TAIL', global.BodyFlag),
                     Skin: getValidFlagsFor('SKIN', global.BodyFlag),
                     Areola: getValidFlagsFor('AREOLA', global.BodyFlag),
-                    Cock: getValidFlagsFor("COCK", global.BodyFlag),
-                    Vagina: getValidFlagsFor("VAGINA", global.BodyFlag),
-                    Tailcunt: getValidFlagsFor("VAGINA", global.BodyFlag)
+                    Cock: getValidFlagsFor('COCK', global.BodyFlag),
+                    Vagina: getValidFlagsFor('VAGINA', global.BodyFlag),
+                    Tailcunt: getValidFlagsFor('VAGINA', global.BodyFlag)
                 };
 
                 global.ValidTypes = {
@@ -352,16 +346,17 @@ const fs = require('fs');
             gameFlags = gameFlags.concat(m.map((value) => value.substr(6)));
         }
 
-        var m = content.match(/flags\[['"][\w_]+['"]\]/g);
+        m = content.match(/flags\[['"][\w_]+['"]\]/g);
         if (m && m.length > 0) {
             gameFlags = gameFlags.concat(m.map((value) => value.substr(7, value.length - 2)));
         }
 
-        var m = content.match(/incFlags\('[\w_]+/g);
+        m = content.match(/incFlags\('[\w_]+/g);
         if (m && m.length > 0) {
             gameFlags = gameFlags.concat(m.map((value) => value.substr(10)));
         }
     }
+
 
     // Remove duplicates
     gameFlags = gameFlags.filter((value, index, self) => self.indexOf(value) === index && value.toUpperCase() === value).sort();
@@ -382,35 +377,37 @@ const fs = require('fs');
 
     var perks = [];
 
-    for (var index = 0; index < contents.length; ++index) {
-        var content = contents[index];
-        const regex = /\.(create|has)Perk\("([\S ][^)]+)\)*/g
+    (function () {
+        for (var index = 0; index < contents.length; ++index) {
+            var content = contents[index];
+            const regex = /\.(create|has)Perk\("([\S ][^)]+)\)*/g;
 
-        var m;
-        while ((m = regex.exec(content)) !== null) {
-            if (m.index === regex.lastIndex) {
-                regex.lastIndex++;
-            }
-
-            m.forEach((match, groupIndex) => {
-                var perk = new StorageClass();
-
-                if (match.startsWith('.create')) {
-                    perk.storageName = match.slice(nthIndex(match, '"', 1) + 1, nthIndex(match, '"', 2));
-                    perk.value1 = getStorageClassValue(1, match);
-                    perk.value2 = getStorageClassValue(2, match);
-                    perk.value3 = getStorageClassValue(3, match);
-                    perk.value4 = getStorageClassValue(4, match);
-
-                    if (nthIndex(match, '"', 3) > 0) {
-                        perk.tooltip = match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, ')', 1) - 1);
-                    }
-
-                    perks.push(perk);
+            var m;
+            while ((m = regex.exec(content)) !== null) {
+                if (m.index === regex.lastIndex) {
+                    regex.lastIndex++;
                 }
-            });
+
+                m.forEach(match => {
+                    var perk = new StorageClass();
+
+                    if (match.startsWith('.create')) {
+                        perk.storageName = match.slice(nthIndex(match, '"', 1) + 1, nthIndex(match, '"', 2));
+                        perk.value1 = getStorageClassValue(1, match);
+                        perk.value2 = getStorageClassValue(2, match);
+                        perk.value3 = getStorageClassValue(3, match);
+                        perk.value4 = getStorageClassValue(4, match);
+
+                        if (nthIndex(match, '"', 3) > 0) {
+                            perk.tooltip = match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, ')', 1) - 1);
+                        }
+
+                        perks.push(perk);
+                    }
+                });
+            }
         }
-    }
+    })();
 
     // Remove duplicates
     perks = perks.filter((v, i, a) => a.findIndex(v2 => (v2.storageName === v.storageName)) === i).sort();
@@ -428,74 +425,76 @@ const fs = require('fs');
 
     var statusEffects = [];
 
-    for (var index = 0; index < contents.length; ++index) {
-        var content = contents[index];
-        const regex = /\.(create|has)StatusEffect\(([\"\w\ \,\+\%\.\'\-\’\!\?\$\#\@\/\&\*]+)\)/g;
+    (function () {
+        for (var index = 0; index < contents.length; ++index) {
+            var content = contents[index];
+            const regex = /\.(create|has)StatusEffect\(([\"\w\ \,\+\%\.\'\-\’\!\?\$\#\@\/\&\*]+)\)/g;
 
-        var m;
-        while ((m = regex.exec(content)) !== null) {
-            if (m.index === regex.lastIndex) {
-                regex.lastIndex++;
-            }
+            var m;
+            while ((m = regex.exec(content)) !== null) {
+                if (m.index === regex.lastIndex) {
+                    regex.lastIndex++;
+                }
 
-            m.forEach((match, groupIndex) => {
-                var statusEffect = new StorageClass();
+                m.forEach(match => {
+                    var statusEffect = new StorageClass();
 
-                if (match.startsWith('.create')) {
-                    if (nthIndex(match, '"', 1) === nthIndex(match, '(', 1) + 1) {
-                        statusEffect.storageName = match.slice(nthIndex(match, '"', 1) + 1, nthIndex(match, '"', 2));
-                    }
-
-                    statusEffect.value1 = getStorageClassValue(1, match);
-                    statusEffect.value2 = getStorageClassValue(2, match);
-                    statusEffect.value3 = getStorageClassValue(3, match);
-                    statusEffect.value4 = getStorageClassValue(4, match);
-
-                    if (nthIndex(match, '"', 5) > 0) {
-                        if (nthIndex(match, ',', 8) > 0) {
-                            statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, '"', 6));
+                    if (match.startsWith('.create')) {
+                        if (nthIndex(match, '"', 1) === nthIndex(match, '(', 1) + 1) {
+                            statusEffect.storageName = match.slice(nthIndex(match, '"', 1) + 1, nthIndex(match, '"', 2));
                         }
-                        else {
-                            if (nthIndex(match, ',', 9) > 0) {
-                                statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ',', 9) - 1);
+
+                        statusEffect.value1 = getStorageClassValue(1, match);
+                        statusEffect.value2 = getStorageClassValue(2, match);
+                        statusEffect.value3 = getStorageClassValue(3, match);
+                        statusEffect.value4 = getStorageClassValue(4, match);
+
+                        if (nthIndex(match, '"', 5) > 0) {
+                            if (nthIndex(match, ',', 8) > 0) {
+                                statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, '"', 6));
                             }
                             else {
-                                statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ')', 1) - 1);
+                                if (nthIndex(match, ',', 9) > 0) {
+                                    statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ',', 9) - 1);
+                                }
+                                else {
+                                    statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ')', 1) - 1);
+                                }
                             }
                         }
+
+                        if (nthIndex(match, '"', 3) > 0) {
+                            statusEffect.iconName = match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, '"', 4));
+                        }
+
+                        if (nthIndex(match, ',', 5) > 0) {
+                            let strBool = '';
+                            let bool = false;
+                            if (nthIndex(match, ',', 6) > 0) {
+                                strBool = match.slice(nthIndex(match, ',', 5) + 1, nthIndex(match, ',', 6));
+                            }
+                            else {
+                                strBool = match.slice(nthIndex(match, ',', 5) + 1, nthIndex(match, ')', 1) - 1);
+
+                            }
+
+                            if (strBool === '!0' || strBool === '!1') {
+                                bool = strBool === '!0';
+                            }
+                            if (strBool === 'true' || strBool === 'false') {
+                                bool = strBool === 'true';
+                            }
+
+                            statusEffect.hidden = bool;
+                        }
+
+
+                        statusEffects.push(statusEffect);
                     }
-
-                    if (nthIndex(match, '"', 3) > 0) {
-                        statusEffect.iconName = match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, '"', 4));
-                    }
-
-                    if (nthIndex(match, ',', 5) > 0) {
-                        let strBool = '';
-                        let bool = false;
-                        if (nthIndex(match, ',', 6) > 0) {
-                            strBool = match.slice(nthIndex(match, ',', 5) + 1, nthIndex(match, ',', 6));
-                        }
-                        else {
-                            strBool = match.slice(nthIndex(match, ',', 5) + 1, nthIndex(match, ')', 1) - 1);
-
-                        }
-
-                        if (strBool === '!0' || strBool === '!1') {
-                            bool = strBool === '!0';
-                        }
-                        if (strBool === 'true' || strBool === 'false') {
-                            bool = strBool === 'true';
-                        }
-
-                        statusEffect.hidden = bool;
-                    }
-
-
-                    statusEffects.push(statusEffect);
-                }
-            });
+                });
+            }
         }
-    }
+    })();
 
     // Remove duplicates
     statusEffects = statusEffects.filter((v, i, a) => a.findIndex(v2 => (v2.storageName === v.storageName)) === i).sort();
@@ -513,21 +512,23 @@ const fs = require('fs');
 
     var codexEntries = [];
 
-    for (var index = 0; index < contents.length; ++index) {
-        var content = contents[index];
-        const regex = /\.addCodexEntry\(([\S ][^)]+)\)*/g;
+    (function () {
+        for (var index = 0; index < contents.length; ++index) {
+            var content = contents[index];
+            const regex = /\.addCodexEntry\(([\S ][^)]+)\)*/g;
 
-        var m;
-        while ((m = regex.exec(content)) !== null) {
-            if (m.index === regex.lastIndex) {
-                regex.lastIndex++;
+            var m;
+            while ((m = regex.exec(content)) !== null) {
+                if (m.index === regex.lastIndex) {
+                    regex.lastIndex++;
+                }
+
+                m.forEach(match => {
+                    codexEntries.push(match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, '"', 4)));
+                });
             }
-
-            m.forEach((match, groupIndex) => {
-                codexEntries.push(match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, '"', 4)));
-            });
         }
-    }
+    })();
 
     // Remove duplicates
     codexEntries = codexEntries.filter((v, i, a) => a.findIndex(v2 => (v2 === v)) === i).sort();
@@ -563,6 +564,6 @@ const fs = require('fs');
     await browser.close();
 
 
-    var operationEnd = Date.now()
+    var operationEnd = Date.now();
     console.log('\nall operations completed, total time: ' + util.getElapsedTime(operationStart, operationEnd));
 })();
