@@ -1,3 +1,6 @@
+/* eslint-disable no-useless-escape */
+/* eslint-disable no-unused-vars */
+
 class Field {
     constructor() {
         this.content = document.createElement('div');
@@ -44,7 +47,7 @@ class TextField extends Field {
             this.input.dataset.bind += ' && $root.isPC';
         }
         if (onChanged) {
-            this.input.dataset.bind += ', event: { change: ' + onChanged + ' }'
+            this.input.dataset.bind += ', event: { change: ' + onChanged + ' }';
         }
 
         this.label.innerText = label;
@@ -133,7 +136,7 @@ class SelectField extends Field {
 
         this.select = document.createElement('select');
         this.select.className = 'form-select form-select-sm';
-        this.select.dataset.bind = `options: $root.getGlobal("` + path + `"),
+        this.select.dataset.bind = "options: $root.getGlobal('" + path + `'),
                                     optionsText: 'name',
                                     optionsValue: 'value',
                                     value: ` + obj + (obj ? '.' : '') + key + `,
@@ -142,7 +145,7 @@ class SelectField extends Field {
             this.input.dataset.bind += ' && $root.isPC';
         }
         if (onChanged) {
-            this.input.dataset.bind += ', event: { change: ' + onChanged + ' }'
+            this.input.dataset.bind += ', event: { change: ' + onChanged + ' }';
         }
 
         this.select.setAttribute('disabled', true);
@@ -169,7 +172,7 @@ class SwitchField extends Field {
             this.input.dataset.bind += ' && $root.isPC';
         }
         if (onChanged) {
-            this.input.dataset.bind += ', event: { change: ' + onChanged + ' }'
+            this.input.dataset.bind += ', event: { change: ' + onChanged + ' }';
         }
 
         this.label.innerText = label;
@@ -222,14 +225,14 @@ class FlagField {
         checkBox.role = 'switch';
         checkBox.className = 'form-check-input';
         checkBox.setAttribute('disabled', true);
-        checkBox.dataset.bind = `checked: $parent.` + obj + (obj ? '.' : '') + key + `,
+        checkBox.dataset.bind = 'checked: $parent.' + obj + (obj ? '.' : '') + key + `,
                                  checkedValue: $data.value,
                                  enable: $root.saveLoaded`;
         if (pcOnly) {
             checkBox.dataset.bind += ' && $root.isPC';
         }
         if (onChanged) {
-            checkBox.dataset.bind += ', event: { change: ' + onChanged + ' }'
+            checkBox.dataset.bind += ', event: { change: ' + onChanged + ' }';
         }
 
         const chkLabel = document.createElement('label');
@@ -258,7 +261,7 @@ class ArrayField {
         const keyDisplayText = key.replace('(', '').replace(')', '');
 
         this.content = document.createElement('div');
-        this.content.id = keyDisplayText + '-accordion'
+        this.content.id = keyDisplayText + '-accordion';
         this.content.dataset.bind = 'foreach: ' + obj + (obj ? '.' : '') + key;
         this.content.className = 'text-light my-3 w-100 editor-array';
 
@@ -271,13 +274,13 @@ class ArrayField {
         this.button.type = 'button';
         this.button.setAttribute('data-bs-toggle', 'collapse');
         this.button.setAttribute('aria-expanded', false);
-        this.button.dataset.bind = `text: $root.` + nameFunc + `($index),
+        this.button.dataset.bind = 'text: $root.' + nameFunc + `($index),
                                     class: 'accordion-button' + ($index() === 0 ? '' : ' collapsed'),
-                                    attr: { 'data-bs-target': '#accordion-body-` + keyDisplayText + `-' + $index() }`;
+                                    attr: { 'data-bs-target': '#accordion-body-` + keyDisplayText + "-' + $index() }";
 
         this.bodyContainer = document.createElement('div');
         this.bodyContainer.setAttribute('data-bs-parent', '#' + keyDisplayText + '-accordion');
-        this.bodyContainer.dataset.bind = `attr: { id: 'accordion-body-` + keyDisplayText + `-' + $index() },
+        this.bodyContainer.dataset.bind = "attr: { id: 'accordion-body-" + keyDisplayText + `-' + $index() },
                                            class: 'accordion-collapse collapse' + ($index() === 0 ? ' show' : '')`;
 
         this.body = document.createElement('div');

@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 class StorageContainer {
     constructor(source, obj, key, hasFunc, dataFields) {
         this.root = document.createElement('div');
@@ -12,7 +14,7 @@ class StorageContainer {
         checkBox.role = 'switch';
         checkBox.className = 'form-check-input storage-switch';
         checkBox.setAttribute('disabled', true);
-        checkBox.dataset.bind = `checked: $root.` + obj + (obj ? '.' : '') + key + `,
+        checkBox.dataset.bind = 'checked: $root.' + obj + (obj ? '.' : '') + key + `,
                                  checkedValue: $data,
                                  enable: $root.saveLoaded`;
 
@@ -20,16 +22,16 @@ class StorageContainer {
         storageName.className = 'form-check-label';
         storageName.dataset.bind = 'text: storageName';
 
-        const tooltip = document.createElement('p');
-        tooltip.className = 'p-sm';
-        tooltip.dataset.bind = "text: $data.tooltip, class: $root." + hasFunc + "($data) ? '' : 'text-muted' ";
+        const toolTip = document.createElement('p');
+        toolTip.className = 'p-sm';
+        toolTip.dataset.bind = 'text: $data.tooltip, class: $root.' + hasFunc + "($data) ? '' : 'text-muted' ";
 
         const dataContainer = document.createElement('div');
         dataContainer.className = 'ps-2';
         dataContainer.style.marginTop = '-8px';
         dataContainer.dataset.bind = 'visible: $root.' + hasFunc + '($data)';
         const dataToggle = document.createElement('button');
-        dataToggle.className = 'btn btn-sm btn-xs btn-outline-light'
+        dataToggle.className = 'btn btn-sm btn-xs btn-outline-light';
         //valueVisibilityToggle.innerHTML = '<i class="fa-solid fa-up-right-and-down-left-from-center"></i> Toggle Data';
         dataToggle.textContent = 'Toggle Data';
         dataToggle.type = 'button';
@@ -55,7 +57,7 @@ class StorageContainer {
         header.appendChild(storageName);
 
         this.root.appendChild(header);
-        this.root.appendChild(tooltip);
+        this.root.appendChild(toolTip);
         this.root.appendChild(dataContainer);
 
         return this.root;
@@ -65,7 +67,6 @@ class StorageContainer {
 class PerkContainer extends StorageContainer {
     constructor(obj, key) {
         const dataFields = [];
-        //super('getPerks', obj, key, 'hasPerk', dataFields);
         super('getPerks', obj, key, 'hasPerk', dataFields);
 
         //this.root = document.createElement('div');

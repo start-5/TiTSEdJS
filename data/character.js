@@ -1,18 +1,21 @@
-//some characters have more or less keys (at least on the save file) but they seem to be
-//internal and specific to that character so those will not be included as of now
+/* eslint-disable no-unused-vars */
+
+// Observations:
+// Some characters have more or less keys (at least on the save file) but they seem to be internal and specific to that character
+// This class will eventually be used to be able to edit properties specific to a character
 
 class Character {
     constructor() {
+        this.a = '';
         this.affinity = '';
         this.aimMod = 0;
+        this.alreadyDefeated = false;
         this.analVirgin = false;
         this.antennae = 0;
         this.antennaeType = 0;
         this.armFlags = [];
         this.armType = 0;
         this.ass = [];
-        this.Internal_ballEfficiency = 0;
-        this.Internal_ballFullness = 0;
         this.balls = 0;
         this.ballSizeMod = 0;
         this.ballSizeRaw = 0;
@@ -25,11 +28,14 @@ class Character {
         this.bellyRatingMod = 0;
         this.bellyRatingRaw = 0;
         this.breastRows = [];
+        this.btnTargetText = null;
+        this.buttonText = null;
         this.buttRatingMod = 0;
         this.buttRatingRaw = 0;
-        //this.buyMarkdown = 0;
+        this.buyMarkdown = 0;
+        this.capitalA = '';
         this.characterClass = 0;
-        //this.classInstance = '';
+        this.classInstance = 0;
         this.clitLength = 0;
         this.cocks = [];
         this.cockVirgin = false;
@@ -40,9 +46,11 @@ class Character {
         this.cumQualityMod = 0;
         this.cumQualityRaw = 0;
         this.cumType = 0;
-        //this.customBlock = '';
-        //this.customDodge = '';
-        //this.defaultCockIndex = 0;
+        this.customBlock = '';
+        this.customDodge = '';
+        this.defaultBreastRowIndex = 0;
+        this.defaultCockIndex = 0;
+        this.defaultVaginaIndex = 0;
         this.dickNippleMultiplier = 0;
         this.dickNippleType = 0;
         this.earFlags = [];
@@ -50,7 +58,7 @@ class Character {
         this.earType = 0;
         this.eggs = 0;
         this.elasticity = 0;
-        //this.energyDisplayName = '';
+        this.energyDisplayName = '';
         this.energyMod = 0;
         this.energyRaw = 0;
         this.exhibitionismRaw = 0;
@@ -62,12 +70,12 @@ class Character {
         this.fertilityMod = 0;
         this.fertilityRaw = 0;
         this.fertilizedEggs = 0;
-        //this.fluidSimulate = false;
+        this.fluidSimulate = false;
         this.furColor = '';
         this.genitalSpot = 0;
         this.gills = false;
         this.girlCumMultiplierMod = 0;
-        this.girlCumMultiplierRaw = 1;
+        this.girlCumMultiplierRaw = 0;
         this.girlCumType = 0;
         this.hairColor = '';
         this.hairLength = 0;
@@ -78,12 +86,14 @@ class Character {
         this.hornLength = 0;
         this.horns = 0;
         this.hornType = 0;
-        //this.hpDisplayName = '';
+        this.hpDisplayName = '';
         this.HPMod = 0;
         this.HPRaw = 0;
         this.impregnationType = '';
         this.intelligenceMod = 0;
         this.Internal_aimRaw = 0;
+        this.Internal_ballEfficiency = 0,
+        this.Internal_ballFullness = 0,
         this.Internal_intelligenceRaw = 0;
         this.Internal_libidoRaw = 0;
         this.Internal_physiqueRaw = 0;
@@ -91,7 +101,12 @@ class Character {
         this.Internal_taintRaw = 0;
         this.Internal_willpowerRaw = 0;
         this.inventory = [];
-        //this.isLustImmune = false;
+        this.isLustImmune = false,
+        this.isPlural = false,
+        this.isUniqueInFight = false,
+        this.keeperBuy = '',
+        this.keeperGreeting = '',
+        this.keeperSell = '',
         this.keyItems = [];
         this.legCount = 0;
         this.legFlags = [];
@@ -100,17 +115,17 @@ class Character {
         this.libidoMod = 0;
         this.lipColor = '';
         this.lipMod = 0;
-        //this.long_internal = '';
+        this.long_internal = '';
         this.lustMod = 0;
         this.lustRaw = 0;
-        //this.lustSimulate = false;
+        this.lustSimulate = false;
         this.milkFullness = 0;
         this.milkMultiplier = 0;
         this.milkRate = 0;
         this.milkStorageMultiplier = 1;
         this.milkType = 0;
-        //this.minutesSinceCum = 0;
-        //this.neverSerialize = false;
+        this.minutesSinceCum = 0;
+        this.neverSerialize = false;
         this.nippleColor = '';
         this.nippleLengthRatio = 0;
         this.nipplesPerBreast = 0;
@@ -132,7 +147,7 @@ class Character {
         this.scaleColor = '';
         this.scrotumColorRaw = '';
         this.scrotumTypeRaw = 0;
-        //this.sellMarkup = 0;
+        this.sellMarkup = 0;
         this.sexualPreferences = [];
         this.shieldDisplayName = '';
         this.shieldsRaw = 0;
@@ -142,45 +157,32 @@ class Character {
         this.skinTone = '';
         this.skinType = 0;
         this.statusEffects = [];
-        //this.statusSimulate = false;
+        this.statusSimulate = false;
         this.tailCock = [];
         this.tailCount = 0;
         this.tailCumType = 0;
         this.tailCunt = [];
         this.tailFlags = [];
-        //this.tailGenital = 0;
-        this.tailGenitalArg = 0;
-        this.tailGenitalColor = '';
         this.tailGirlCumType = 0;
         this.tailRecharge = 0;
         this.tailType = 0;
         this.tailVenom = 0;
         this.taintMod = 0;
         this.tallness = 0;
-        //this.teaseLevel = 0;
-        //this.teaseXP = 0;
+        this.teaseLevel = 0;
+        this.teaseXP = 0;
         this.thickness = 0;
-        //this.timesCum = 0;
+        this.timesCum = 0;
         this.tone = 0;
         this.tongueFlags = [];
         this.tongueType = 0;
-        //this.typesBought = [];
-        //this.uniqueName = null;
-        this.vaginalVirgin = false;
+        this.typesBought = [];
+        this.uniqueName = null;
+        this.vaginalVirgin = true;
         this.vaginas = [];
-        //this.version = 0;
+        this.version = 1;
         this.willpowerMod = 0;
         this.wingCount = 0;
         this.wingType = 0;
-    }
-}
-
-class PlayerCharacter extends Character {
-    constructor() {
-        //this.synthWombSetting = 0;
-        //this.unclaimedClassPerks = 0;
-        //this.unclaimedGenericPerks = 0;
-        //this.unspentStatPoints = 111;
-        //this.XPRaw = 0;
     }
 }

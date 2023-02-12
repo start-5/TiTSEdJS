@@ -352,3 +352,4 @@ MigrationBackup/
 /Web.config
 *.sln
 /.eslintrc.json
+/package-lock.json

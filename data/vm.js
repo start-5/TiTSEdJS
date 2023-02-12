@@ -1,3 +1,7 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-prototype-builtins */
+
 /** @type {ViewModel} */
 var vm = undefined;
 
@@ -13,7 +17,7 @@ const loadMapping = {
             }
         }
     }
-}
+};
 
 
 var ViewModel = function (data) {
@@ -29,11 +33,11 @@ var ViewModel = function (data) {
     ko.mapping.fromJS(data, loadMapping, self.save);
 
     self.getGlobal = function (path) {
-        var obj = GlobalKeys;
+        var obj = Globals;
 
         for (var i = 0, path = path.split('.'), len = path.length; i < len; i++) {
             obj = obj[path[i]];
-        };
+        }
 
         return obj;
     };
@@ -66,15 +70,15 @@ var ViewModel = function (data) {
 
             //let vmPerks = self.perkList;
 
-            let vmPerks = ko.mapping.fromJS(ko.mapping.toJS(self.perkList));
+            const vmPerks = ko.mapping.fromJS(ko.mapping.toJS(self.perkList));
             //return ko.mapping.fromJS(ko.mapping.toJS(self.perkList));
-            let charPerks = self.selectedCharacter().obj.perks;
+            const charPerks = self.selectedCharacter().obj.perks;
 
             for (var i = 0; i < charPerks().length; i++) {
-                let charPerk = charPerks()[i];
-                let vmPerk = vmPerks().find(p => p.storageName() === charPerk.storageName());
+                const charPerk = charPerks()[i];
+                const vmPerk = vmPerks().find(p => p.storageName() === charPerk.storageName());
                 if (!vmPerk) {
-                    let unknownPerk = ko.mapping.fromJS(ko.mapping.toJS(new StorageClass()));
+                    const unknownPerk = ko.mapping.fromJS(ko.mapping.toJS(new StorageClass()));
                     unknownPerk.storageName(charPerk.storageName());
                     unknownPerk.tooltip(charPerk.tooltip());
                     self.perkList.push(unknownPerk);
@@ -96,7 +100,7 @@ var ViewModel = function (data) {
 
     self.hasPerk = function (data) {
         return self.selectedCharacter().obj.perks().find(p => p.storageName() === data.storageName()) !== undefined;
-    }
+    };
 
     // #endregion
 
@@ -108,14 +112,14 @@ var ViewModel = function (data) {
             // two things are happening here, one, ensuring that characters don't have objcts that reference each other,
             // second, adding any unknown storage to the pool, i haven't found a better way to do this yet
 
-            let vmStatusEffects = ko.mapping.fromJS(ko.mapping.toJS(self.statusEffectList));
-            let charStatusEffects = self.selectedCharacter().obj.statusEffects;
+            const vmStatusEffects = ko.mapping.fromJS(ko.mapping.toJS(self.statusEffectList));
+            const charStatusEffects = self.selectedCharacter().obj.statusEffects;
 
             for (var i = 0; i < charStatusEffects().length; i++) {
-                let charStatusEffect = charStatusEffects()[i];
-                let vmStatusEffect = vmStatusEffects().find(p => p.storageName() === charStatusEffect.storageName());
+                const charStatusEffect = charStatusEffects()[i];
+                const vmStatusEffect = vmStatusEffects().find(p => p.storageName() === charStatusEffect.storageName());
                 if (!vmStatusEffect) {
-                    let unknownStatusEffect = ko.mapping.fromJS(ko.mapping.toJS(new StorageClass()));
+                    const unknownStatusEffect = ko.mapping.fromJS(ko.mapping.toJS(new StorageClass()));
                     unknownStatusEffect.storageName(charStatusEffect.storageName());
                     unknownStatusEffect.tooltip(charStatusEffect.tooltip());
                     self.statusEffectList.push(unknownStatusEffect);
@@ -131,13 +135,15 @@ var ViewModel = function (data) {
 
     self.hasStatusEffect = function (data) {
         return self.selectedCharacter().obj.statusEffects().includes(data);
-    }
+    };
 
     // #endregion
 
+
     self.expandStorage = function (data, event) {
         $(event.target).next().collapse('toggle');
-    }
+    };
+
 
     // #region OnChanged
 
@@ -158,7 +164,7 @@ var ViewModel = function (data) {
                 }
             }
         }
-    }
+    };
 
     self.emailChanged = function (data, event) {
         const email = event.target.value;
@@ -170,11 +176,13 @@ var ViewModel = function (data) {
                 mail['ToAddressCache'] = email + '@SteeleTech.corp';
             }
         }
-    }
+    };
 
     // #endregion
 
+
     // #region Validation
+
     self.validateNumberInput = function (data, event) {
         const input = event.target;
         const type = !!input.pattern ? 'int' : 'float';
@@ -198,81 +206,105 @@ var ViewModel = function (data) {
             input.value = !isNaN(parseFloat(input.min)) ? +input.min : 0;
             alert(type === 'int' ? 'Value must be an integer (whole number)' : 'Value must be a number');
         }
-    }
+    };
+
     // #endregion
 
+
     // #region Arrays
+
+
+    // #region Penis
+
     self.getPenisName = function (index) {
         const i = self.selectedCharacter().obj.cocks()[index()];
         const color = i.cockColor();
         const len = +i.cLengthRaw() + +i.cLengthMod();
-        const type = GlobalKeys.BodyType.find(t => t.value == i.cType()).name.toLowerCase();
-        return 'a ' + color + ' ' + len + '" ' + type + ' penis';
-    }
+        const type = Globals.BodyType.find(t => t.value == i.cType()).name.toLowerCase();
+        return `a ${color} ${len}" ${type} penis`;
+    };
 
     self.addPenis = function () {
         self.selectedCharacter().obj.cocks.push(ko.mapping.fromJS(new Cock()));
-    }
+    };
 
     self.removePenis = function (data) {
         self.selectedCharacter().obj.cocks.remove(data);
-    }
+    };
+
+    // #endregion
+
+
+    // #region Vagina
 
     self.getVaginaName = function (index) {
         const i = self.selectedCharacter().obj.vaginas()[index()];
         const color = i.vaginaColor();
-        const type = GlobalKeys.BodyType.find(t => t.value == i.type()).name.toLowerCase();
+        const type = Globals.BodyType.find(t => t.value == i.type()).name.toLowerCase();
         return 'a ' + color + ' ' + type + ' vagina';
-    }
+    };
 
     self.addVagina = function () {
         self.selectedCharacter().obj.vaginas.push(ko.mapping.fromJS(new Vagina()));
-    }
+    };
 
     self.removeVagina = function (data) {
         self.selectedCharacter().obj.vaginas.remove(data);
-    }
+    };
+
+    // #endregion
+
+
+    // #region Breasts
 
     self.getBreastName = function (index) {
         const i = self.selectedCharacter().obj.breastRows()[index()];
         const count = +i.breasts();
         const rating = +i.breastRatingRaw() + +i.breastRatingMod();
         return count + ' ' + util.getCupSize(rating) + ' breast' + (count > 1 ? 's' : '');
-    }
+    };
 
     self.addBreastRow = function () {
         self.selectedCharacter().obj.breastRows.push(ko.mapping.fromJS(new BreastRow()));
-    }
+    };
 
     self.removeBreastRow = function (data) {
         self.selectedCharacter().obj.breastRows.remove(data);
-    }
+    };
+
     // #endregion
-}
+
+
+    // #endregion
+
+};
 
 
 function koInit() {
 
     // Custom handler to write actual numbers and not strings when needed
     ko.bindingHandlers.numberInput = {
+
         init: function (element, valueAccessor, allBindingsAccessor) {
             var underlyingObservable = valueAccessor();
 
             var interceptor = ko.pureComputed({
+                owner: this,
                 read: underlyingObservable,
                 write: function (value) {
                     underlyingObservable(+value);
-                },
-                owner: this
+                }
             });
 
             ko.bindingHandlers.textInput.init(element, function () {
-                return interceptor
+                return interceptor;
             }, allBindingsAccessor);
         },
+
         update: function (element, valueAccessor, allBindingsAccessor) {
             element.value = valueAccessor()();
         }
+
     };
 
 }

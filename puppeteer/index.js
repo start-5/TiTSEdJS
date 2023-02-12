@@ -1,6 +1,12 @@
 const puppeteer = require('puppeteer');
 const prettier = require('prettier');
 const fs = require('fs');
+const path = require('path');
+//const readline = require('readline');
+//const rl = readline.createInterface({
+//    input: process.stdin,
+//    output: process.stdout
+//});
 
 
 /* eslint-disable no-useless-escape */
@@ -16,17 +22,25 @@ const fs = require('fs');
 
 (async () => {
 
-    const operationStart = Date.now();
-
-
     const util = {
 
         /**
         * Format a 'StorageClass' flag array
         * @param {Array<StorageClass>} arr
         */
-        formatStorageClassArray: function (arr) {
+        formatStorageClassArrayDefault: function (arr) {
             return arr.filter((v, i, a) => a.findIndex(v2 => (v2.storageName === v.storageName)) === i).sort();
+        },
+
+        /**
+        * Format game data when saving to diff file
+        * @param {any} data
+        */
+        formatToDiff: function (data) {
+            return prettier.format(data, {
+                parser: 'babel',
+                tabWidth: 4
+            });
         },
 
         /**
@@ -92,6 +106,24 @@ const fs = require('fs');
         }
 
     };
+
+    const appConfig = {
+
+        runDiffs: false,
+        runDiffsPath: ''
+
+    };
+
+
+    if (appConfig.runDiffs) {
+        //rl.question('Enter diffs path ', function (answer) {
+        //    appConfig.runDiffsPath = answer;
+        //    rl.close();
+        //});
+    }
+
+
+    const operationStart = Date.now();
 
 
     const browser = await puppeteer.launch();
@@ -231,7 +263,7 @@ const fs = require('fs');
                                 .map(str => str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase()).join(' '),
                             value: window.GLOBAL[key]
                         }))
-                        .filter(key => key.name != 'Names');
+                        .filter(key => typeof key.value !== 'object');
                 }
 
                 /* eslint-enable no-inner-declarations */
@@ -251,6 +283,7 @@ const fs = require('fs');
                     SexPref: getGlobalsByPrefix('SEXPREF_'),
                     SkinType: getGlobalsByPrefix('SKIN_TYPE_'),
                     TailGenital: getGlobalsByPrefix('TAIL_GENITAL_'),
+                    Upbringing: getGlobalsByPrefix('UPBRINGING_'),
                     ValidFlags: {},
                     ValidTypes: {}
                 };
@@ -260,9 +293,9 @@ const fs = require('fs');
                 global.ValidFlags = {
                     Areola: getValidFlagsFor('AREOLA', bf),
                     Arm: getValidFlagsFor('ARM', bf),
-                    Cock: getValidFlagsFor('COCK', bf),
                     Face: getValidFlagsFor('FACE', bf),
                     Leg: getValidFlagsFor('LEG', bf),
+                    Penis: getValidFlagsFor('COCK', bf),
                     Skin: getValidFlagsFor('SKIN', bf),
                     Tail: getValidFlagsFor('TAIL', bf),
                     Tailcunt: getValidFlagsFor('VAGINA', bf),
@@ -276,13 +309,13 @@ const fs = require('fs');
                 global.ValidTypes = {
                     Antennae: getValidTypesFor('ANTENNAE', bt),
                     Arm: getValidTypesFor('ARM', bt),
-                    Cock: getValidTypesFor('COCK', bt),
                     Dicknipple: getValidTypesFor('DICKNIPPLE', bt),
                     Ear: getValidTypesFor('EAR', bt),
                     Eye: getValidTypesFor('EYE', bt),
                     Face: getValidTypesFor('FACE', bt),
                     Horn: getValidTypesFor('HORN', bt),
                     Leg: getValidTypesFor('LEG', bt),
+                    Penis: getValidTypesFor('COCK', bt),
                     Tail: getValidTypesFor('TAIL', bt),
                     TailGenital: getValidFor('TAIL_GENITAL', '_ARGS', bt),
                     Tongue: getValidTypesFor('TONGUE', bt),
@@ -290,13 +323,18 @@ const fs = require('fs');
                     Wing: getValidTypesFor('WING', bt)
                 };
 
+
                 const pantyData = {};
                 const pantyDataArr = window.PantyData.toJSON();
                 for (let i = 0; i < pantyDataArr.length; i++) {
                     pantyData[pantyDataArr[i][0]] = pantyDataArr[i][1].panty;
                 }
 
-                return { global, pantyData };
+
+                const version = window.version;
+
+
+                return { global, pantyData, version };
             }
             catch (e) {
                 return { error: e };
@@ -323,6 +361,7 @@ const fs = require('fs');
 
     const obj = evalResult.global;
     const pantyData = evalResult.pantyData;
+    const version = evalResult.version;
 
 
     // #region Util
@@ -350,7 +389,7 @@ const fs = require('fs');
     // #endregion
 
 
-    // #region StorageClass stuff
+    // #region StorageClass
 
     class StorageClass {
         constructor() {
@@ -369,6 +408,58 @@ const fs = require('fs');
             this.minutesLeft = 0;
             this.iconShade = 'var(--textColor)';
         }
+
+        /**
+        * Parse 'StorageClass' values using the default implementation
+        * @param {string} text
+        */
+        parseFromTextDefault(text) {
+            const texts = text.split('"');
+            const args = text.split(',');
+
+            this.storageName = texts[0] || '';
+
+            this.value1 = +args[1] || 0;
+            this.value2 = +args[2] || 0;
+            this.value3 = +args[3] || 0;
+            this.value4 = +args[4] || 0;
+
+            this.tooltip = texts[2] || '';
+        }
+    }
+
+    /**
+    * Parse game data into a 'StorageClass' array using the default implementation
+    * @param {RegExp} regex
+    * @param {boolean} skipFormat
+    */
+    function getStorageClassDataDefault(regex, skipFormat) {
+        var storageArray = [];
+
+        for (var index = 0; index < contents.length; ++index) {
+            var content = contents[index];
+
+            var m;
+            while ((m = regex.exec(content)) !== null) {
+                if (m.index === regex.lastIndex) {
+                    regex.lastIndex++;
+                }
+
+                m.forEach((match, groupIndex) => {
+                    if (groupIndex == 1) {
+                        const storage = new StorageClass();
+                        storage.parseFromTextDefault(match);
+                        storageArray.push(storage);
+                    }
+                });
+            }
+        }
+
+        if (!skipFormat) {
+            storageArray = util.formatStorageClassArrayDefault(storageArray);
+        }
+
+        return storageArray;
     }
 
     /**
@@ -396,7 +487,53 @@ const fs = require('fs');
     // #endregion
 
 
-    // #region Valid Body Flags (handle valid body flags that aren't part of GLOBALS)
+    // #region Diffs
+
+    if (appConfig.runDiffs) {
+
+        console.log('\ngetting diffs');
+        const diffsStart = Date.now();
+
+        (function () {
+            var diffPath = path.join(appConfig.runDiffsPath, version);
+
+            if (!fs.existsSync(diffPath)) {
+                fs.mkdirSync(diffPath);
+            }
+
+            for (let i = 0; i < contents.length; i++) {
+
+                const urlRx = /[\w]+.[\w]+.js/g;
+
+                var url = urls[i];
+                var content = contents[i];
+
+                var fileNameCurr = url.match(urlRx)[0];
+                var fileParts = fileNameCurr.split('.');
+                fileNameCurr = fileParts[0] + '.current.' + fileParts[2];
+
+                var filePathCurr = path.join(diffPath, fileNameCurr);
+                var filePathPrev = path.join(diffPath, fileNameCurr.replace('current', 'previous'));
+
+                if (!fs.existsSync(filePathPrev)) {
+                    fs.writeFileSync(filePathPrev, util.formatToDiff(content));
+                }
+                else if (fs.existsSync(filePathCurr)) {
+                    fs.writeFileSync(filePathPrev, fs.readFileSync(filePathCurr, 'utf-8'));
+                }
+
+                fs.writeFileSync(filePathCurr, util.formatToDiff(content));
+            }
+        })();
+
+        const diffsEnd = Date.now();
+        util.printOperationTime('diffs', diffsStart, diffsEnd);
+    }
+
+    // #endregion
+
+
+    // #region Valid Body Flags (handle valid body flags that aren't part of GLOBAL)
 
 
     // #region Ear
@@ -442,12 +579,12 @@ const fs = require('fs');
     // #endregion
 
 
-    // #region Ass
+    // #region Butt
 
-    console.log('\ngetting valid ass flags');
+    console.log('\ngetting valid butt flags');
     const validAssFlagsStart = Date.now();
 
-    var validAssFlags = [];
+    var validButtFlags = [];
 
     (function () {
         for (var index = 0; index < contents.length; ++index) {
@@ -462,14 +599,14 @@ const fs = require('fs');
 
                 m.forEach((match, groupIndex) => {
                     if (groupIndex == 2) {
-                        var assFlagArray = match.match(/_([\S ])[^\,\]]*/g);
+                        var buttFlagsArray = match.match(/_([\S ])[^\,\]]*/g);
 
-                        assFlagArray.forEach((item, index, arr) => arr[index] = item.slice(1));
+                        buttFlagsArray.forEach((item, index, arr) => arr[index] = item.slice(1));
 
-                        for (let i = 0; i < assFlagArray.length; i++) {
-                            const flag = obj.BodyFlag.find((body) => body.name.toLocaleLowerCase() == assFlagArray[i].toLocaleLowerCase());
+                        for (let i = 0; i < buttFlagsArray.length; i++) {
+                            const flag = obj.BodyFlag.find((body) => body.name.toLocaleLowerCase() == buttFlagsArray[i].toLocaleLowerCase());
 
-                            validAssFlags.push({
+                            validButtFlags.push({
                                 name: flag.name,
                                 value: flag.value
                             });
@@ -480,12 +617,12 @@ const fs = require('fs');
         }
     })();
 
-    validAssFlags = util.formatValidFlagArray(validAssFlags);
+    validButtFlags = util.formatValidFlagArray(validButtFlags);
 
-    obj.ValidFlags.Ass = validAssFlags;
+    obj.ValidFlags.Butt = validButtFlags;
 
-    const validAssFlagsEnd = Date.now();
-    util.printOperationTime('valid ass flags', validAssFlagsStart, validAssFlagsEnd);
+    const validButtFlagsEnd = Date.now();
+    util.printOperationTime('valid butt flags', validAssFlagsStart, validButtFlagsEnd);
 
     // #endregion
 
@@ -513,11 +650,6 @@ const fs = require('fs');
             if (m && m.length > 0) {
                 gameFlags = gameFlags.concat(m.map((value) => value.substr(7, value.length - 2)));
             }
-
-            m = content.match(/incFlags\('[\w_]+/g);
-            if (m && m.length > 0) {
-                gameFlags = gameFlags.concat(m.map((value) => value.substr(10)));
-            }
         }
     })();
 
@@ -539,41 +671,7 @@ const fs = require('fs');
     console.log('\ngetting perks');
     const perksStart = Date.now();
 
-    var perks = [];
-
-    (function () {
-        for (var index = 0; index < contents.length; ++index) {
-            var content = contents[index];
-            const regex = /\.(create|has)Perk\("([\S ][^)]+)\)*/g;
-
-            var m;
-            while ((m = regex.exec(content)) !== null) {
-                if (m.index === regex.lastIndex) {
-                    regex.lastIndex++;
-                }
-
-                m.forEach(match => {
-                    var perk = new StorageClass();
-
-                    if (match.startsWith('.create')) {
-                        perk.storageName = match.slice(nthIndex(match, '"', 1) + 1, nthIndex(match, '"', 2));
-                        perk.value1 = getStorageClassValue(1, match);
-                        perk.value2 = getStorageClassValue(2, match);
-                        perk.value3 = getStorageClassValue(3, match);
-                        perk.value4 = getStorageClassValue(4, match);
-
-                        if (nthIndex(match, '"', 3) > 0) {
-                            perk.tooltip = match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, ')', 1) - 1);
-                        }
-
-                        perks.push(perk);
-                    }
-                });
-            }
-        }
-    })();
-
-    perks = util.formatStorageClassArray(perks);
+    const perks = getStorageClassDataDefault(/\.createPerk\("([\S ][^)]+)\)*/g);
 
     const perksEnd = Date.now();
     util.printOperationTime('perks', perksStart, perksEnd);
@@ -582,6 +680,8 @@ const fs = require('fs');
 
 
     // #region Status Effects
+
+    // TODO: This is still kind of a mess
 
     console.log('\ngetting status effects');
     const statusEffectsStart = Date.now();
@@ -659,7 +759,7 @@ const fs = require('fs');
         }
     })();
 
-    statusEffects = util.formatStorageClassArray(statusEffects);
+    statusEffects = util.formatStorageClassArrayDefault(statusEffects);
 
     const statusEffectsEnd = Date.now();
     util.printOperationTime('status effects', statusEffectsStart, statusEffectsEnd);
@@ -668,6 +768,8 @@ const fs = require('fs');
 
 
     // #region Codex
+
+    // TODO: Codex is not as shallow as just text
 
     console.log('\ngetting codex entries');
     const codexEntriesStart = Date.now();
@@ -703,15 +805,20 @@ const fs = require('fs');
 
     // #region Key Items
 
+    // Observations:
+    // 'Personalised Dice Set' is broken because it's created based on a variable
+
     console.log('\ngetting key items');
     const keyItemsStart = Date.now();
 
-    var keyitems = [];
+    var keyitems = getStorageClassDataDefault(/\.createKeyItem\("([\S ][^)]+)\)*/g, true);
+
+    const panties = [];
 
     (function () {
         for (var index = 0; index < contents.length; ++index) {
             var content = contents[index];
-            const regex = /\.(create|has)KeyItem\("([\S ][^)]+)\)*/g;
+            const regex = /\.createKeyItem\((PantyData\.get\("([\S ][^")]+)"\)[^)][\S ][^)]+)\)*/g;
 
             var m;
             while ((m = regex.exec(content)) !== null) {
@@ -719,64 +826,29 @@ const fs = require('fs');
                     regex.lastIndex++;
                 }
 
-                m.forEach((match) => {
-                    var keyitem = new StorageClass();
+                const panty = new StorageClass();
 
-                    if (match.startsWith('.create')) {
-                        keyitem.storageName = match.slice(nthIndex(match, '"', 1) + 1, nthIndex(match, '"', 2));
-                        keyitem.value1 = getStorageClassValue(1, match);
-                        keyitem.value2 = getStorageClassValue(2, match);
-                        keyitem.value3 = getStorageClassValue(3, match);
-                        keyitem.value4 = getStorageClassValue(4, match);
+                m.forEach((match, groupIndex) => {
+                    if (groupIndex == 1) {
+                        panty.parseFromTextDefault(match);
 
-                        if (nthIndex(match, '"', 3) > 0) {
-                            keyitem.tooltip = match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, ')', 1) - 1);
-                        }
+                        const texts = match.split('"');
+                        panty.tooltip = texts[3] || '';
 
-                        keyitems.push(keyitem);
+                    }
+                    else if (groupIndex == 2) {
+                        panty.storageName = pantyData[match];
                     }
                 });
-            }
-        }
-    })();
 
-    var panties = [];
-
-    (function () {
-        for (var index = 0; index < contents.length; ++index) {
-            var content = contents[index];
-            const regex = /\.(create|has)KeyItem\((PantyData.get\([\S ][^)]+[\S ][^)]+)\)/g;
-
-            var m;
-            while ((m = regex.exec(content)) !== null) {
-                if (m.index === regex.lastIndex) {
-                    regex.lastIndex++;
-                }
-
-                m.forEach((match) => {
-                    var panty = new StorageClass();
-
-                    if (match.startsWith('.create')) {
-                        panty.storageName = pantyData[(match.slice(nthIndex(match, '"', 1) + 1, nthIndex(match, '"', 2)))];
-                        panty.value1 = getStorageClassValue(1, match);
-                        panty.value2 = getStorageClassValue(2, match);
-                        panty.value3 = getStorageClassValue(3, match);
-                        panty.value4 = getStorageClassValue(4, match);
-
-                        if (nthIndex(match, '"', 3) > 0) {
-                            panty.tooltip = match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, ')', 2) - 1);
-                        }
-
-                        panties.push(panty);
-                    }
-                });
+                panties.push(panty);
             }
         }
     })();
 
     keyitems = keyitems.concat(panties);
 
-    keyitems = util.formatStorageClassArray(keyitems);
+    keyitems = util.formatStorageClassArrayDefault(keyitems);
 
     const keyItemsEnd = Date.now();
     util.printOperationTime('key items', keyItemsStart, keyItemsEnd);
@@ -825,7 +897,7 @@ const fs = require('fs');
         for (var index = 0; index < contents.length; ++index) {
             var content = contents[index];
 
-            // only check tavros (cause only ceria is a hairdresser)
+            // Only check Tavros (Ceria is the only hairdresser)
             if (!content.includes('sourceMappingURL=content_tavros')) {
                 continue;
             }
@@ -855,7 +927,7 @@ const fs = require('fs');
 
     hairStyles = hairStyles.filter((v, i, a) => a.findIndex(v2 => (v2 === v)) === i).sort();
 
-    obj.HairStyles = hairStyles;
+    obj.HairStyle = hairStyles;
 
     const hairStylesEnd = Date.now();
     util.printOperationTime('hair styles', hairStylesStart, hairStylesEnd);
@@ -866,7 +938,7 @@ const fs = require('fs');
     console.log('\nwriting to disk');
     const writeStart = Date.now();
 
-    fs.writeFileSync('../data/global.js', util.formatToFile('GlobalKeys', obj));
+    fs.writeFileSync('../data/global.js', util.formatToFile('Globals', obj));
     fs.writeFileSync('../data/flags.js', util.formatToFile('Flags', gameFlags));
     fs.writeFileSync('../data/perks.js', util.formatToFile('Perks', perks));
     fs.writeFileSync('../data/status.js', util.formatToFile('StatusEffects', statusEffects));

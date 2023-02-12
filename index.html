@@ -150,7 +150,7 @@
                                     ko.applyBindings(vm);
                                 }
                                 else {
-                                    ko.mapping.fromJS(json, window.mapping, vm);
+                                    ko.mapping.fromJS(json, loadMapping, vm.save);
                                 }
                             } catch (e) {
                                 alert('An internal error ocurred while processing the save data\n\n' + e)
