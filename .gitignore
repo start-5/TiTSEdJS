@@ -350,3 +350,6 @@ MigrationBackup/
 .ionide/
 
 /Web.config
+*.sln
+/.eslintrc.json
+/package-lock.json

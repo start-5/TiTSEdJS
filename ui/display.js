@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
+
 const instance = 'save.gameInstanceInfo';
 const char = 'selectedCharacter().obj';
 const pc = 'save.characters.PC';
@@ -8,12 +11,11 @@ function displayGame() {
     return new Tab([
         new Row([
             new Group('Internal', [
-                new TextField(flags, 'PC_EMAIL_ADDRESS', 'E-Mail', null, 'emailChanged'),
+                //new TextField(flags, 'PC_EMAIL_ADDRESS', 'E-Mail', null, 'emailChanged'), TODO: This doesn't work at the moment
                 new TextField(instance, 'note', 'Note'),
                 new IntegerField('save', 'days', 'Days', 'days', 0),
                 new IntegerField('save', 'hours', 'Hours', 'hours', 0, 23),
                 new IntegerField('save', 'minutes', 'Minutes', 'minutes', 0, 59),
-                //rr
             ]),
             new Group('Game Settings', [
                 new SwitchField('save', 'easyMode', 'Easy Mode'),
@@ -114,7 +116,7 @@ function displayHead() {
                 new SelectField('HairType', char, 'hairType', 'Hair Type'),
                 new FloatField(char, 'hairLength', 'Hair Length', 'inches', 0),
                 new TextField(char, 'hairColor', 'Hair Color'),
-                // todo hair style
+                new SelectField('HairStyle', char, 'hairStyle', 'Hair Style'),
                 new FloatField(char, 'beardLength', 'Beard Length', 'inches', 0),
                 new SelectField('HairType', char, 'beardType', 'Beard Type'),
                 // todo beard style
@@ -138,8 +140,7 @@ function displayHead() {
             new Group('Ears', [
                 new SelectField('ValidTypes.Ear', char, 'earType', 'Ear Type'),
                 new FloatField(char, 'earLength', 'Ear Length', 'inches', 0),
-                //find ear flags
-                //new FlagField(globalKeys.ValidFlags.Ear, new Binding('earFlags'), 'Ear Flags'),
+                new FlagField('ValidFlags.Ear', char, 'earFlags', 'Ear Flags'),
             ]),
             new Group('Eyes', [
                 new SelectField('ValidTypes.Eye', char, 'eyeType', 'Eye Type'),
@@ -175,8 +176,7 @@ function displayBody() {
                 new TextField(char, 'skinAccent', 'Skin Accent'),
                 new TextField(char, 'furColor', 'Fur Color'),
                 new TextField(char, 'scaleColor', 'Scale Color'),
-                //find skin flags
-                //new FlagField(globalKeys.ValidFlags.Skin, new Binding('skinFlags'), 'Skin Flags')
+                new FlagField('ValidFlags.Skin', char, 'skinFlags', 'Skin Flags'),
             ])
         ]),
         new Row([
@@ -196,11 +196,10 @@ function displayBody() {
         ]),
         new Row([
             new Group('Butt', [
-                //todo virgin
+                new SwitchField(char, 'analVirgin', 'Anal Virgin'),
                 new IntegerField(butt, 'minLooseness', 'Min Looseness', null, 0),
                 new IntegerField(butt, 'bonusCapacity', 'Bonus Capacity', null, 0),
-                //find ass flags
-                //new FlagField(globalKeys.ValidFlags.Ass, new Binding('flags', 'ass'), 'Ass Flags'),
+                new FlagField('ValidFlags.Butt', butt, 'flags', 'Butt Flags'),
                 new NestedGroup('', [
                     new IntegerField(butt, 'loosenessRaw', 'Looseness Raw', null, 0),
                     new IntegerField(butt, 'loosenessMod', 'Looseness Mod', null, 0)
@@ -215,10 +214,6 @@ function displayBody() {
                 new IntegerField(char, 'tailCount', 'Tail Count', null, 0),
                 new IntegerField(char, 'tailVenom', 'Tail Venom', null, 0, 100),
                 new IntegerField(char, 'tailRecharge', 'Tail Recharge', null, 0),
-                new SelectField('TailGenital', char, 'tailGenital', 'Tail Genital Type'),
-                // find tail arg
-                //new SelectField(globalKeys.TailGenital, char, 'tailGenital', ValueType.Integer), 'Tail Genital Type'),
-                new TextField(char, 'tailGenitalColor', 'Tail Genital Color'),
                 new FlagField('ValidFlags.Tail', char, 'tailFlags', 'Tail Flags')
             ])
         ]),
@@ -235,8 +230,7 @@ function displayBody() {
                 new IntegerField(char, 'nipplesPerBreast', 'Nipples Per Breast', null, 0),
                 new FloatField(char, 'nippleLengthRatio', 'Nipple Length Ratio', null, 0),
                 new FloatField(char, 'nippleWidthRatio', 'Nipple Width Ratio', null, 0),
-                //find dicknipple type
-                //new SelectField(globalKeys.ValidTypes.Dicknipple, char, 'dickNippleType', ValueType.Integer), 'Dick Nipple Type'),
+                new SelectField('ValidTypes.Dicknipple', char, 'dickNippleType', 'Dicknipple type'),
                 new IntegerField(char, 'dickNippleMultiplier', 'Dick Nipple Multiplier', null, 0)
             ]),
             new ArrayGroup('Breasts', 'addBreastRow', [
@@ -248,9 +242,8 @@ function displayBody() {
                     new IntegerField('', 'breastRatingHoneypotMod', 'Honeypot Mod', null, 0),
                     new SelectField('NippleType', '', 'nippleType', 'Nipple Type'),
                     new FloatField('', 'fullness', 'Fullness', null, 0),
-                    new FlagField('areola', '', 'areolaFlags', 'Areola Flags')
+                    new FlagField('ValidFlags.Areola', '', 'areolaFlags', 'Areola Flags')
                 ])
-                //todo figure out breasts
             ])
         ])
     ]);
@@ -277,7 +270,7 @@ function displayCrotch() {
                     new FloatField(char, 'cumQualityRaw', 'Cum Quality Raw', null, 0),
                     new IntegerField(char, 'cumQualityMod', 'Cum Quality Mod', null, 0)
                 ]),
-                new SwitchField(char, 'cockVirgin', 'Cock Virgin')
+                new SwitchField(char, 'cockVirgin', 'Penis Virgin')
             ]),
             new ArrayGroup('Penises', 'addPenis', [
                 new ArrayField(char, 'cocks()', 'getPenisName', 'removePenis', [
@@ -289,12 +282,12 @@ function displayCrotch() {
                         new FloatField('', 'cThicknessRatioRaw', 'Thickness Ratio Raw', null, 0),
                         new FloatField('', 'cThicknessRatioMod', 'Thickness Ratio Mod', null, 0),
                     ]),
-                    new SelectField('BodyType', '', 'cType', 'Type'),
+                    new SelectField('ValidTypes.Penis', '', 'cType', 'Type'),
                     new TextField('', 'cockColor', 'Color'),
                     new FloatField('', 'knotMultiplier', 'Knot Multiplier', null, 0),
                     new FloatField('', 'flaccidMultiplier', 'Flaccid Multiplier', null, 0),
                     new SwitchField('', 'virgin', 'Virgin'),
-                    new FlagField('BodyFlag', '', 'flags', 'Flags') //todo flags
+                    new FlagField('ValidFlags.Penis', '', 'flags', 'Flags')
                     //todo piercing
                 ])
             ])
@@ -325,13 +318,13 @@ function displayCrotch() {
                         new IntegerField('', 'wetnessMod', 'Wetness Mod', null, 0)
                     ]),
                     new IntegerField('', 'bonusCapacity', 'Bonus Capacity', null, 0),
-                    new SelectField('BodyType', '', 'type', 'Type'),
+                    new SelectField('ValidTypes.Vagina', '', 'type', 'Type'),
                     new TextField('', 'vaginaColor', 'Color'),
                     new IntegerField('', 'clits', 'Clits', null, 1),
                     new FloatField('', 'fullness', 'Fullness', null, 0),
                     new IntegerField('', 'shrinkCounter', 'Shrink Counter', null, 0),
                     new SwitchField('', 'hymen', 'Hymen'),
-                    new FlagField('BodyFlag', '', 'flags', 'Flags') //todo flags
+                    new FlagField('ValidFlags.Vagina', '', 'flags', 'Flags')
                     //todo piercing
                 ])
             ]),
@@ -346,6 +339,10 @@ function displayPerks() {
 function displayStatusEffects() {
     return new StatusEffectContainer(char, 'statusEffects');
 }
+
+//function displayKeyItems() {
+//    return new StorageContainer();
+//}
 
 function displayFlags() {
     return new FlagContainer();

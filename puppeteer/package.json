@@ -7,9 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "start-5",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "prettier": "^2.6.2",
-    "puppeteer": "^13.7.0"
+    "prettier": "^2.8.4",
+    "puppeteer": "^19.6.3"
   }
 }
