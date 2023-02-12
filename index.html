@@ -96,6 +96,10 @@
                 e.preventDefault();
                 e.stopPropagation();
 
+                if (!e.dataTransfer) {
+                    e.dataTransfer = e.originalEvent.dataTransfer;
+                }
+
                 if (!e.dataTransfer || !e.dataTransfer.files || e.dataTransfer.files.length == 0) {
                     alert('Error loading dropped file, please try again.');
                 }
