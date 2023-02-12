@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 const Flags = {
     ABANDONED_CHAURMINE: null,
     ABLE_BATHS: null,

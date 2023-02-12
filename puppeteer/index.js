@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const prettier = require('prettier');
+const sort_json = require('prettier-plugin-sort-json');
 const fs = require('fs');
 const path = require('path');
 //const readline = require('readline');
@@ -18,6 +19,9 @@ const path = require('path');
 // You could create a "custom" perk with whatever value and the game would count it as valid, but to actually have an effect it
 // would need to be checked at some point with this.hasPerk, otherwise it just sits there.
 // (afaik) This is the same with everything that inherits from StorageClass
+//
+// The window.GLOBAL object is actually inaccurate when dealing with valid flags/types. Though to be fair since flags are added/checked on demand
+// it makes sense that it's outdated/inaccurate
 
 
 (async () => {
@@ -49,20 +53,33 @@ const path = require('path');
         * @param {any} data
         */
         formatToFile: function (name, data) {
-            const src = `const ${name} = ${JSON.stringify(data)}`;
+            const format1 = prettier.format(JSON.stringify(data), {
+                parser: 'json',
+                plugins: [sort_json],
+                ...{
+                    jsonRecursiveSort: true,
+                },
+            });
 
-            return prettier.format(src, {
-                parser: 'babel',
+            var format2 = prettier.format(format1, {
+                endOfLine: 'crlf',
+                parser: 'json5',
+                singleQuote: true,
                 tabWidth: 4
             });
+            format2 = format2.substr(0, format2.lastIndexOf('\r\n')); // Remove the stupid newline https://github.com/prettier/prettier/issues/6360
+
+            return '/* eslint-disable no-unused-vars */\r\n\r\nconst ' + name + ' = ' + format2 + ';';
         },
 
         /**
         * Format a valid flag array
-        * @param {Array} arr
+        * @param {Array<{name:string, value:number}>} arr
         */
         formatValidFlagArray: function (arr) {
-            return arr.filter((v, i, a) => a.findIndex(v2 => (v2.value === v.value)) === i).sort();
+            return arr
+                .filter((flag, index, self) => self.findIndex(flag2 => (flag2.value === flag.value)) === index)
+                .sort((l, r) => l.value - r.value);
         },
 
         /**
@@ -291,20 +308,20 @@ const path = require('path');
                 const bt = global.BodyType;
 
                 global.ValidFlags = {
-                    Areola: getValidFlagsFor('AREOLA', bf),
-                    Arm: getValidFlagsFor('ARM', bf),
-                    Face: getValidFlagsFor('FACE', bf),
-                    Leg: getValidFlagsFor('LEG', bf),
-                    Penis: getValidFlagsFor('COCK', bf),
-                    Skin: getValidFlagsFor('SKIN', bf),
-                    Tail: getValidFlagsFor('TAIL', bf),
-                    Tailcunt: getValidFlagsFor('VAGINA', bf),
-                    Tongue: getValidFlagsFor('TONGUE', bf),
-                    Vagina: getValidFlagsFor('VAGINA', bf)
+                    //Areola: getValidFlagsFor('AREOLA', bf),
+                    //Arm: getValidFlagsFor('ARM', bf),
+                    //Face: getValidFlagsFor('FACE', bf),
+                    //Leg: getValidFlagsFor('LEG', bf),
+                    //Penis: getValidFlagsFor('COCK', bf),
+                    //Skin: getValidFlagsFor('SKIN', bf),
+                    //Tail: getValidFlagsFor('TAIL', bf),
+                    //Tailcunt: getValidFlagsFor('VAGINA', bf),
+                    //Tongue: getValidFlagsFor('TONGUE', bf),
+                    //Vagina: getValidFlagsFor('VAGINA', bf)
                 };
 
-                global.ValidFlags.Tail.push({ name: 'Parasitic', value: 55 });
-                global.ValidFlags.Tailcunt.push({ name: 'Tailcunt', value: 42 });
+                //global.ValidFlags.Tail.push({ name: 'Parasitic', value: 55 });
+                //global.ValidFlags.Tailcunt.push({ name: 'Tailcunt', value: 42 });
 
                 global.ValidTypes = {
                     Antennae: getValidTypesFor('ANTENNAE', bt),
@@ -533,21 +550,17 @@ const path = require('path');
     // #endregion
 
 
-    // #region Valid Body Flags (handle valid body flags that aren't part of GLOBAL)
+    // #region Valid Body Flags
 
+    /**
+    * Get accurate VALID_X_FLAGS using regex
+    * @param {RegExp} regex
+    */
+    function getValidBodyFlagsDefault(regex) {
+        var validFlags = [];
 
-    // #region Ear
-
-    console.log('\ngetting valid ear flags');
-    const validEarFlagsStart = Date.now();
-
-    var validEarFlags = [];
-
-    (function () {
         for (var index = 0; index < contents.length; ++index) {
             var content = contents[index];
-            // const regex = /\.(addEarFlag)\(([\S ][^)]+)\)*/g;
-            const regex = /\.(addEarFlag)\((GLOBAL.FLAG_([\S ][^)]+))\)*/g;
 
             var m;
             while ((m = regex.exec(content)) !== null) {
@@ -556,10 +569,10 @@ const path = require('path');
                 }
 
                 m.forEach((match, groupIndex) => {
-                    if (groupIndex == 3) {
-                        const flag = obj.BodyFlag.find((body) => body.name.toLocaleLowerCase() == match.toLocaleLowerCase());
+                    if (groupIndex == 2) {
+                        const flag = obj.BodyFlag.find((body) => body.name.toLocaleLowerCase() == match.replace('_', ' ').toLocaleLowerCase());
 
-                        validEarFlags.push({
+                        validFlags.push({
                             name: flag.name,
                             value: flag.value
                         });
@@ -567,16 +580,67 @@ const path = require('path');
                 });
             }
         }
-    })();
 
-    validEarFlags = util.formatValidFlagArray(validEarFlags);
+        validFlags = util.formatValidFlagArray(validFlags);
 
-    obj.ValidFlags.Ear = validEarFlags;
+        return validFlags;
+    }
 
-    const validEarFlagsEnd = Date.now();
-    util.printOperationTime('valid ear flags', validEarFlagsStart, validEarFlagsEnd);
+    /**
+    * Get a regex that can be used to check for flags
+    * @param {string} name
+    */
+    //function getFlagCheckRegex(name) {
 
-    // #endregion
+    //}
+
+
+    obj.ValidFlags.Areola = getValidBodyFlagsDefault(/\.(add|has)AreolaFlag\(GLOBAL\.FLAG_([\S ][^)]+)\)*/g);
+
+    obj.ValidFlags.Ear = getValidBodyFlagsDefault(/\.(add|has)EarFlag\(GLOBAL\.FLAG_([\S ][^)]+)\)*/g);
+
+
+    //// #region Ear
+
+    //console.log('\ngetting valid ear flags');
+    //const validEarFlagsStart = Date.now();
+
+    //var validEarFlags = [];
+
+    //(function () {
+    //    for (var index = 0; index < contents.length; ++index) {
+    //        var content = contents[index];
+    //        // const regex = /\.(addEarFlag)\(([\S ][^)]+)\)*/g;
+    //        const regex = /\.(addEarFlag)\((GLOBAL.FLAG_([\S ][^)]+))\)*/g;
+
+    //        var m;
+    //        while ((m = regex.exec(content)) !== null) {
+    //            if (m.index === regex.lastIndex) {
+    //                regex.lastIndex++;
+    //            }
+
+    //            m.forEach((match, groupIndex) => {
+    //                if (groupIndex == 3) {
+    //                    const flag = obj.BodyFlag.find((body) => body.name.toLocaleLowerCase() == match.toLocaleLowerCase());
+
+    //                    validEarFlags.push({
+    //                        name: flag.name,
+    //                        value: flag.value
+    //                    });
+    //                }
+    //            });
+    //        }
+    //    }
+    //})();
+
+    //validEarFlags = util.formatValidFlagArray(validEarFlags);
+
+    //obj.ValidFlags.Ear = validEarFlags;
+
+    //const validEarFlagsEnd = Date.now();
+    //util.printOperationTime('valid ear flags', validEarFlagsStart, validEarFlagsEnd);
+
+    //// #endregion
 
 
     // #region Butt
