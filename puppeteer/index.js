@@ -20,13 +20,46 @@ const path = require('path');
 // would need to be checked at some point with this.hasPerk, otherwise it just sits there.
 // (afaik) This is the same with everything that inherits from StorageClass
 //
-// The window.GLOBAL object is actually inaccurate when dealing with valid flags/types. Though to be fair since flags are added/checked on demand
+// The window.GLOBAL object is actually inaccurate when dealing with valid flags/types. Though to be fair since flags are loosely added/checked on demand
 // it makes sense that it's outdated/inaccurate
+//
+// - Regarding face flags: 'FLAG_FLUFFY' is added but never checked (Korgonne Snacks). 'FLAG_GOOEY' is checked but never added (Appearance)
+// - Regarding leg flags: 'FLAG_TAPERED' is added but never checked (Naleen Nip).
+// - Regarding penis flags: 'FLAG_FLARED', 'FLAG_NUBBY', 'FLAG_STINGER_TIPPED', some of Penny's interactions check flags backwards
+// I'm gonna stop counting cause there's too many cases where this happens
+
 
 
 (async () => {
 
     const util = {
+
+        /**
+        * @callback execRegexOnContentsCallback
+        * @param {string} match
+        * @param {number} groupIndex
+        */
+        /**
+        * Iterate through all contents using a regex
+        * @param {RegExp} regex
+        * @param {execRegexOnContentsCallback} callback
+        */
+        execRegexOnContents: function (regex, callback) {
+            for (var index = 0; index < contents.length; ++index) {
+                var content = contents[index];
+
+                var m;
+                while ((m = regex.exec(content)) !== null) {
+                    if (m.index === regex.lastIndex) {
+                        regex.lastIndex++;
+                    }
+
+                    m.forEach((match, groupIndex) => {
+                        callback(match, groupIndex, m);
+                    });
+                }
+            }
+        },
 
         /**
         * Format a 'StorageClass' flag array
@@ -550,36 +583,57 @@ const path = require('path');
     // #endregion
 
 
-    // #region Valid Body Flags
+    // #region Valid Body Flags/Types
+
+
+    // #region Flags
+
+
+    // The idea here is, if the game adds it or checks for it, it's valid.
+
 
     /**
-    * Get accurate VALID_X_FLAGS using regex
+    * Get body flag object by name
+    * @param {string} name
+    */
+    function getBodyFlagByName(name) {
+        const flag = obj.BodyFlag.find(flag => flag.name.toLocaleLowerCase() == name.replace('_', ' ').toLocaleLowerCase());
+        return {
+            name: flag.name,
+            value: flag.value
+        };
+    }
+
+    /**
+    * Get VALID_X_FLAGS using regex
     * @param {RegExp} regex
     */
     function getValidBodyFlagsDefault(regex) {
         var validFlags = [];
 
-        for (var index = 0; index < contents.length; ++index) {
-            var content = contents[index];
-
-            var m;
-            while ((m = regex.exec(content)) !== null) {
-                if (m.index === regex.lastIndex) {
-                    regex.lastIndex++;
-                }
-
-                m.forEach((match, groupIndex) => {
-                    if (groupIndex == 2) {
-                        const flag = obj.BodyFlag.find((body) => body.name.toLocaleLowerCase() == match.replace('_', ' ').toLocaleLowerCase());
-
-                        validFlags.push({
-                            name: flag.name,
-                            value: flag.value
-                        });
-                    }
-                });
+        util.execRegexOnContents(regex, (match, groupIndex) => {
+            if (groupIndex == 2) {
+                validFlags.push(getBodyFlagByName(match));
             }
-        }
+        });
+
+        validFlags = util.formatValidFlagArray(validFlags);
+
+        return validFlags;
+    }
+
+    /**
+    * Get accurate VALID_X_FLAGS for arrays using regex
+    * @param {RegExp} regex
+    */
+    function getValidBodyFlagsForArray(regex) {
+        var validFlags = [];
+
+        util.execRegexOnContents(regex, (match, groupIndex, matches) => {
+            if ((!matches[5] && groupIndex == 3) || matches[5] && groupIndex == 5) { // 3 => simple check, 5 => array check
+                validFlags.push(getBodyFlagByName(match));
+            }
+        });
 
         validFlags = util.formatValidFlagArray(validFlags);
 
@@ -590,103 +644,103 @@ const path = require('path');
     * Get a regex that can be used to check for flags
     * @param {string} name
     */
-    //function getFlagCheckRegex(name) {
+    function getFlagCheckRegex(name) {
+        return new RegExp('\\.(add|has)' + name + 'Flag\\(GLOBAL\\.FLAG_([\\S ][^)]+)\\)*', 'g');
+    }
 
-    //}
+    /**
+    * Get a regex that can be used to check for flags that are called on arrays
+    * @param {string} name
+    * @param {string} arrayName
+    */
+    function getFlagCheckForArrayRegex(simpleName, arrayName) {
+        // Here two checks need to be done. One for char.(add|has)(), another for the array access array[x].(add|has)()
 
+        const charCheck = '\\.(add|has)' + simpleName + 'Flag\\(GLOBAL\\.FLAG_([\\S ][^),]+)\\)*';
+        const arrayCheck = '\\.' + arrayName + '\\[[\\S]\\]\\.(add|has)Flag\\(GLOBAL.FLAG_([\\S ][^)]+)\\)*';
 
-    obj.ValidFlags.Areola = getValidBodyFlagsDefault(/\.(add|has)AreolaFlag\(GLOBAL\.FLAG_([\S ][^)]+)\)*/g);
-
-    obj.ValidFlags.Ear = getValidBodyFlagsDefault(/\.(add|has)EarFlag\(GLOBAL\.FLAG_([\S ][^)]+)\)*/g);
-
-
-    //// #region Ear
-
-    //console.log('\ngetting valid ear flags');
-    //const validEarFlagsStart = Date.now();
-
-    //var validEarFlags = [];
-
-    //(function () {
-    //    for (var index = 0; index < contents.length; ++index) {
-    //        var content = contents[index];
-    //        // const regex = /\.(addEarFlag)\(([\S ][^)]+)\)*/g;
-    //        const regex = /\.(addEarFlag)\((GLOBAL.FLAG_([\S ][^)]+))\)*/g;
-
-    //        var m;
-    //        while ((m = regex.exec(content)) !== null) {
-    //            if (m.index === regex.lastIndex) {
-    //                regex.lastIndex++;
-    //            }
-
-    //            m.forEach((match, groupIndex) => {
-    //                if (groupIndex == 3) {
-    //                    const flag = obj.BodyFlag.find((body) => body.name.toLocaleLowerCase() == match.toLocaleLowerCase());
-
-    //                    validEarFlags.push({
-    //                        name: flag.name,
-    //                        value: flag.value
-    //                    });
-    //                }
-    //            });
-    //        }
-    //    }
-    //})();
-
-    //validEarFlags = util.formatValidFlagArray(validEarFlags);
-
-    //obj.ValidFlags.Ear = validEarFlags;
-
-    //const validEarFlagsEnd = Date.now();
-    //util.printOperationTime('valid ear flags', validEarFlagsStart, validEarFlagsEnd);
-
-    //// #endregion
+        return new RegExp(`(${charCheck}|${arrayCheck})`, 'g');
+    }
 
 
-    // #region Butt
+    console.log('\ngetting valid body flags');
+    const validBodyFlagsStart = Date.now();
 
-    console.log('\ngetting valid butt flags');
-    const validAssFlagsStart = Date.now();
 
-    var validButtFlags = [];
+    // Simple add/has checks
+    ['Areola', 'Arm', 'Ear', 'Face', 'Leg', 'Skin', 'Tail', 'Tongue'].forEach(name => {
+        obj.ValidFlags[name] = getValidBodyFlagsDefault(getFlagCheckRegex(name));
+    });
 
-    (function () {
-        for (var index = 0; index < contents.length; ++index) {
-            var content = contents[index];
-            const regex = /(ass.flags)[= ]+(\[(GLOBAL.FLAG_[\S ][^)]+)\])/g;
+    // Array add/has checks
+    obj.ValidFlags.Penis = getValidBodyFlagsForArray(getFlagCheckForArrayRegex('Cock', 'cocks'));
+    obj.ValidFlags.Vagina = getValidBodyFlagsForArray(getFlagCheckForArrayRegex('Vagina', 'vaginas'));
 
-            var m;
-            while ((m = regex.exec(content)) !== null) {
-                if (m.index === regex.lastIndex) {
-                    regex.lastIndex++;
-                }
+    // Other
+    obj.ValidFlags.Butt = getValidBodyFlagsDefault(/ass\.(add|has)Flag\(GLOBAL\.FLAG_([\S][^)]+)\)*/g);
 
-                m.forEach((match, groupIndex) => {
-                    if (groupIndex == 2) {
-                        var buttFlagsArray = match.match(/_([\S ])[^\,\]]*/g);
 
-                        buttFlagsArray.forEach((item, index, arr) => arr[index] = item.slice(1));
+    const validBodyFlagsEnd = Date.now();
+    util.printOperationTime('valid body flags', validBodyFlagsStart, validBodyFlagsEnd);
 
-                        for (let i = 0; i < buttFlagsArray.length; i++) {
-                            const flag = obj.BodyFlag.find((body) => body.name.toLocaleLowerCase() == buttFlagsArray[i].toLocaleLowerCase());
+    // #endregion
 
-                            validButtFlags.push({
-                                name: flag.name,
-                                value: flag.value
-                            });
-                        }
-                    }
-                });
+
+    // #region Types
+
+
+    // The idea here is, if the game assigns it or checks for it, it's valid.
+
+
+    /**
+    * Get body type object by name
+    * @param {string} name
+    */
+    function getBodyTypeByName(name) {
+        const flag = obj.BodyType.find(type => type.name.toLocaleLowerCase() == name.replace('_', ' ').toLocaleLowerCase());
+        return {
+            name: flag.name,
+            value: flag.value
+        };
+    }
+
+    /**
+    * Get VALID_X_TYPES using regex
+    * @param {RegExp} regex
+    */
+    function getValidBodyTypesDefault(regex) {
+        var validTypes = [];
+
+        util.execRegexOnContents(regex, (match, groupIndex) => {
+            if (groupIndex == 1) {
+                validTypes.push(getBodyTypeByName(match));
             }
-        }
-    })();
+        });
 
-    validButtFlags = util.formatValidFlagArray(validButtFlags);
+        validTypes = util.formatValidFlagArray(validTypes);
 
-    obj.ValidFlags.Butt = validButtFlags;
+        return validTypes;
+    }
 
-    const validButtFlagsEnd = Date.now();
-    util.printOperationTime('valid butt flags', validAssFlagsStart, validButtFlagsEnd);
+    /**
+    * Get a regex that can be used to check for flags
+    * @param {string} name
+    */
+    function getTypeCheckRegex(name) {
+        return new RegExp('\\.' + name + 'Type ={1,3} GLOBAL\\.TYPE_([\\w_]+)', 'g'); //figure out why javascript doesnt like this expression
+    }
+
+
+    console.log('\ngetting valid body types');
+    const validBodyTypesStart = Date.now();
+
+
+    //obj.ValidTypes.Ear = getValidBodyTypesDefault(getTypeCheckRegex('ear'));
+
+
+    const validBodyTypesEnd = Date.now();
+    util.printOperationTime('valid body types', validBodyTypesStart, validBodyTypesEnd);
+
 
     // #endregion
 
