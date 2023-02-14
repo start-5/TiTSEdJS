@@ -62,6 +62,16 @@ const path = require('path');
         },
 
         /**
+        * Format a name value array
+        * @param {Array<{name:string, value:number}>} arr
+        */
+        formatNameValueArray: function (arr) {
+            return arr
+                .filter((flag, index, self) => self.findIndex(flag2 => (flag2.value === flag.value)) === index)
+                .sort((l, r) => l.value - r.value);
+        },
+
+        /**
         * Format a 'StorageClass' flag array
         * @param {Array<StorageClass>} arr
         */
@@ -103,16 +113,6 @@ const path = require('path');
             format2 = format2.substr(0, format2.lastIndexOf('\r\n')); // Remove the stupid newline https://github.com/prettier/prettier/issues/6360
 
             return '/* eslint-disable no-unused-vars */\r\n\r\nconst ' + name + ' = ' + format2 + ';';
-        },
-
-        /**
-        * Format a valid flag array
-        * @param {Array<{name:string, value:number}>} arr
-        */
-        formatValidFlagArray: function (arr) {
-            return arr
-                .filter((flag, index, self) => self.findIndex(flag2 => (flag2.value === flag.value)) === index)
-                .sort((l, r) => l.value - r.value);
         },
 
         /**
@@ -357,20 +357,20 @@ const path = require('path');
                 //global.ValidFlags.Tailcunt.push({ name: 'Tailcunt', value: 42 });
 
                 global.ValidTypes = {
-                    Antennae: getValidTypesFor('ANTENNAE', bt),
-                    Arm: getValidTypesFor('ARM', bt),
-                    Dicknipple: getValidTypesFor('DICKNIPPLE', bt),
-                    Ear: getValidTypesFor('EAR', bt),
-                    Eye: getValidTypesFor('EYE', bt),
-                    Face: getValidTypesFor('FACE', bt),
-                    Horn: getValidTypesFor('HORN', bt),
-                    Leg: getValidTypesFor('LEG', bt),
-                    Penis: getValidTypesFor('COCK', bt),
-                    Tail: getValidTypesFor('TAIL', bt),
-                    TailGenital: getValidFor('TAIL_GENITAL', '_ARGS', bt),
-                    Tongue: getValidTypesFor('TONGUE', bt),
-                    Vagina: getValidTypesFor('VAGINA', bt),
-                    Wing: getValidTypesFor('WING', bt)
+                    //Antennae: getValidTypesFor('ANTENNAE', bt),
+                    //Arm: getValidTypesFor('ARM', bt),
+                    //Dicknipple: getValidTypesFor('DICKNIPPLE', bt),
+                    //Ear: getValidTypesFor('EAR', bt),
+                    //Eye: getValidTypesFor('EYE', bt),
+                    //Face: getValidTypesFor('FACE', bt),
+                    //Horn: getValidTypesFor('HORN', bt),
+                    //Leg: getValidTypesFor('LEG', bt),
+                    //Penis: getValidTypesFor('COCK', bt),
+                    //Tail: getValidTypesFor('TAIL', bt),
+                    //TailGenital: getValidFor('TAIL_GENITAL', '_ARGS', bt), - ??? todo still probably
+                    //Tongue: getValidTypesFor('TONGUE', bt),
+                    //Vagina: getValidTypesFor('VAGINA', bt),
+                    //Wing: getValidTypesFor('WING', bt)
                 };
 
 
@@ -586,6 +586,40 @@ const path = require('path');
     // #region Valid Body Flags/Types
 
 
+    /**
+    * Get GLOBAL object of type by name
+    * @param {string} type
+    * @param {string} name
+    */
+    function getGlobalByName(type, name) {
+        const found = obj[type].find(o => o.name.toLocaleLowerCase() == name.replace('_', ' ').toLocaleLowerCase());
+        return {
+            name: found.name,
+            value: found.value
+        };
+    }
+
+    /**
+    * Get valid body x by type, using regex and boolean callback
+    * @param {string} type
+    * @param {RegExp} regex
+    * @param {Function} callback
+    */
+    function getValidBodyParts(type, regex, callback) {
+        var validArray = [];
+
+        util.execRegexOnContents(regex, (match, groupIndex, matches) => {
+            if (callback(match, groupIndex, matches)) {
+                validArray.push(getGlobalByName(type, match));
+            }
+        });
+
+        validArray = util.formatNameValueArray(validArray);
+
+        return validArray;
+    }
+
+
     // #region Flags
 
 
@@ -593,71 +627,43 @@ const path = require('path');
 
 
     /**
-    * Get body flag object by name
-    * @param {string} name
-    */
-    function getBodyFlagByName(name) {
-        const flag = obj.BodyFlag.find(flag => flag.name.toLocaleLowerCase() == name.replace('_', ' ').toLocaleLowerCase());
-        return {
-            name: flag.name,
-            value: flag.value
-        };
-    }
-
-    /**
-    * Get VALID_X_FLAGS using regex
+    * Get accurate VALID_<BODYPART>_FLAGS using regex
     * @param {RegExp} regex
     */
     function getValidBodyFlagsDefault(regex) {
-        var validFlags = [];
-
-        util.execRegexOnContents(regex, (match, groupIndex) => {
-            if (groupIndex == 2) {
-                validFlags.push(getBodyFlagByName(match));
-            }
+        return getValidBodyParts('BodyFlag', regex, (_, groupIndex) => {
+            return groupIndex == 2;
         });
-
-        validFlags = util.formatValidFlagArray(validFlags);
-
-        return validFlags;
     }
 
     /**
-    * Get accurate VALID_X_FLAGS for arrays using regex
+    * Get accurate VALID_<BODYPART>_FLAGS for arrays using regex
     * @param {RegExp} regex
     */
     function getValidBodyFlagsForArray(regex) {
-        var validFlags = [];
-
-        util.execRegexOnContents(regex, (match, groupIndex, matches) => {
-            if ((!matches[5] && groupIndex == 3) || matches[5] && groupIndex == 5) { // 3 => simple check, 5 => array check
-                validFlags.push(getBodyFlagByName(match));
-            }
+        return getValidBodyParts('BodyFlag', regex, (_, groupIndex, matches) => {
+            return (!matches[5] && groupIndex == 3) || (matches[5] && groupIndex == 5); // 3 => simple check, 5 => array check
         });
-
-        validFlags = util.formatValidFlagArray(validFlags);
-
-        return validFlags;
     }
 
     /**
-    * Get a regex that can be used to check for flags
+    * Get a regex that can be used to check for valid body flags
     * @param {string} name
     */
     function getFlagCheckRegex(name) {
-        return new RegExp('\\.(add|has)' + name + 'Flag\\(GLOBAL\\.FLAG_([\\S ][^)]+)\\)*', 'g');
+        return new RegExp(`\\.(add|has)${name}Flag\\(GLOBAL\\.FLAG_([\\S ][^)]+)\\)*`, 'g');
     }
 
     /**
-    * Get a regex that can be used to check for flags that are called on arrays
+    * Get a regex that can be used to check for valid body flags that are called on arrays
     * @param {string} name
     * @param {string} arrayName
     */
     function getFlagCheckForArrayRegex(simpleName, arrayName) {
         // Here two checks need to be done. One for char.(add|has)(), another for the array access array[x].(add|has)()
 
-        const charCheck = '\\.(add|has)' + simpleName + 'Flag\\(GLOBAL\\.FLAG_([\\S ][^),]+)\\)*';
-        const arrayCheck = '\\.' + arrayName + '\\[[\\S]\\]\\.(add|has)Flag\\(GLOBAL.FLAG_([\\S ][^)]+)\\)*';
+        const charCheck = `\\.(add|has)${simpleName}Flag\\(GLOBAL\\.FLAG_([\\S ][^),]+)\\)*`;
+        const arrayCheck = `\\.${arrayName}\\[[\\S]\\]\\.(add|has)Flag\\(GLOBAL.FLAG_([\\S ][^)]+)\\)*`;
 
         return new RegExp(`(${charCheck}|${arrayCheck})`, 'g');
     }
@@ -667,12 +673,12 @@ const path = require('path');
     const validBodyFlagsStart = Date.now();
 
 
-    // Simple add/has checks
+    // Simple add|has checks
     ['Areola', 'Arm', 'Ear', 'Face', 'Leg', 'Skin', 'Tail', 'Tongue'].forEach(name => {
         obj.ValidFlags[name] = getValidBodyFlagsDefault(getFlagCheckRegex(name));
     });
 
-    // Array add/has checks
+    // Array add|has checks
     obj.ValidFlags.Penis = getValidBodyFlagsForArray(getFlagCheckForArrayRegex('Cock', 'cocks'));
     obj.ValidFlags.Vagina = getValidBodyFlagsForArray(getFlagCheckForArrayRegex('Vagina', 'vaginas'));
 
@@ -693,41 +699,53 @@ const path = require('path');
 
 
     /**
-    * Get body type object by name
-    * @param {string} name
-    */
-    function getBodyTypeByName(name) {
-        const flag = obj.BodyType.find(type => type.name.toLocaleLowerCase() == name.replace('_', ' ').toLocaleLowerCase());
-        return {
-            name: flag.name,
-            value: flag.value
-        };
-    }
-
-    /**
-    * Get VALID_X_TYPES using regex
+    * Get accurate VALID_<BODYPART>_TYPES using regex
     * @param {RegExp} regex
     */
     function getValidBodyTypesDefault(regex) {
-        var validTypes = [];
-
-        util.execRegexOnContents(regex, (match, groupIndex) => {
-            if (groupIndex == 1) {
-                validTypes.push(getBodyTypeByName(match));
-            }
+        return getValidBodyParts('BodyType', regex, (match, groupIndex) => {
+            return groupIndex == 1 && match.toLocaleLowerCase() !== 'kaithrit';
+            // For whatever reason, the game sets the 'TYPE_KAITHRIT' type for the [Kui-Tan Lt, XO Defender, XO Gunner] creatures
+            // even though 'GLOBAL.TYPE_KAITHRIT' doesn't exist
         });
-
-        validTypes = util.formatValidFlagArray(validTypes);
-
-        return validTypes;
     }
 
     /**
-    * Get a regex that can be used to check for flags
+    * Get accurate VALID_<BODYPART>_TYPES for arrays using regex
+    * @param {RegExp} regex
+    */
+    function getValidBodyTypesForArray(regex) {
+        return getValidBodyParts('BodyType', regex, (match, groupIndex, matches) => {
+            return ((!matches[3] && groupIndex == 2) || (matches[3] && groupIndex == 3)) && match.toLocaleLowerCase() !== 'kaithrit';
+            // 2 => simple check, 3 => array check
+            // For whatever reason, the game sets the 'TYPE_KAITHRIT' type for the [Kui-Tan Lt, XO Defender, XO Gunner] creatures
+            // even though 'GLOBAL.TYPE_KAITHRIT' doesn't exist
+        });
+    }
+
+    // After fiddling with this shit for almost an hour it turns out it wasn't working because the spaces around the equal sign were getting removed, silly me
+
+    /**
+    * Get a regex that can be used to check for valid body part types
     * @param {string} name
     */
     function getTypeCheckRegex(name) {
-        return new RegExp('\\.' + name + 'Type ={1,3} GLOBAL\\.TYPE_([\\w_]+)', 'g'); //figure out why javascript doesnt like this expression
+        return new RegExp(`\.${name}Type={1,3}GLOBAL\\.TYPE_([\\w]+)*`, 'g');
+    }
+
+    /**
+    * Get a regex that can be used to check for valid body part types that are called on arrays
+    * @param {string} name
+    * @param {string} arrayName
+    * @param {string} keyName
+    */
+    function getTypeCheckForArrayRegex(simpleName, arrayName, keyName = 'type') {
+        // Again, two checks need to be done. One for char.hasXType(), another for the array access array[x].type==
+
+        const charCheck = `\\.has${simpleName}Type\\(GLOBAL\\.TYPE_([\\S ][^),]+)\\)*`;
+        const arrayCheck = `\\.${arrayName}\\[[\\S]\\]\\.${keyName}={1,3}GLOBAL\\.TYPE_([\\w]+)`;
+
+        return new RegExp(`(${charCheck}|${arrayCheck})`, 'g');
     }
 
 
@@ -735,12 +753,24 @@ const path = require('path');
     const validBodyTypesStart = Date.now();
 
 
-    //obj.ValidTypes.Ear = getValidBodyTypesDefault(getTypeCheckRegex('ear'));
+    // Simple assignment|equality checks
+    ['Antennae', 'Arm', 'Ear', 'Eye', 'Face', 'Horn', 'Leg', 'Tail', 'Tongue', 'Wing'].forEach(name => {
+        obj.ValidTypes[name] = getValidBodyTypesDefault(getTypeCheckRegex(name.toLocaleLowerCase()));
+    });
+
+    // Array assignment|equality checks
+    obj.ValidTypes.Penis = getValidBodyTypesForArray(getTypeCheckForArrayRegex('Cock', 'cocks', 'cType'));
+    obj.ValidTypes.Vagina = getValidBodyTypesForArray(getTypeCheckForArrayRegex('Vagina', 'vaginas'));
+
+    // Other
+
+
+    // TODO:
+    // dNip - should be the same as pen but should check to be sure
 
 
     const validBodyTypesEnd = Date.now();
     util.printOperationTime('valid body types', validBodyTypesStart, validBodyTypesEnd);
-
 
     // #endregion
 
