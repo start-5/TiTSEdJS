@@ -231,73 +231,12 @@ const path = require('path');
                 // By this point we have started evaluating the page, which means that we are scoped to the browser page and not the file
 
 
+                // At some point this will support loading a file to read some hard-to-get data, but I haven't found a consistent way yet
+
+
                 // #region Funcs
 
                 /* eslint-disable no-inner-declarations */
-
-                /**
-                * Get an object/value with the specified key inside another object, recursively
-                * @param {string} key
-                */
-                function getObjectRecursive(obj, key) {
-
-                    var result = null;
-
-                    if (obj instanceof Array) {
-                        for (var i = 0; i < obj.length; i++) {
-                            result = getObjectRecursive(obj[i]);
-                        }
-                    }
-                    else {
-                        for (var prop in obj) {
-                            if (prop == key) {
-                                return obj[key];
-                            }
-                            if (obj[prop] instanceof Object || obj[prop] instanceof Array)
-                                result = getObjectRecursive(obj[prop]);
-                        }
-                    }
-
-                    return result;
-                }
-
-                /**
-                * Get valid xyz for a body part
-                * @param {string} bodyPartName
-                * @param {string} type
-                * @param {Array} bodyPartArray
-                */
-                function getValidFor(bodyPartName, type, bodyPartArray) {
-                    const validArray = [];
-
-                    const key = 'VALID_' + bodyPartName + type;
-
-                    const gameArray = getObjectRecursive(window.GLOBAL, key);
-
-                    for (var i = 0; i < gameArray.length; i++) {
-                        validArray.push(bodyPartArray.find(f => f.value == gameArray[i]));
-                    }
-
-                    return validArray;
-                }
-
-                /**
-                * Get valid flags for a body part
-                * @param {string} bodyPartName
-                * @param {Array} bodyFlagsArray
-                */
-                function getValidFlagsFor(bodyPartName, bodyFlagsArray) {
-                    return getValidFor(bodyPartName, '_FLAGS', bodyFlagsArray);
-                }
-
-                /**
-                * Get valid types for a body part
-                * @param {string} bodyPartName
-                * @param {Array} bodyPartsArray
-                */
-                function getValidTypesFor(bodyPartName, bodyPartsArray) {
-                    return getValidFor(bodyPartName, '_TYPES', bodyPartsArray);
-                }
 
                 /**
                 * Get data in the game's GLOBAL var by their prefix
@@ -336,41 +275,6 @@ const path = require('path');
                     Upbringing: getGlobalsByPrefix('UPBRINGING_'),
                     ValidFlags: {},
                     ValidTypes: {}
-                };
-                const bf = global.BodyFlag;
-                const bt = global.BodyType;
-
-                global.ValidFlags = {
-                    //Areola: getValidFlagsFor('AREOLA', bf),
-                    //Arm: getValidFlagsFor('ARM', bf),
-                    //Face: getValidFlagsFor('FACE', bf),
-                    //Leg: getValidFlagsFor('LEG', bf),
-                    //Penis: getValidFlagsFor('COCK', bf),
-                    //Skin: getValidFlagsFor('SKIN', bf),
-                    //Tail: getValidFlagsFor('TAIL', bf),
-                    //Tailcunt: getValidFlagsFor('VAGINA', bf),
-                    //Tongue: getValidFlagsFor('TONGUE', bf),
-                    //Vagina: getValidFlagsFor('VAGINA', bf)
-                };
-
-                //global.ValidFlags.Tail.push({ name: 'Parasitic', value: 55 });
-                //global.ValidFlags.Tailcunt.push({ name: 'Tailcunt', value: 42 });
-
-                global.ValidTypes = {
-                    //Antennae: getValidTypesFor('ANTENNAE', bt),
-                    //Arm: getValidTypesFor('ARM', bt),
-                    //Dicknipple: getValidTypesFor('DICKNIPPLE', bt),
-                    //Ear: getValidTypesFor('EAR', bt),
-                    //Eye: getValidTypesFor('EYE', bt),
-                    //Face: getValidTypesFor('FACE', bt),
-                    //Horn: getValidTypesFor('HORN', bt),
-                    //Leg: getValidTypesFor('LEG', bt),
-                    //Penis: getValidTypesFor('COCK', bt),
-                    //Tail: getValidTypesFor('TAIL', bt),
-                    //TailGenital: getValidFor('TAIL_GENITAL', '_ARGS', bt), - ??? todo still probably
-                    //Tongue: getValidTypesFor('TONGUE', bt),
-                    //Vagina: getValidTypesFor('VAGINA', bt),
-                    //Wing: getValidTypesFor('WING', bt)
                 };
 
 
@@ -1079,6 +983,50 @@ const path = require('path');
 
     const hairStylesEnd = Date.now();
     util.printOperationTime('hair styles', hairStylesStart, hairStylesEnd);
+
+    // #endregion
+
+
+    // #region Beard Styles
+
+    console.log('\ngetting beard styles');
+    const beardStylesStart = Date.now();
+
+    var beardStyles = [];
+
+    (function () {
+        for (var index = 0; index < contents.length; ++index) {
+            var content = contents[index];
+            const regex = /case ([0-9]):[\s\S][^break;]+t="([\S ][^"]+)",/g;
+
+            var m;
+            while ((m = regex.exec(content)) !== null) {
+                if (m.index === regex.lastIndex) {
+                    regex.lastIndex++;
+                }
+
+                const beardStyle = {};
+
+                m.forEach((match, groupIndex) => {
+                    if (groupIndex == 1) {
+                        beardStyle.value = match;
+                    }
+                    else if (groupIndex == 2) {
+                        beardStyle.name = match;
+                    }
+                });
+
+                beardStyles.push(beardStyle);
+            }
+        }
+    })();
+
+    beardStyles = util.formatNameValueArray(hairStyles);
+
+    obj.BeardStyle = beardStyles;
+
+    const beardStylesEnd = Date.now();
+    util.printOperationTime('beard styles', beardStylesStart, beardStylesEnd);
 
     // #endregion
 
