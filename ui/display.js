@@ -119,7 +119,7 @@ function displayHead() {
                 new SelectField('HairStyle', char, 'hairStyle', 'Hair Style'),
                 new FloatField(char, 'beardLength', 'Beard Length', 'inches', 0),
                 new SelectField('HairType', char, 'beardType', 'Beard Type'),
-                // todo beard style
+                new SelectField('BeardStyle', char, 'beardStyle', 'Beard Style')
             ])
         ]),
         new Row([
