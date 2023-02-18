@@ -35,6 +35,14 @@ const path = require('path');
     const util = {
 
         /**
+        * Capitalizes the first letter
+        * @param {string} str
+        */
+        capitalize: function (str) {
+            return str && str[0].toUpperCase() + str.slice(1);
+        },
+
+        /**
         * @callback execRegexOnContentsCallback
         * @param {string} match
         * @param {number} groupIndex
@@ -67,7 +75,17 @@ const path = require('path');
         */
         formatNameValueArray: function (arr) {
             return arr
-                .filter((flag, index, self) => self.findIndex(flag2 => (flag2.value === flag.value)) === index)
+                .filter((item, index, self) => self.findIndex(item2 => (item2.value === item.value)) === index)
+                .sort((l, r) => l.value - r.value);
+        },
+
+        /**
+        * Format a name value array by name
+        * @param {Array<{name:string, value:number}>} arr
+        */
+        formatNameValueArrayByName: function (arr) {
+            return arr
+                .filter((item, index, self) => self.findIndex(item2 => (item2.name === item.name)) === index)
                 .sort((l, r) => l.value - r.value);
         },
 
@@ -176,7 +194,7 @@ const path = require('path');
     const operationStart = Date.now();
 
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch();// ({ devtools: true, headless: false });
     const page = await browser.newPage();
 
 
@@ -223,15 +241,12 @@ const path = require('path');
         console.log('evaluating game instance');
         const evalGameStart = Date.now();
 
-        evalResult = await page.evaluate(() => {
+        evalResult = await page.evaluate(async () => {
             try {
 
 
                 // Note:
                 // By this point we have started evaluating the page, which means that we are scoped to the browser page and not the file
-
-
-                // At some point this will support loading a file to read some hard-to-get data, but I haven't found a consistent way yet
 
 
                 // #region Funcs
@@ -255,9 +270,48 @@ const path = require('path');
                         .filter(key => typeof key.value !== 'object');
                 }
 
+                /**
+                * Wait for completion of stuff
+                * @param {number} time
+                */
+                function delay(time) {
+                    return new Promise(function (resolve) {
+                        setTimeout(resolve, time);
+                    });
+                }
+
                 /* eslint-enable no-inner-declarations */
 
                 // #endregion
+
+
+                // #region Save File
+
+                let raw = '{"classInstance":"GameState","neverSerialize":false,"version":21,"gameInstanceInfo":{"classInstance":"SaveSlotData","neverSerialize":false,"version":21,"note":null,"gender":"M","location":"FIRST-14, Kalas","name":"Donut","level":1,"occupation":"Smuggler","avatar":null,"miniMapVisible":true,"minimapRolledOut":false,"bustRolledOut":false,"dateTimeVisible":true},"debugMode":false,"easyMode":false,"sillyMode":false,"minutes":43,"hours":6,"days":1,"characters":{"PC":{"classInstance":"PlayerCharacter","neverSerialize":false,"version":2,"cocks":[{"classInstance":"Cock","neverSerialize":false,"version":3,"cLengthRaw":4,"cLengthMod":0,"cThicknessRatioRaw":1,"cThicknessRatioMod":0,"cType":0,"cockColor":"pink","knotMultiplier":1,"flaccidMultiplier":0.25,"virgin":true,"flags":[],"piercing":null,"cocksock":null}],"vaginas":[],"ass":{"classInstance":"Vagina","neverSerialize":false,"version":3,"type":0,"hymen":false,"clits":0,"vaginaColor":"pink","wetnessRaw":0,"wetnessMod":0,"loosenessRaw":1,"loosenessMod":0,"minLooseness":1,"bonusCapacity":0,"shrinkCounter":0,"flags":[],"fullness":0,"piercing":null,"clitPiercing":null},"breastRows":[{"classInstance":"BreastRow","neverSerialize":false,"version":2,"breasts":2,"nippleType":0,"areolaFlags":[],"breastRatingRaw":0,"breastRatingMod":0,"breastRatingLactationMod":0,"breastRatingHoneypotMod":0,"piercing":null,"fullness":0}],"perks":[{"classInstance":"StorageClass","neverSerialize":false,"version":1,"storageName":"Virile","value1":1.15,"value2":0,"value3":0,"value4":0,"hidden":true,"iconName":"","tooltip":"Increases the quality of your sperm.","combatOnly":false,"minutesLeft":0,"iconShade":"var(--textColor)"}],"statusEffects":[],"keyItems":[],"inventory":{"classInstance":"Inventory","neverSerialize":false,"version":1,"locationKey":"GLOBAL","storage":[],"decorationStorage":[],"transientStorage":[],"equippedItems":{"classInstance":"EquippedItems","neverSerialize":false,"version":1,"meleeWeapon":{"classInstance":"Knife","quantity":1},"rangedWeapon":{"classInstance":"HoldOutPistol","quantity":1},"armor":{"classInstance":"DressClothes","quantity":1},"upperUndergarment":{"classInstance":"PlainUndershirt","quantity":1},"lowerUndergarment":{"classInstance":"PlainBriefs","quantity":1},"accessory":null,"shield":{"classInstance":"BasicShield","quantity":1}},"transientEquipment":{"classInstance":"EquippedItems","neverSerialize":false,"version":1,"meleeWeapon":null,"rangedWeapon":null,"armor":null,"upperUndergarment":null,"lowerUndergarment":null,"accessory":null,"shield":null},"equippedPiercings":{"classInstance":"EquippedPiercings","neverSerialize":false,"version":1,"eyebrow":null,"nose":null,"tongue":null,"lip":null,"ear":null,"belly":null},"equippedImplants":{"classInstance":"EquippedImplants","neverSerialize":false,"version":1,"combatImplant":null,"utilityImplant":null},"equippedTent":{"classInstance":"HLTent","neverSerialize":false,"version":1,"hasDynamicProperties":true,"stackSize":1,"quantity":1,"hasUniqueName":false,"shortName":"HL Tent I","longName":"hardlight survival tent","description_internal":"a JoyCo-branded hardlight survival tent","tooltip":"While traditional tents are known for their reliability, hardlight tents have come into popularity in the last several centuries, owing to their durability, ability to vacuum-seal themselves to protect against hazards like toxic storms, and surprising lightness. Typical hardlight survival tents weigh no more than the lightest grenades.\n\nThis particular JoyCo model is lighter than most, manufactured for light survival use. Its small power core requires <b>three days</b> to replenish its charge via its miniaturized kinetic generator. To many, this is a major flaw. To explorers who might need to avoid one surprise downpour when they’re too far from town, it’s perfect.\n\n<b>This item is only usable in hazardous areas.</b>\n<b>Cooldown:</b> 3 days.","attackVerb":"","attackNoun":"","type":20,"basePrice":250,"level":1,"rarity":0,"customImage":"","customIcon":"","itemFlags":[],"attack":0,"baseDamage":{"classInstance":"TypeCollection","values":[0,0,0,0,0,0,0,0,0,0,0,0],"flags":[]},"defense":0,"shieldDefense":0,"shields":0,"sexiness":0,"resolve":0,"critBonus":0,"evasion":0,"fortification":0,"hardLightEquipped":false,"resistances":{"classInstance":"TypeCollection","values":[0,0,0,0,0,0,0,0,0,0,0,0],"flags":[]},"lustGain":0,"lustMin":0,"isUsable":true,"combatUsable":false,"targetsSelf":true,"requiresTarget":false,"dynamicProperties":null,"lastUseAt":-10000,"cooldown":4320}},"sexualPreferences":{"classInstance":"SexualPreferences","neverSerialize":false,"version":1,"sexPrefs":{}},"pregnancyData":[{"classInstance":"PregnancyData","neverSerialize":false,"version":1,"pregnancyIncubation":0,"pregnancyType":"","pregnancyQuantity":0,"pregnancyIncubationMulti":1,"pregnancyBellyRatingContribution":0},{"classInstance":"PregnancyData","neverSerialize":false,"version":1,"pregnancyIncubation":0,"pregnancyType":"","pregnancyQuantity":0,"pregnancyIncubationMulti":1,"pregnancyBellyRatingContribution":0},{"classInstance":"PregnancyData","neverSerialize":false,"version":1,"pregnancyIncubation":0,"pregnancyType":"","pregnancyQuantity":0,"pregnancyIncubationMulti":1,"pregnancyBellyRatingContribution":0},{"classInstance":"PregnancyData","neverSerialize":false,"version":1,"pregnancyIncubation":0,"pregnancyType":"","pregnancyQuantity":0,"pregnancyIncubationMulti":1,"pregnancyBellyRatingContribution":0}],"short":"Donut","long_internal":"You scrawny, yo.","originalRace":"human","a":"a ","isPlural":false,"fluidSimulate":false,"lustSimulate":false,"statusSimulate":false,"customDodge":"","customBlock":"","typesBought":[],"sellMarkup":1,"buyMarkdown":1,"keeperGreeting":"<i>“Hello and welcome to my shop. Take a gander and let me know if you see anything you like,”</i> a  says with a smile.\n","keeperBuy":"What would you like to buy?\n","keeperSell":"What would you like to sell?\n","Internal_physiqueRaw":3,"Internal_reflexesRaw":3,"Internal_aimRaw":3,"Internal_intelligenceRaw":4,"Internal_willpowerRaw":2,"Internal_libidoRaw":3,"Internal_taintRaw":0,"physiqueMod":0,"reflexesMod":0,"aimMod":0,"intelligenceMod":0,"willpowerMod":0,"libidoMod":0,"taintMod":0,"affinity":"intelligence","characterClass":0,"personality":17,"exhibitionismRaw":0,"HPRaw":15,"HPMod":0,"shieldsRaw":14,"lustRaw":2.3916666666666666,"lustMod":0,"energyRaw":100,"energyMod":0,"teaseLevel":0,"teaseXP":0,"baseHPResistances":{"classInstance":"TypeCollection","values":[0,0,0,0,0,0,0,0,0,0,0,0],"flags":[]},"baseShieldResistances":{"classInstance":"TypeCollection","values":[0,0,0,0,0,0,0,0,0,0,0,0],"flags":[]},"isLustImmune":false,"level":1,"credits":2500,"perkPoints":0,"femininity":30,"eyeType":0,"eyeColor":"blue","tallness":48,"thickness":20,"tone":50,"hairColor":"black","beardColor":"no","scaleColor":"blue","furColor":"black","hairLength":1,"hairStyle":"null","hairType":0,"beardType":0,"beardLength":0,"beardStyle":0,"skinType":0,"skinTone":"pale","skinAccent":"","skinFlags":[],"faceType":0,"faceFlags":[],"tongueType":0,"tongueFlags":[],"lipMod":0,"lipColor":"peach","earType":0,"earLength":0,"antennae":0,"antennaeType":0,"horns":0,"hornType":0,"hornLength":0,"armType":0,"armFlags":[],"gills":false,"wingCount":0,"wingType":0,"legType":0,"legCount":2,"legFlags":[16],"earFlags":[],"cumType":2,"genitalSpot":0,"crotchFlags":[],"tailType":0,"tailCount":0,"tailFlags":[],"tailCock":{"classInstance":"Cock","neverSerialize":false,"version":3,"cLengthRaw":5,"cLengthMod":0,"cThicknessRatioRaw":1,"cThicknessRatioMod":0,"cType":0,"cockColor":"pink","knotMultiplier":1,"flaccidMultiplier":0.25,"virgin":true,"flags":[],"piercing":null,"cocksock":null},"tailCunt":{"classInstance":"Vagina","neverSerialize":false,"version":3,"type":0,"hymen":true,"clits":1,"vaginaColor":"pink","wetnessRaw":1,"wetnessMod":0,"loosenessRaw":1,"loosenessMod":0,"minLooseness":1,"bonusCapacity":0,"shrinkCounter":0,"flags":[],"fullness":0,"piercing":null,"clitPiercing":null},"tailVenom":0,"tailRecharge":5,"tailCumType":2,"tailGirlCumType":5,"hipRatingRaw":1,"hipRatingMod":0,"buttRatingRaw":2,"buttRatingMod":0,"balls":2,"ballSizeRaw":1.5,"ballSizeMod":0,"Internal_ballFullness":51.36666666666667,"Internal_ballEfficiency":3,"refractoryRate":1,"scrotumTypeRaw":-1,"scrotumColorRaw":"","minutesSinceCum":41,"timesCum":0,"cockVirgin":true,"clitLength":0.5,"elasticity":1,"girlCumType":5,"vaginalVirgin":true,"nippleColor":"pink","nipplesPerBreast":1,"nippleLengthRatio":1,"nippleWidthRatio":1,"dickNippleMultiplier":3,"dickNippleType":0,"milkMultiplier":0,"milkType":0,"milkStorageMultiplier":1,"milkFullness":0,"milkRate":10,"analVirgin":true,"cumMultiplierRaw":1,"cumMultiplierMod":0,"girlCumMultiplierRaw":1,"girlCumMultiplierMod":0,"impregnationType":"","cumQualityRaw":1,"cumQualityMod":0,"pregnancyIncubationBonusFatherRaw":1,"pregnancyIncubationBonusFatherMod":0,"pregnancyMultiplierRaw":1,"pregnancyMultiplierMod":0,"fertilityRaw":1,"fertilityMod":0,"pregnancyIncubationBonusMotherRaw":1,"pregnancyIncubationBonusMotherMod":0,"bellyRatingRaw":0,"bellyRatingMod":0,"eggs":0,"fertilizedEggs":0,"isUniqueInFight":false,"uniqueName":null,"alreadyDefeated":false,"shieldDisplayName":"SHIELDS","hpDisplayName":"HP","btnTargetText":null,"buttonText":null,"energyDisplayName":"ENERGY","defaultCockIndex":0,"defaultVaginaIndex":-1,"defaultBreastRowIndex":0,"XPRaw":0,"unspentStatPoints":0,"unclaimedClassPerks":0,"unclaimedGenericPerks":0,"synthWombSetting":1,"inseminatorProEnabled":0,"inseminatorProVirility":1,"inseminatorProMaxCum":1,"inseminatorProRefractoryRate":1,"inseminatorProRefractoryRateOrig":1,"inseminatorProCumQ":0,"dildo":null,"forceCreatureRace":null}},"ships":{"SHIP":{"classInstance":"Casstech","neverSerialize":false,"version":6,"short":"Casstech Z14","long":"It’s been painted gold with black stripes. Looking at it again, you realize that you recognize this from some of your father’s holo-pics, at least the ones he’d let you see. This is the same ship that he took out on the Thirteenth Planet Rush, almost two centuries ago.","internalDescription":"","shieldDisplayName":"SHIELDS","hpDisplayName":"ARMOR","inventory":{"classInstance":"ShipInventory","neverSerialize":false,"version":1,"locationKey":"GLOBAL","storage":[],"decorationStorage":[],"storageLimits":{"0":10,"1":10,"2":10,"3":10,"4":10},"equippedItems":{"classInstance":"EquippedShipItems","neverSerialize":false,"version":3,"weapons":[{"classInstance":"MGun","quantity":1},{"classInstance":"LCannon","quantity":1}],"armor":{"classInstance":"ShipArmor","neverSerialize":false,"version":1,"hasDynamicProperties":true,"stackSize":1,"quantity":1,"hasUniqueName":false,"shortName":"Armor","longName":"armor plating","description_internal":"an armor plate","tooltip":"TBD","attackVerb":"shoot","attackNoun":"shot","type":5,"basePrice":5000,"level":1,"rarity":0,"customImage":"","customIcon":"","itemFlags":[],"attack":0,"baseDamage":{"classInstance":"TypeCollection","values":[0,0,0,0,0,0,0,0,0,0,0,0],"flags":[]},"defense":30,"shieldDefense":0,"shields":0,"sexiness":0,"resolve":0,"critBonus":0,"evasion":0,"fortification":0,"hardLightEquipped":false,"resistances":{"classInstance":"TypeCollection","values":[0,25,25,0,-50,0,0,0,0,0,0,0],"flags":[]},"lustGain":0,"lustMin":0,"isUsable":true,"combatUsable":false,"targetsSelf":true,"requiresTarget":false,"dynamicProperties":null},"shield":{"classInstance":"ShipShield","neverSerialize":false,"version":1,"hasDynamicProperties":true,"stackSize":1,"quantity":1,"hasUniqueName":false,"shortName":"ShieldGen","longName":"shield generator","description_internal":"a shield generator","tooltip":"TBD","attackVerb":"shoot","attackNoun":"shot","type":6,"basePrice":5000,"level":1,"rarity":0,"customImage":"","customIcon":"","itemFlags":[],"attack":0,"baseDamage":{"classInstance":"TypeCollection","values":[0,0,0,0,0,0,0,0,0,0,0,0],"flags":[]},"defense":0,"shieldDefense":20,"shields":3000,"sexiness":0,"resolve":0,"critBonus":0,"evasion":0,"fortification":0,"hardLightEquipped":false,"resistances":{"classInstance":"TypeCollection","values":[50,-50,-25,0,25,0,0,0,0,0,0,0],"flags":[]},"lustGain":0,"lustMin":0,"isUsable":true,"combatUsable":false,"targetsSelf":true,"requiresTarget":false,"dynamicProperties":null}}},"perks":[],"statusEffects":[],"keyItems":[],"captainDisplay":"UNKNOWN","modelDisplay":"Casstech Z14","factionDisplay":"UNKNOWN","gunCapacityRaw":2,"capacityRaw":4,"agilityRaw":20,"speedRaw":33,"powerRaw":25,"sensorsRaw":14,"systemsRaw":25,"baseHPResistances":{"classInstance":"TypeCollection","values":[0,0,0,0,0,0,0,0,0,0,0,0],"flags":[]},"baseShieldResistances":{"classInstance":"TypeCollection","values":[0,0,0,0,0,0,0,0,0,0,0,0],"flags":[]},"HPRaw":2000,"HPMod":2000,"shieldsRaw":3000,"energyRaw":200,"energyMod":0,"level":0,"holodeck":false,"isUniqueInFight":true,"ownerIndex":"PC","wardrobeSizeRaw":10,"equipmentSizeRaw":10,"consumableSizeRaw":10,"valuablesSizeRaw":10,"toysSizeRaw":10,"a":"the ","capitalA":"The ","customBlock":"<b>Placeholder</b>.","customDodge":"It’s too evasive!","isPlural":false,"credits":25000,"btnTargetText":"CT.Z14"}},"flags":{"artistOverrides":{"pc":"mannequin_auto","pc_nude":"mannequin_auto"},"pathOverrides":{},"customMannequin":{"pc":{"femininity":0,"tone":0,"thickness":0,"hipRating":0,"buttRating":0,"bellyRating":0,"breasts0":2,"breastRating0":0,"breasts1":0,"breastRating1":0,"breasts2":0,"breastRating2":0,"breastRatingMax":100},"pc_nude":{"femininity":0,"tone":0,"thickness":0,"hipRating":0,"buttRating":0,"bellyRating":0,"breasts0":2,"breastRating0":0,"breasts1":0,"breastRating1":0,"breasts2":0,"breastRating2":0,"breastRatingMax":100}},"PC_UPBRINGING":0,"PREV_LOCATION":"CASSTECH.BOARDINGRAMP","PREV_SHIP_LOCATION":"KALAS.INTRO_SPACE_PLACE.INTRO_SPACE","RIVALCONFIGURED":1,"BIANCA_PLANET":"mhen’ga","BIANCA_LAST_DAY_MOVED":1,"MAJIN_LAST_FLIGHT":1,"MAJIN_SHIZZY_LOC":2,"MAJIN_LAST_SHIFT":66,"LUCA_ADDICTION":0,"LUCA_SUBMISSION":0,"KIRO_TRUST":40,"STEPH_FIRST_WATCHED":1802,"STEPH_DEFAULT_UNLOCKED":"STEPH_NYAN","TIMES_HAD_SEX_WITH_DELILAH_IN_SOME_WAY":0,"NYKKE_VERSION":2,"ENCOUNTERS_DISABLED":1},"inactivePlayerOwnedShips":[],"mailState":{"classInstance":"MailStateStorage","neverSerialize":false,"version":1,"mails":{"sorryIMissedTheFuneral":{"classInstance":"MailStateStorageEntry","neverSerialize":false,"version":1,"UnlockedTimestamp":1802,"ContentCache":"<i>You recognize the company email of Anyxine Rhenesuune, the daughter of one of your father’s leithan business partners and a friend from your pre-teen years, though she <b>did</b> become kind of a bully later on.</i><br><br>Hey, Donut, long time no talk. My dad finally told me you switched emails. Guess I was screaming into the void for a couple weeks there. Anyway. I’m real sorry I couldn’t make the funeral. I’m just getting set up in a new office over Uveto, made planetary director finally. Shitty excuse, but I just couldn’t get away. :{<br><br>You know how much your old man meant to me and the whole family. Still kind of hard to believe Uncle Vic’s gone. You’ve probably heard this like fifty times already, but he really was my hero growing up.<br><br>Look, I know I was kind of a dick the last time we hung out but you’re still my friend. I hope you’re doing okay. Sending you big comfy lizard hugs! <3<br><br>P.S. There’s a Steele Tech science outpost here, and the nerds are saying you’re not being bumped up to E-suite yet? Any idea why?<br><br>If you need a job or something, I’m sure I can find a janitor’s bucket or something for you :)<br><br>-Anyx","ToCache":"Donut Steele","ToAddressCache":"Donut_Steele@SteeleTech.corp","Folder":0}}},"childState":{"classInstance":"ChildStateStorage","neverSerialize":false,"version":2,"children":[]},"codexState":{"classInstance":"CodexStateStorage","neverSerialize":false,"version":1,"unlockedEntries":["Ausar","Dzaan","Galotians","Gryvain","Humans","Kaithrit","Kui-Tan","Ovir","Saurmorians","Thraggen","Aegis","J’ejune","JoyCo","KihaCorp","Nova Securities","Pyrite","Reaper","RhenWorld","Steele Tech","Xenogen","Black Void","J.A.F.","T.S.C.","U.G.C.","Soak","AI Systems","Item Mechanics","Taint","Bull’s Strength","Dildo Snakes","Dragon’s Hoard"],"viewedEntries":[]},"mapState":{"classInstance":"MapStateStorage","neverSerialize":false,"version":1,"sector":{"Systems":{"KALAS":{"TAVROS":{"NURSERYSTAIRS2F":0,"NURSERYC6":0,"NURSERYE8":0,"NURSERYE6":0,"NURSERYE4":0,"NURSERYG8":0,"NURSERYG6":0,"NURSERYG4":0,"NURSERYI6":0,"NURSERYSERA":0,"TAVROS LIFT":0,"TAVROS HANGAR":0},"FIRST-14":{"FIRST R20":0,"FIRST R18":0,"FIRST T20":0,"FIRST V22":0,"FIRST V20":0,"FIRST X24":0,"FIRST X22":0,"FIRST X20":0}}},"Ships":{}}},"locationStorage":{"classInstance":"LocationStorage","neverSerialize":false,"version":3,"locations":{}},"timestampedEventBuffer":[],"eventQueue":[],"currentLocation":"KALAS.FIRST-14.FIRST X24","shipLocation":"KALAS.FIRST-14.FIRST X24","inSceneBlockSaving":false,"gameOverEvent":false,"statStorage":{"movement":{"time travelled":1}}}';
+                raw = raw.replaceAll('\n', ''); // No clue how this doesn't explode when loading a save normally
+
+                const file = new File([raw], 'save.json', { type: 'application/json' });
+                const data = new DataTransfer();
+                data.items.add(file);
+
+                window.showSaveLoad();
+                await delay(500);
+
+                const fileInput = document.getElementById('fileToLoad');
+                fileInput.files = data.files;
+
+                await delay(500);
+                window.pressButton(3);
+                await delay(500);
+
+                fileInput.dispatchEvent(new Event('change', { 'bubbles': true }));
+
+                await delay(5000);
+
+                // #endregion
+
+
+                const pc = window.pc;
 
 
                 const global = {
@@ -278,11 +332,33 @@ const path = require('path');
                 };
 
 
+                // #region Beard Styles
+
+                const beardStyles = [];
+
+                for (var i = 0; i < 20; i++) {
+                    pc.beardStyle = i;
+
+                    beardStyles.push({
+                        name: pc.beardStyles(),
+                        value: i
+                    });
+                }
+
+                global.BeardStyle = beardStyles;
+
+                // #endregion
+
+
+                // #region PantyData
+
                 const pantyData = {};
                 const pantyDataArr = window.PantyData.toJSON();
                 for (let i = 0; i < pantyDataArr.length; i++) {
                     pantyData[pantyDataArr[i][0]] = pantyDataArr[i][1].panty;
                 }
+
+                // #endregion
 
 
                 const version = window.version;
@@ -987,46 +1063,20 @@ const path = require('path');
     // #endregion
 
 
-    // #region Beard Styles
+    // #region Other
 
-    console.log('\ngetting beard styles');
-    const beardStylesStart = Date.now();
 
-    var beardStyles = [];
+    // #region Beard Style
 
-    (function () {
-        for (var index = 0; index < contents.length; ++index) {
-            var content = contents[index];
-            const regex = /case ([0-9]):[\s\S][^break;]+t="([\S ][^"]+)",/g;
+    for (var i = 0; i < obj.BeardStyle.length; i++) {
+        obj.BeardStyle[i].name = util.capitalize(obj.BeardStyle[i].name);
+    }
 
-            var m;
-            while ((m = regex.exec(content)) !== null) {
-                if (m.index === regex.lastIndex) {
-                    regex.lastIndex++;
-                }
+    obj.BeardStyle = util.formatNameValueArrayByName(obj.BeardStyle);
 
-                const beardStyle = {};
 
-                m.forEach((match, groupIndex) => {
-                    if (groupIndex == 1) {
-                        beardStyle.value = match;
-                    }
-                    else if (groupIndex == 2) {
-                        beardStyle.name = match;
-                    }
-                });
+    // #endregion
 
-                beardStyles.push(beardStyle);
-            }
-        }
-    })();
-
-    beardStyles = util.formatNameValueArray(hairStyles);
-
-    obj.BeardStyle = beardStyles;
-
-    const beardStylesEnd = Date.now();
-    util.printOperationTime('beard styles', beardStylesStart, beardStylesEnd);
 
     // #endregion
 

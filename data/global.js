@@ -1,6 +1,20 @@
 /* eslint-disable no-unused-vars */
 
 const Globals = {
+    BeardStyle: [
+        { name: 'Unstyled', value: 0 },
+        { name: 'Braided', value: 1 },
+        { name: 'Curly', value: 2 },
+        { name: 'Untamed', value: 3 },
+        { name: 'Anchor', value: 4 },
+        { name: 'Mutton chops', value: 5 },
+        { name: 'Boxed', value: 6 },
+        { name: 'Chin strap', value: 7 },
+        { name: 'Mustache', value: 8 },
+        { name: 'Handlebars', value: 9 },
+        { name: 'Goatee', value: 10 },
+        { name: 'Sideburns', value: 11 },
+    ],
     BodyFlag: [
         { name: 'Long', value: 1 },
         { name: 'Prehensile', value: 2 },
