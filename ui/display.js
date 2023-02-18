@@ -119,7 +119,7 @@ function displayHead() {
                 new SelectField('HairStyle', char, 'hairStyle', 'Hair Style'),
                 new FloatField(char, 'beardLength', 'Beard Length', 'inches', 0),
                 new SelectField('HairType', char, 'beardType', 'Beard Type'),
-                // todo beard style
+                new SelectField('BeardStyle', char, 'beardStyle', 'Beard Style')
             ])
         ]),
         new Row([
@@ -230,8 +230,8 @@ function displayBody() {
                 new IntegerField(char, 'nipplesPerBreast', 'Nipples Per Breast', null, 0),
                 new FloatField(char, 'nippleLengthRatio', 'Nipple Length Ratio', null, 0),
                 new FloatField(char, 'nippleWidthRatio', 'Nipple Width Ratio', null, 0),
-                new SelectField('ValidTypes.Dicknipple', char, 'dickNippleType', 'Dicknipple type'),
-                new IntegerField(char, 'dickNippleMultiplier', 'Dick Nipple Multiplier', null, 0)
+                new SelectField('ValidTypes.Penis', char, 'dickNippleType', 'Dicknipple type'),
+                new IntegerField(char, 'dickNippleMultiplier', 'Dicknipple Multiplier', null, 0)
             ]),
             new ArrayGroup('Breasts', 'addBreastRow', [
                 new ArrayField(char, 'breastRows()', 'getBreastName', 'removeBreastRow', [
