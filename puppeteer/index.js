@@ -809,83 +809,103 @@ const path = require('path');
 
     // #region Status Effects
 
-    // TODO: This is still kind of a mess
+
+    // i dont even know what im lookin at
+    //237
+    //16734c
+    // 
+
 
     console.log('\ngetting status effects');
     const statusEffectsStart = Date.now();
 
     var statusEffects = [];
 
-    (function () {
-        for (var index = 0; index < contents.length; ++index) {
-            var content = contents[index];
-            const regex = /\.(create|has)StatusEffect\(([\"\w\ \,\+\%\.\'\-\’\!\?\$\#\@\/\&\*]+)\)/g;
+    util.execRegexOnContents(/\.(create|has)StatusEffect\(([\"\w\ \,\+\%\.\'\-\’\!\?\$\#\@\/\&\*]+)\)/g, (match, groupIndex, matches) => {
 
-            var m;
-            while ((m = regex.exec(content)) !== null) {
-                if (m.index === regex.lastIndex) {
-                    regex.lastIndex++;
+        var statusEffect = new StorageClass();
+
+        if (match.startsWith('.create')) {
+            if (nthIndex(match, '"', 1) === nthIndex(match, '(', 1) + 1) {
+                statusEffect.storageName = match.slice(nthIndex(match, '"', 1) + 1, nthIndex(match, '"', 2));
+            }
+
+            statusEffect.value1 = getStorageClassValue(1, match);
+            statusEffect.value2 = getStorageClassValue(2, match);
+            statusEffect.value3 = getStorageClassValue(3, match);
+            statusEffect.value4 = getStorageClassValue(4, match);
+
+            if (nthIndex(match, '"', 5) > 0) {
+                if (nthIndex(match, ',', 8) > 0) {
+                    statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, '"', 6));
+                }
+                else {
+                    if (nthIndex(match, ',', 9) > 0) {
+                        statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ',', 9) - 1);
+                    }
+                    else {
+                        statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ')', 1) - 1);
+                    }
+                }
+            }
+
+            if (nthIndex(match, '"', 3) > 0) {
+                statusEffect.iconName = match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, '"', 4));
+            }
+
+            if (nthIndex(match, ',', 5) > 0) {
+                let strBool = '';
+                let bool = false;
+                if (nthIndex(match, ',', 6) > 0) {
+                    strBool = match.slice(nthIndex(match, ',', 5) + 1, nthIndex(match, ',', 6));
+                }
+                else {
+                    strBool = match.slice(nthIndex(match, ',', 5) + 1, nthIndex(match, ')', 1) - 1);
+
                 }
 
-                m.forEach(match => {
-                    var statusEffect = new StorageClass();
+                if (strBool === '!0' || strBool === '!1') {
+                    bool = strBool === '!0';
+                }
+                if (strBool === 'true' || strBool === 'false') {
+                    bool = strBool === 'true';
+                }
 
-                    if (match.startsWith('.create')) {
-                        if (nthIndex(match, '"', 1) === nthIndex(match, '(', 1) + 1) {
-                            statusEffect.storageName = match.slice(nthIndex(match, '"', 1) + 1, nthIndex(match, '"', 2));
-                        }
-
-                        statusEffect.value1 = getStorageClassValue(1, match);
-                        statusEffect.value2 = getStorageClassValue(2, match);
-                        statusEffect.value3 = getStorageClassValue(3, match);
-                        statusEffect.value4 = getStorageClassValue(4, match);
-
-                        if (nthIndex(match, '"', 5) > 0) {
-                            if (nthIndex(match, ',', 8) > 0) {
-                                statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, '"', 6));
-                            }
-                            else {
-                                if (nthIndex(match, ',', 9) > 0) {
-                                    statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ',', 9) - 1);
-                                }
-                                else {
-                                    statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ')', 1) - 1);
-                                }
-                            }
-                        }
-
-                        if (nthIndex(match, '"', 3) > 0) {
-                            statusEffect.iconName = match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, '"', 4));
-                        }
-
-                        if (nthIndex(match, ',', 5) > 0) {
-                            let strBool = '';
-                            let bool = false;
-                            if (nthIndex(match, ',', 6) > 0) {
-                                strBool = match.slice(nthIndex(match, ',', 5) + 1, nthIndex(match, ',', 6));
-                            }
-                            else {
-                                strBool = match.slice(nthIndex(match, ',', 5) + 1, nthIndex(match, ')', 1) - 1);
-
-                            }
-
-                            if (strBool === '!0' || strBool === '!1') {
-                                bool = strBool === '!0';
-                            }
-                            if (strBool === 'true' || strBool === 'false') {
-                                bool = strBool === 'true';
-                            }
-
-                            statusEffect.hidden = bool;
-                        }
-
-
-                        statusEffects.push(statusEffect);
-                    }
-                });
+                statusEffect.hidden = bool;
             }
+
+
+            statusEffects.push(statusEffect);
         }
-    })();
+
+    });
+
+
+    //statusEffects = statusEffects
+    //    .filter((effect, index, self) => {
+
+    //        const otherIndex = self.findIndex(effect2 => effect2.storageName === effect.storageName);
+
+    //        const largestEffect = self.find(effect2 => effect2.storageName === effect.storageName && effect2.value1 > effect.value1);
+    //        if (largestEffect != undefined) {
+    //            return false;
+    //        }
+
+
+    //        //if (otherIndex !== index) {
+
+    //        //    // Prioritize status effects that have values
+
+    //        //    var other = self.find(effect2 => effect2.storageName === effect.storageName);
+
+    //        //    if (effect.value1 != 0 && other.value1 != 0) {
+    //        //        return other.value1 > effect.value1;
+    //        //    }
+    //        //}
+
+    //        return otherIndex === index;
+    //    })
+    //    .sort();
 
     statusEffects = util.formatStorageClassArrayDefault(statusEffects);
 
