@@ -456,62 +456,54 @@ const path = require('path');
 
             this.tooltip = texts[2] || '';
         }
+
+        /**
+        * Parse 'StorageClass' status effects
+        * @param {string} text
+        */
+        parseStatusEffect(text) {
+            const texts = text.split('"');
+            const args = text.split(',');
+
+            this.parseFromTextDefault(text);
+
+            this.tooltip = texts[4] || '';
+
+            this.hidden = args[5] === '!0';
+            this.iconName = texts[2];
+            this.combatOnly = args[8] === '!0';
+            this.minutesLeft = +args[9] || 0;
+        }
     }
 
     /**
     * Parse game data into a 'StorageClass' array using the default implementation
     * @param {RegExp} regex
     * @param {boolean} skipFormat
+    * @param {Function} func
+    * @returns {Array<StorageClass>}
     */
-    function getStorageClassDataDefault(regex, skipFormat) {
+    function getStorageClassData(regex, skipFormat = false, func = null) {
         var storageArray = [];
 
-        for (var index = 0; index < contents.length; ++index) {
-            var content = contents[index];
-
-            var m;
-            while ((m = regex.exec(content)) !== null) {
-                if (m.index === regex.lastIndex) {
-                    regex.lastIndex++;
+        util.execRegexOnContents(regex, (match, groupIndex) => {
+            if (groupIndex == 2) {
+                if (!func) {
+                    const storage = new StorageClass();
+                    storage.parseFromTextDefault(match);
+                    storageArray.push(storage);
                 }
-
-                m.forEach((match, groupIndex) => {
-                    if (groupIndex == 1) {
-                        const storage = new StorageClass();
-                        storage.parseFromTextDefault(match);
-                        storageArray.push(storage);
-                    }
-                });
+                else {
+                    storageArray.push(func(match));
+                }
             }
-        }
+        });
 
         if (!skipFormat) {
             storageArray = util.formatStorageClassArrayDefault(storageArray);
         }
 
         return storageArray;
-    }
-
-    /**
-    * Get data for a StorageClass 'Value' field at the specified position from a string
-    * @param {number} position
-    * @param {string} str
-    */
-    function getStorageClassValue(position, str) {
-        var value = 0;
-
-        if (nthIndex(str, ',', position) > 0) {
-            if (nthIndex(str, ',', position + 1) > 0) {
-                value = str.slice(nthIndex(str, ',', position) + 1, nthIndex(str, ',', position + 1));
-            }
-            else {
-                value = str.slice(nthIndex(str, ',', position) + 1, nthIndex(str, ')', 1));
-            }
-
-            value = !isNaN(parseFloat(value)) ? parseFloat(value) : 0;
-        }
-
-        return value;
     }
 
     // #endregion
@@ -799,7 +791,7 @@ const path = require('path');
     console.log('\ngetting perks');
     const perksStart = Date.now();
 
-    const perks = getStorageClassDataDefault(/\.createPerk\("([\S ][^)]+)\)*/g);
+    const perks = getStorageClassData(/\.(create|has)Perk\("([\S ][^)]+)\)*/g);
 
     const perksEnd = Date.now();
     util.printOperationTime('perks', perksStart, perksEnd);
@@ -810,104 +802,46 @@ const path = require('path');
     // #region Status Effects
 
 
-    // i dont even know what im lookin at
-    //237
-    //16734c
-    // 
+    // This system is a mess
+    // There are tons of effects that are used as 'cooldowns', some are even used for quest progression.
+    // The list of actual 'status effects' is probably very slim in comparison to the list that this produces
 
 
     console.log('\ngetting status effects');
     const statusEffectsStart = Date.now();
 
-    var statusEffects = [];
-
-    util.execRegexOnContents(/\.(create|has)StatusEffect\(([\"\w\ \,\+\%\.\'\-\’\!\?\$\#\@\/\&\*]+)\)/g, (match, groupIndex, matches) => {
-
-        var statusEffect = new StorageClass();
-
-        if (match.startsWith('.create')) {
-            if (nthIndex(match, '"', 1) === nthIndex(match, '(', 1) + 1) {
-                statusEffect.storageName = match.slice(nthIndex(match, '"', 1) + 1, nthIndex(match, '"', 2));
-            }
-
-            statusEffect.value1 = getStorageClassValue(1, match);
-            statusEffect.value2 = getStorageClassValue(2, match);
-            statusEffect.value3 = getStorageClassValue(3, match);
-            statusEffect.value4 = getStorageClassValue(4, match);
-
-            if (nthIndex(match, '"', 5) > 0) {
-                if (nthIndex(match, ',', 8) > 0) {
-                    statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, '"', 6));
-                }
-                else {
-                    if (nthIndex(match, ',', 9) > 0) {
-                        statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ',', 9) - 1);
-                    }
-                    else {
-                        statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ')', 1) - 1);
-                    }
-                }
-            }
-
-            if (nthIndex(match, '"', 3) > 0) {
-                statusEffect.iconName = match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, '"', 4));
-            }
-
-            if (nthIndex(match, ',', 5) > 0) {
-                let strBool = '';
-                let bool = false;
-                if (nthIndex(match, ',', 6) > 0) {
-                    strBool = match.slice(nthIndex(match, ',', 5) + 1, nthIndex(match, ',', 6));
-                }
-                else {
-                    strBool = match.slice(nthIndex(match, ',', 5) + 1, nthIndex(match, ')', 1) - 1);
-
-                }
-
-                if (strBool === '!0' || strBool === '!1') {
-                    bool = strBool === '!0';
-                }
-                if (strBool === 'true' || strBool === 'false') {
-                    bool = strBool === 'true';
-                }
-
-                statusEffect.hidden = bool;
-            }
-
-
-            statusEffects.push(statusEffect);
-        }
-
+    var statusEffects = getStorageClassData(/\.(create|has)StatusEffect\("([\S ][^)]+)\)/g, true, match => {
+        const statusEffect = new StorageClass();
+        statusEffect.parseStatusEffect(match);
+        return statusEffect;
     });
 
+    // Remove duplicates and do the best attempt at preserving values and tooltips
+    statusEffects = statusEffects
+        .reduce((acc, curr) => {
 
-    //statusEffects = statusEffects
-    //    .filter((effect, index, self) => {
+            const existingEffect = acc.find(e => e.storageName === curr.storageName);
+            if (existingEffect) {
 
-    //        const otherIndex = self.findIndex(effect2 => effect2.storageName === effect.storageName);
+                const existingIndex = acc.indexOf(existingEffect);
 
-    //        const largestEffect = self.find(effect2 => effect2.storageName === effect.storageName && effect2.value1 > effect.value1);
-    //        if (largestEffect != undefined) {
-    //            return false;
-    //        }
+                if (curr.value1 > existingEffect.value1) {
+                    acc[existingIndex] = curr;
+                }
 
+                //if (curr.tooltip > existingEffect.tooltip) {
+                //    acc[existingIndex].tooltip = curr.tooltip;
+                //}
 
-    //        //if (otherIndex !== index) {
+            }
+            else {
+                acc.push(curr);
+            }
 
-    //        //    // Prioritize status effects that have values
+            return acc;
 
-    //        //    var other = self.find(effect2 => effect2.storageName === effect.storageName);
-
-    //        //    if (effect.value1 != 0 && other.value1 != 0) {
-    //        //        return other.value1 > effect.value1;
-    //        //    }
-    //        //}
-
-    //        return otherIndex === index;
-    //    })
-    //    .sort();
-
-    statusEffects = util.formatStorageClassArrayDefault(statusEffects);
+        }, [])
+        .sort();
 
     const statusEffectsEnd = Date.now();
     util.printOperationTime('status effects', statusEffectsStart, statusEffectsEnd);
@@ -959,7 +893,7 @@ const path = require('path');
     console.log('\ngetting key items');
     const keyItemsStart = Date.now();
 
-    var keyitems = getStorageClassDataDefault(/\.createKeyItem\("([\S ][^)]+)\)*/g, true);
+    var keyitems = getStorageClassData(/\.(create|has)KeyItem\("([\S ][^)]+)\)*/g, true);
 
     const panties = [];
 
@@ -1083,7 +1017,11 @@ const path = require('path');
     // #endregion
 
 
-    // #region Other
+    // #region Misc
+
+
+    console.log('\ngetting misc');
+    const miscStart = Date.now();
 
 
     // #region Beard Style
@@ -1098,6 +1036,57 @@ const path = require('path');
     // #endregion
 
 
+    // #region Counts
+
+    const objLength = o => Object.keys(o).length;
+    const arrLength = a => a.length;
+
+
+    const counts = {};
+
+
+    // Global
+    counts.Global = {};
+    counts.Global.ValidFlags = {};
+    counts.Global.ValidTypes = {};
+
+    Object.keys(obj).forEach(k => {
+        if (!k.toLocaleLowerCase().startsWith('valid')) {
+            counts.Global[k] = objLength(obj[k]);
+        }
+    });
+
+    Object.keys(obj.ValidFlags).forEach(k => {
+        counts.Global.ValidFlags[k] = objLength(obj.ValidFlags[k]);
+    });
+    Object.keys(obj.ValidTypes).forEach(k => {
+        counts.Global.ValidTypes[k] = objLength(obj.ValidTypes[k]);
+    });
+
+
+    // Codex
+    counts.Codex = objLength(codexEntries);
+
+    // Game Flags
+    counts.GameFlags = objLength(gameFlags);
+
+    // Key Items
+    counts.KeyItems = arrLength(keyitems);
+
+    // Perks
+    counts.Perks = arrLength(perks);
+
+    // Status Effects
+    counts.StatusEffects = arrLength(statusEffects);
+
+
+    // #endregion
+
+
+    const miscEnd = Date.now();
+    util.printOperationTime('misc', miscStart, miscEnd);
+
+
     // #endregion
 
 
@@ -1110,6 +1099,7 @@ const path = require('path');
     fs.writeFileSync('../data/status.js', util.formatToFile('StatusEffects', statusEffects));
     fs.writeFileSync('../data/codex.js', util.formatToFile('CodexEntries', codexEntries));
     fs.writeFileSync('../data/keyitems.js', util.formatToFile('KeyItems', keyitems));
+    fs.writeFileSync('../data/counts.js', util.formatToFile('Counts', counts));
 
     const writeEnd = Date.now();
     util.printOperationTime('written', writeStart, writeEnd, 'files ');
