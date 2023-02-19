@@ -43,14 +43,9 @@ const path = require('path');
         },
 
         /**
-        * @callback execRegexOnContentsCallback
-        * @param {string} match
-        * @param {number} groupIndex
-        */
-        /**
         * Iterate through all contents using a regex
         * @param {RegExp} regex
-        * @param {execRegexOnContentsCallback} callback
+        * @param {Function} callback
         */
         execRegexOnContents: function (regex, callback) {
             for (var index = 0; index < contents.length; ++index) {
@@ -791,7 +786,7 @@ const path = require('path');
     console.log('\ngetting perks');
     const perksStart = Date.now();
 
-    const perks = getStorageClassData(/\.(create|has)Perk\("([\S ][^)]+)\)*/g);
+    const perks = getStorageClassData(/\.(create|has|remove)Perk\("([\S ][^)]+)\)*/g);
 
     const perksEnd = Date.now();
     util.printOperationTime('perks', perksStart, perksEnd);
@@ -810,7 +805,7 @@ const path = require('path');
     console.log('\ngetting status effects');
     const statusEffectsStart = Date.now();
 
-    var statusEffects = getStorageClassData(/\.(create|has)StatusEffect\("([\S ][^)]+)\)/g, true, match => {
+    var statusEffects = getStorageClassData(/\.(create|has|remove)StatusEffect\("([\S ][^)]+)\)/g, true, match => {
         const statusEffect = new StorageClass();
         statusEffect.parseStatusEffect(match);
         return statusEffect;
@@ -893,40 +888,25 @@ const path = require('path');
     console.log('\ngetting key items');
     const keyItemsStart = Date.now();
 
-    var keyitems = getStorageClassData(/\.(create|has)KeyItem\("([\S ][^)]+)\)*/g, true);
+    var keyitems = getStorageClassData(/\.(create|has|remove)KeyItem\("([\S ][^)]+)\)*/g, true);
 
     const panties = [];
+    //                       /\.(create|has)KeyItem\((PantyData\.get\("([\S ][^")]+)"\)[^)][\S ][^)]+)\)*/g
+    util.execRegexOnContents(/\.createKeyItem\((PantyData\.get\("([\S ][^")]+)"\)[^)][\S ][^)]+)\)*/g, (match, groupIndex, matches) => {
+        if (groupIndex == 2) {
+            const panty = new StorageClass();
 
-    (function () {
-        for (var index = 0; index < contents.length; ++index) {
-            var content = contents[index];
-            const regex = /\.createKeyItem\((PantyData\.get\("([\S ][^")]+)"\)[^)][\S ][^)]+)\)*/g;
-
-            var m;
-            while ((m = regex.exec(content)) !== null) {
-                if (m.index === regex.lastIndex) {
-                    regex.lastIndex++;
-                }
-
-                const panty = new StorageClass();
-
-                m.forEach((match, groupIndex) => {
-                    if (groupIndex == 1) {
-                        panty.parseFromTextDefault(match);
-
-                        const texts = match.split('"');
-                        panty.tooltip = texts[3] || '';
-
-                    }
-                    else if (groupIndex == 2) {
-                        panty.storageName = pantyData[match];
-                    }
-                });
-
-                panties.push(panty);
+            // Handle tooltip
+            if (matches[0].indexOf(',') > -1) {
+                const texts = matches[1].split('"');
+                panty.tooltip = texts[3];
             }
+
+            panty.storageName = pantyData[match];
+
+            panties.push(panty);
         }
-    })();
+    });
 
     keyitems = keyitems.concat(panties);
 
