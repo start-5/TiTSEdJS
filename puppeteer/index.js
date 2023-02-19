@@ -684,7 +684,7 @@ const path = require('path');
     */
     function getValidBodyTypesDefault(regex) {
         return getValidBodyParts('BodyType', regex, (match, groupIndex) => {
-            return groupIndex == 1 && match.toLocaleLowerCase() !== 'kaithrit';
+            return groupIndex == 2 && match.toLocaleLowerCase() !== 'kaithrit';
             // For whatever reason, the game sets the 'TYPE_KAITHRIT' type for the [Kui-Tan Lt, XO Defender, XO Gunner] creatures
             // even though 'GLOBAL.TYPE_KAITHRIT' doesn't exist
         });
@@ -696,8 +696,8 @@ const path = require('path');
     */
     function getValidBodyTypesForArray(regex) {
         return getValidBodyParts('BodyType', regex, (match, groupIndex, matches) => {
-            return ((!matches[3] && groupIndex == 2) || (matches[3] && groupIndex == 3)) && match.toLocaleLowerCase() !== 'kaithrit';
-            // 2 => simple check, 3 => array check
+            return ((!matches[4] && groupIndex == 2) || (matches[4] && groupIndex == 4)) && match.toLocaleLowerCase() !== 'kaithrit';
+            // 2 => simple check, 4 => array check
             // For whatever reason, the game sets the 'TYPE_KAITHRIT' type for the [Kui-Tan Lt, XO Defender, XO Gunner] creatures
             // even though 'GLOBAL.TYPE_KAITHRIT' doesn't exist
         });
@@ -710,7 +710,7 @@ const path = require('path');
     * @param {string} name
     */
     function getTypeCheckRegex(name) {
-        return new RegExp(`\.${name}Type={1,3}GLOBAL\\.TYPE_([\\w]+)*`, 'g');
+        return new RegExp(`\.${name}Type(!|)={1,3}GLOBAL\\.TYPE_([\\w]+)*`, 'g');
     }
 
     /**
@@ -723,7 +723,7 @@ const path = require('path');
         // Again, two checks need to be done. One for char.hasXType(), another for the array access array[x].type==
 
         const charCheck = `\\.has${simpleName}Type\\(GLOBAL\\.TYPE_([\\S ][^),]+)\\)*`;
-        const arrayCheck = `\\.${arrayName}\\[[\\S]\\]\\.${keyName}={1,3}GLOBAL\\.TYPE_([\\w]+)`;
+        const arrayCheck = `\\.${arrayName}\\[[\\S]\\]\\.${keyName}(!|)={1,3}GLOBAL\\.TYPE_([\\w]+)`;
 
         return new RegExp(`(${charCheck}|${arrayCheck})`, 'g');
     }
