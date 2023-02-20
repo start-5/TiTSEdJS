@@ -88,8 +88,56 @@ const path = require('path');
         * Format a 'StorageClass' flag array
         * @param {Array<StorageClass>} arr
         */
-        formatStorageClassArrayDefault: function (arr) {
-            return arr.filter((v, i, a) => a.findIndex(v2 => (v2.storageName === v.storageName)) === i).sort();
+        formatStorageClassArray: function (arr) {
+
+            function tryGetMaxValue(curr, existing, key, acc) {
+                if (curr[key] > existing[key]) {
+                    acc[key] = curr[key];
+                }
+            }
+
+            function tryGetMaxText(curr, existing, key, acc) {
+                if (curr[key].length > existing[key].length) {
+                    acc[key] = curr[key];
+                }
+            }
+
+            return arr
+                .reduce((acc, curr) => {
+
+                    const existingEffect = acc.find(e => e.storageName === curr.storageName);
+                    if (existingEffect) {
+                        const existingIndex = acc.indexOf(existingEffect);
+
+                        tryGetMaxValue(curr, existingEffect, 'value1', acc[existingIndex]);
+                        tryGetMaxValue(curr, existingEffect, 'value2', acc[existingIndex]);
+                        tryGetMaxValue(curr, existingEffect, 'value3', acc[existingIndex]);
+                        tryGetMaxValue(curr, existingEffect, 'value4', acc[existingIndex]);
+
+                        tryGetMaxText(curr, existingEffect, 'tooltip', acc[existingIndex]);
+                        tryGetMaxText(curr, existingEffect, 'iconName', acc[existingIndex]);
+
+                        const defaultShade = 'var(--textColor)';
+                        if (curr.iconShade != defaultShade && existingEffect.iconShade == defaultShade) {
+                            acc[existingIndex].iconShade = curr.iconShade;
+                        }
+                    }
+                    else {
+                        acc.push(curr);
+                    }
+
+                    return acc;
+
+                }, [])
+                .sort((l, r) => {
+                    if (l.storageName < r.storageName) {
+                        return -1;
+                    }
+                    if (l.storageName > r.storageName) {
+                        return 1;
+                    }
+                    return 0;
+                });
         },
 
         /**
@@ -165,7 +213,6 @@ const path = require('path');
         */
         printOperationTime: function (msg, start, end, prefix = null) {
             console.log((prefix ?? 'got ') + msg + ', operation took ' + util.getElapsedTime(start, end) + ' to complete');
-
         }
 
     };
@@ -259,7 +306,8 @@ const path = require('path');
                         .map(key => ({
                             name: key.slice(prefix.length)
                                 .split('_')
-                                .map(str => str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase()).join(' '),
+                                .map(str => str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase())
+                                .join(' '),
                             value: window.GLOBAL[key]
                         }))
                         .filter(key => typeof key.value !== 'object');
@@ -320,6 +368,7 @@ const path = require('path');
                     NippleType: getGlobalsByPrefix('NIPPLE_TYPE_'),
                     SexPref: getGlobalsByPrefix('SEXPREF_'),
                     SkinType: getGlobalsByPrefix('SKIN_TYPE_'),
+                    StatusEffectShades: getGlobalsByPrefix('STATUS_'),
                     TailGenital: getGlobalsByPrefix('TAIL_GENITAL_'),
                     Upbringing: getGlobalsByPrefix('UPBRINGING_'),
                     ValidFlags: {},
@@ -360,6 +409,7 @@ const path = require('path');
 
 
                 return { global, pantyData, version };
+
             }
             catch (e) {
                 return { error: e };
@@ -410,96 +460,6 @@ const path = require('path');
         return index;
     }
 
-
-    // #endregion
-
-
-    // #region StorageClass
-
-    class StorageClass {
-        constructor() {
-            this.classInstance = 'StorageClass';
-            this.neverSerialize = false;
-            this.version = 1;
-            this.storageName = '';
-            this.value1 = 0;
-            this.value2 = 0;
-            this.value3 = 0;
-            this.value4 = 0;
-            this.hidden = true;
-            this.iconName = '';
-            this.tooltip = '';
-            this.combatOnly = false;
-            this.minutesLeft = 0;
-            this.iconShade = 'var(--textColor)';
-        }
-
-        /**
-        * Parse 'StorageClass' values using the default implementation
-        * @param {string} text
-        */
-        parseFromTextDefault(text) {
-            const texts = text.split('"');
-            const args = text.split(',');
-
-            this.storageName = texts[0] || '';
-
-            this.value1 = +args[1] || 0;
-            this.value2 = +args[2] || 0;
-            this.value3 = +args[3] || 0;
-            this.value4 = +args[4] || 0;
-
-            this.tooltip = texts[2] || '';
-        }
-
-        /**
-        * Parse 'StorageClass' status effects
-        * @param {string} text
-        */
-        parseStatusEffect(text) {
-            const texts = text.split('"');
-            const args = text.split(',');
-
-            this.parseFromTextDefault(text);
-
-            this.tooltip = texts[4] || '';
-
-            this.hidden = args[5] === '!0';
-            this.iconName = texts[2];
-            this.combatOnly = args[8] === '!0';
-            this.minutesLeft = +args[9] || 0;
-        }
-    }
-
-    /**
-    * Parse game data into a 'StorageClass' array using the default implementation
-    * @param {RegExp} regex
-    * @param {boolean} skipFormat
-    * @param {Function} func
-    * @returns {Array<StorageClass>}
-    */
-    function getStorageClassData(regex, skipFormat = false, func = null) {
-        var storageArray = [];
-
-        util.execRegexOnContents(regex, (match, groupIndex) => {
-            if (groupIndex == 2) {
-                if (!func) {
-                    const storage = new StorageClass();
-                    storage.parseFromTextDefault(match);
-                    storageArray.push(storage);
-                }
-                else {
-                    storageArray.push(func(match));
-                }
-            }
-        });
-
-        if (!skipFormat) {
-            storageArray = util.formatStorageClassArrayDefault(storageArray);
-        }
-
-        return storageArray;
-    }
 
     // #endregion
 
@@ -781,6 +741,125 @@ const path = require('path');
     // #endregion
 
 
+    // #region StorageClass
+
+
+    // #region Class
+
+    class StorageClass {
+        constructor() {
+            this.classInstance = 'StorageClass';
+            this.neverSerialize = false;
+            this.version = 1;
+            this.storageName = '';
+            this.value1 = 0;
+            this.value2 = 0;
+            this.value3 = 0;
+            this.value4 = 0;
+            this.hidden = true;
+            this.iconName = '';
+            this.tooltip = '';
+            this.combatOnly = false;
+            this.minutesLeft = 0;
+            this.iconShade = 'var(--textColor)';
+        }
+
+        /**
+        * Parse 'StorageClass' values using the default implementation
+        * @param {string} text
+        */
+        parseFromTextDefault(text) {
+            const texts = text.split('"');
+
+            for (var i = 0; i < texts.length; i++) {
+                text = text.replace(`${i === 0 ? '' : '"'}${texts[i]}"`, '');
+            }
+
+            const args = text.split(',');
+
+            this.storageName = texts[0] || '';
+
+            this.value1 = +args[1] || 0;
+            this.value2 = +args[2] || 0;
+            this.value3 = +args[3] || 0;
+            this.value4 = +args[4] || 0;
+
+            this.tooltip = texts[2] || '';
+        }
+
+        /**
+        * Parse 'StorageClass' status effects
+        * @param {string} text
+        */
+        parseStatusEffect(text) {
+            const texts = text.split('"');
+
+            this.parseFromTextDefault(text);
+
+            for (var i = 0; i < texts.length; i++) {
+                text = text.replace(`${i === 0 ? '' : '"'}${texts[i]}"`, '');
+            }
+
+            const args = text.split(',');
+
+            this.tooltip = texts[4] || '';
+
+            this.hidden = args[5] ? args[5] === '!0' : true;
+            this.iconName = texts[2] || '';
+            this.combatOnly = args[8] ? args[8] === '!0' : false;
+            this.minutesLeft = +args[9] || 0;
+
+            // Icon Shade
+            // Some status effects have a shade like '12030916' or similar, which may be a remnant from the old version.
+            const iconShadeRaw = args[10];
+            if (iconShadeRaw && !+iconShadeRaw) {
+                if (iconShadeRaw.startsWith('"var')) { // already in var() format
+                    this.iconShade = iconShadeRaw.replaceAll('"', '') + ')';
+                }
+                else if (iconShadeRaw.startsWith('GLOBAL')) { // global.status_ format
+                    const shadeName = args[10].replace('GLOBAL.STATUS_', '').split('_')
+                        .map(str => str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase())
+                        .join(' ');
+
+                    this.iconShade = obj.StatusEffectShades.find(s => s.name === shadeName).value;
+                }
+            }
+        }
+    }
+
+    /**
+    * Parse game data into a 'StorageClass' array using the default implementation
+    * @param {RegExp} regex
+    * @param {boolean} skipFormat
+    * @param {Function} func
+    * @returns {Array<StorageClass>}
+    */
+    function getStorageClassData(regex, skipFormat = false, func = null) {
+        var storageArray = [];
+
+        util.execRegexOnContents(regex, (match, groupIndex) => {
+            if (groupIndex == 2) {
+                if (!func) {
+                    const storage = new StorageClass();
+                    storage.parseFromTextDefault(match);
+                    storageArray.push(storage);
+                }
+                else {
+                    storageArray.push(func(match));
+                }
+            }
+        });
+
+        if (!skipFormat) {
+            storageArray = util.formatStorageClassArray(storageArray);
+        }
+
+        return storageArray;
+    }
+
+    // #endregion
+
+
     // #region Perks
 
     console.log('\ngetting perks');
@@ -796,50 +875,55 @@ const path = require('path');
 
     // #region Status Effects
 
-
-    // This system is a mess
-    // There are tons of effects that are used as 'cooldowns', some are even used for quest progression.
-    // The list of actual 'status effects' is probably very slim in comparison to the list that this produces
-
-
     console.log('\ngetting status effects');
     const statusEffectsStart = Date.now();
 
-    var statusEffects = getStorageClassData(/\.(create|has|remove)StatusEffect\("([\S ][^)]+)\)/g, true, match => {
+    var statusEffects = getStorageClassData(/\.(create|has|remove)StatusEffect\("([\S ][^)]+)\)/g, false, match => {
         const statusEffect = new StorageClass();
         statusEffect.parseStatusEffect(match);
         return statusEffect;
     });
 
-    // Remove duplicates and do the best attempt at preserving values and tooltips
-    statusEffects = statusEffects
-        .reduce((acc, curr) => {
-
-            const existingEffect = acc.find(e => e.storageName === curr.storageName);
-            if (existingEffect) {
-
-                const existingIndex = acc.indexOf(existingEffect);
-
-                if (curr.value1 > existingEffect.value1) {
-                    acc[existingIndex] = curr;
-                }
-
-                //if (curr.tooltip > existingEffect.tooltip) {
-                //    acc[existingIndex].tooltip = curr.tooltip;
-                //}
-
-            }
-            else {
-                acc.push(curr);
-            }
-
-            return acc;
-
-        }, [])
-        .sort();
-
     const statusEffectsEnd = Date.now();
     util.printOperationTime('status effects', statusEffectsStart, statusEffectsEnd);
+
+    // #endregion
+
+
+    // #region Key Items
+
+    console.log('\ngetting key items');
+    const keyItemsStart = Date.now();
+
+    var keyitems = getStorageClassData(/\.(create|has|remove)KeyItem\("([\S ][^)]+)\)*/g, true);
+
+    const panties = [];
+
+    util.execRegexOnContents(/\.createKeyItem\((PantyData\.get\("([\S ][^")]+)"\)[^)][\S ][^)]+)\)*/g, (match, groupIndex, matches) => {
+        if (groupIndex == 2) {
+            const panty = new StorageClass();
+
+            // Handle tooltip
+            if (matches[0].indexOf(',') > -1) {
+                const texts = matches[1].split('"');
+                panty.tooltip = texts[3];
+            }
+
+            panty.storageName = pantyData[match];
+
+            panties.push(panty);
+        }
+    });
+
+    keyitems = keyitems.concat(panties);
+
+    keyitems = util.formatStorageClassArray(keyitems);
+
+    const keyItemsEnd = Date.now();
+    util.printOperationTime('key items', keyItemsStart, keyItemsEnd);
+
+    // #endregion
+
 
     // #endregion
 
@@ -876,44 +960,6 @@ const path = require('path');
 
     const codexEntriesEnd = Date.now();
     util.printOperationTime('codex entries', codexEntriesStart, codexEntriesEnd);
-
-    // #endregion
-
-
-    // #region Key Items
-
-    // Observations:
-    // 'Personalised Dice Set' is broken because it's created based on a variable
-
-    console.log('\ngetting key items');
-    const keyItemsStart = Date.now();
-
-    var keyitems = getStorageClassData(/\.(create|has|remove)KeyItem\("([\S ][^)]+)\)*/g, true);
-
-    const panties = [];
-    //                       /\.(create|has)KeyItem\((PantyData\.get\("([\S ][^")]+)"\)[^)][\S ][^)]+)\)*/g
-    util.execRegexOnContents(/\.createKeyItem\((PantyData\.get\("([\S ][^")]+)"\)[^)][\S ][^)]+)\)*/g, (match, groupIndex, matches) => {
-        if (groupIndex == 2) {
-            const panty = new StorageClass();
-
-            // Handle tooltip
-            if (matches[0].indexOf(',') > -1) {
-                const texts = matches[1].split('"');
-                panty.tooltip = texts[3];
-            }
-
-            panty.storageName = pantyData[match];
-
-            panties.push(panty);
-        }
-    });
-
-    keyitems = keyitems.concat(panties);
-
-    keyitems = util.formatStorageClassArrayDefault(keyitems);
-
-    const keyItemsEnd = Date.now();
-    util.printOperationTime('key items', keyItemsStart, keyItemsEnd);
 
     // #endregion
 
@@ -1011,6 +1057,25 @@ const path = require('path');
     }
 
     obj.BeardStyle = util.formatNameValueArrayByName(obj.BeardStyle);
+
+
+    // #endregion
+
+
+    // #region Manual clean
+
+
+    // #region Key Items
+
+    [''].forEach(name => {
+        const index = keyitems.findIndex(k => k.storageName === name);
+        if (index > -1) {
+            keyitems.splice(index, 1);
+        }
+    });
+
+
+    // #endregion
 
 
     // #endregion

@@ -16,6 +16,7 @@ const Counts = {
         NippleType: 7,
         SexPref: 33,
         SkinType: 10,
+        StatusEffectShades: 16,
         TailGenital: 4,
         Upbringing: 6,
         ValidFlags: {
@@ -46,7 +47,7 @@ const Counts = {
             Wing: 18,
         },
     },
-    KeyItems: 129,
+    KeyItems: 128,
     Perks: 205,
     StatusEffects: 1172,
 };
