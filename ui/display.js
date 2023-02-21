@@ -212,8 +212,6 @@ function displayBody() {
             new Group('Tail', [
                 new SelectField('ValidTypes.Tail', char, 'tailType', 'Tail Type'),
                 new IntegerField(char, 'tailCount', 'Tail Count', null, 0),
-                new IntegerField(char, 'tailVenom', 'Tail Venom', null, 0, 100),
-                new IntegerField(char, 'tailRecharge', 'Tail Recharge', null, 0),
                 new FlagField('ValidFlags.Tail', char, 'tailFlags', 'Tail Flags')
             ])
         ]),
