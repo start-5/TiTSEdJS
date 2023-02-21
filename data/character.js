@@ -131,7 +131,6 @@ class Character {
         this.nipplesPerBreast = 0;
         this.nippleWidthRatio = 0;
         this.originalRace = '';
-        this.perkPoints = 0;
         this.perks = [];
         this.personality = 0;
         this.physiqueMod = 0;
@@ -160,17 +159,11 @@ class Character {
         this.statusSimulate = false;
         this.tailCock = [];
         this.tailCount = 0;
-        this.tailCumType = 0;
         this.tailCunt = [];
         this.tailFlags = [];
-        this.tailGirlCumType = 0;
-        this.tailRecharge = 0;
         this.tailType = 0;
-        this.tailVenom = 0;
         this.taintMod = 0;
         this.tallness = 0;
-        this.teaseLevel = 0;
-        this.teaseXP = 0;
         this.thickness = 0;
         this.timesCum = 0;
         this.tone = 0;
