@@ -1,10 +1,13 @@
 /* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 
 class StorageContainer {
-    constructor(source, obj, key, hasFunc, dataFields) {
+
+    constructor(source, obj, key, hasFunc, hasTooltip) {
+
         this.root = document.createElement('div');
         this.root.className = 'text-light my-3 w-100';
-        this.root.dataset.bind = 'foreach: $root.' + source;
+        this.root.dataset.bind = `foreach: $root.${source}`;
 
         const header = document.createElement('div');
         header.className = 'form-check form-switch mt-4';
@@ -18,56 +21,40 @@ class StorageContainer {
                                  checkedValue: $data,
                                  enable: $root.saveLoaded`;
 
-        const storageName = document.createElement('label');
-        storageName.className = 'form-check-label';
-        storageName.dataset.bind = 'text: storageName';
+        const lblName = document.createElement('label');
+        lblName.className = 'form-check-label';
+        lblName.dataset.bind = `text: storageName,
+                                class: $root.${hasFunc}($data) ? 'fw-bold' : ''`;
 
-        const toolTip = document.createElement('p');
-        toolTip.className = 'p-sm';
-        toolTip.dataset.bind = 'text: $data.tooltip, class: $root.' + hasFunc + "($data) ? '' : 'text-muted' ";
+        const pToolTip = document.createElement('p');
+        pToolTip.className = 'p-sm';
+        pToolTip.dataset.bind = `text: $data.tooltip,
+                                 class: $root.${hasFunc}($data) ? 'fw-bold' : 'text-muted'`;
 
-        const dataContainer = document.createElement('div');
-        dataContainer.className = 'ps-2';
-        dataContainer.style.marginTop = '-8px';
-        dataContainer.dataset.bind = 'visible: $root.' + hasFunc + '($data)';
-        const dataToggle = document.createElement('button');
-        dataToggle.className = 'btn btn-sm btn-xs btn-outline-light';
-        //valueVisibilityToggle.innerHTML = '<i class="fa-solid fa-up-right-and-down-left-from-center"></i> Toggle Data';
-        dataToggle.textContent = 'Toggle Data';
-        dataToggle.type = 'button';
-        dataToggle.dataset.bind = 'click: $root.expandStorage';
-        dataToggle.dataset.toggle = 'collapse';
-        dataContainer.appendChild(dataToggle);
-
-        const dataCollapse = document.createElement('div');
-        dataCollapse.className = 'mt-2 collapse';
-        const dataBody = document.createElement('div');
-        dataBody.className = 'd-flex flex-wrap';
-
-        for (var i = 1; i < 5; i++) {
-            dataBody.appendChild(createStorageField('Value ' + i, 'value' + i, 'numberInput'));
-        }
-
-        dataFields.forEach(f => dataBody.appendChild(f));
-
-        dataCollapse.appendChild(dataBody);
-        dataContainer.appendChild(dataCollapse);
+        const btnEdit = document.createElement('i');
+        btnEdit.className = 'fa-solid fa-pen-to-square ms-3';
+        btnEdit.role = 'button';
+        btnEdit.dataset.bind = 'click: function(data) { $root.a(data) }';
 
         header.appendChild(checkBox);
-        header.appendChild(storageName);
+        header.appendChild(lblName);
+        util.appendKoIfBlock(header, btnEdit, `$root.${hasFunc}($data)`);
 
         this.root.appendChild(header);
-        this.root.appendChild(toolTip);
-        this.root.appendChild(dataContainer);
+        hasTooltip && util.appendKoIfBlock(this.root, pToolTip, `$root.${hasTooltip}($data)`);
+        //this.root.appendChild(pToolTip);
 
         return this.root;
+
     }
+
 }
 
 class PerkContainer extends StorageContainer {
+
     constructor(obj, key) {
-        const dataFields = [];
-        super('getPerks', obj, key, 'hasPerk', dataFields);
+
+        super('getPerks', obj, key, 'hasPerk');
 
         //this.root = document.createElement('div');
         //this.root.className = 'text-light my-3 w-100 editor-perk';
@@ -145,15 +132,17 @@ class PerkContainer extends StorageContainer {
 
         //return this.root;
     }
+
 }
 
 class StatusEffectContainer extends StorageContainer {
+
     constructor(obj, key) {
-        const dataFields = [];
+
         //dataFields.push(createStorageField('Minutes Left', 'minutesLeft', 'numberInput'));
         //dataFields.push(createStorageField('Icon Name', 'iconName', 'textInput'));
         //dataFields.push(createStorageField('Icon Shade', 'iconShade', 'textInput'));
-        super('getStatusEffects', obj, key, 'hasStatusEffect', dataFields);
+        super('statusEffectList', obj, key, 'hasStatusEffect', 'hasStatusEffectTooltip');
 
         //dataFields.push(createStorageField('Minutes Left', 'minutesLeft'));
         //dataFields.push(createStorageField('Minutes Left', 'minutesLeft'));
@@ -214,9 +203,11 @@ class StatusEffectContainer extends StorageContainer {
 
         //return this.root;
     }
+
 }
 
 class FlagContainer {
+
     constructor() {
         this.root = document.createElement('div');
 
@@ -274,6 +265,7 @@ class FlagContainer {
 
         //return this.root;
     }
+
 }
 
 function createStorageField(labelText, key, bindingType) {
