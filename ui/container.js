@@ -24,12 +24,12 @@ class StorageContainer {
         const lblName = document.createElement('label');
         lblName.className = 'form-check-label';
         lblName.dataset.bind = `text: storageName,
-                                class: $root.${hasFunc}($data) ? 'fw-bold' : ''`;
+                                class: $root.${hasFunc}($data, 'statusEffects') ? 'fw-bold' : ''`;
 
         const pToolTip = document.createElement('p');
         pToolTip.className = 'p-sm';
         pToolTip.dataset.bind = `text: $data.tooltip,
-                                 class: $root.${hasFunc}($data) ? 'fw-bold' : 'text-muted'`;
+                                 class: $root.${hasFunc}($data, 'statusEffects') ? 'fw-bold' : 'text-muted'`;
 
         const btnEdit = document.createElement('i');
         btnEdit.className = 'fa-solid fa-pen-to-square ms-3';
@@ -38,7 +38,7 @@ class StorageContainer {
 
         header.appendChild(checkBox);
         header.appendChild(lblName);
-        util.appendKoIfBlock(header, btnEdit, `$root.${hasFunc}($data)`);
+        util.appendKoIfBlock(header, btnEdit, `$root.${hasFunc}($data, 'statusEffects')`);
 
         this.root.appendChild(header);
         hasTooltip && util.appendKoIfBlock(this.root, pToolTip, `$root.${hasTooltip}($data)`);
@@ -142,7 +142,7 @@ class StatusEffectContainer extends StorageContainer {
         //dataFields.push(createStorageField('Minutes Left', 'minutesLeft', 'numberInput'));
         //dataFields.push(createStorageField('Icon Name', 'iconName', 'textInput'));
         //dataFields.push(createStorageField('Icon Shade', 'iconShade', 'textInput'));
-        super('statusEffectList', obj, key, 'hasStatusEffect', 'hasStatusEffectTooltip');
+        super('statusEffectList', obj, key, 'hasStorage', 'hasStorageTooltip');
 
         //dataFields.push(createStorageField('Minutes Left', 'minutesLeft'));
         //dataFields.push(createStorageField('Minutes Left', 'minutesLeft'));

@@ -24,6 +24,7 @@ var ViewModel = function (data) {
     var self = this;
 
     self.saveLoaded = ko.observable(false);
+
     self.busy = ko.observable(false);
 
     self.saveName = ko.observable('');
@@ -49,6 +50,42 @@ var ViewModel = function (data) {
     // #region Character
 
     self.selectedCharacter = ko.observable();
+
+    self.selectedCharacter.subscribe(_ => {
+
+        if (self.selectedCharacter()) {
+
+            var editorEffects = ko.mapping.fromJS(StatusEffects);
+            const charEffects = self.selectedCharacter().obj.statusEffects;
+
+            editorEffects = ko.utils.arrayFilter(editorEffects(), editorEffect => {
+
+                const match = ko.utils.arrayFirst(charEffects(), charEffect => {
+                    return charEffect.storageName() === editorEffect.storageName();
+                });
+
+                return match === undefined;
+
+            });
+
+            self.statusEffectList(
+                editorEffects
+                    .concat(charEffects())
+                    .sort((l, r) => {
+                        if (l.storageName() < r.storageName()) {
+                            return -1;
+                        }
+                        if (l.storageName() > r.storageName()) {
+                            return 1;
+                        }
+                        return 0;
+                    })
+            );
+
+        }
+
+    });
+
 
     self.chars = ko.computed(function () {
         return Object.keys(self.save.characters).map(key => ({
@@ -108,51 +145,33 @@ var ViewModel = function (data) {
     // #endregion
 
 
+    // #region StorageClass
+
+
+    self.hasStorage = (storage, type) => {
+
+        if (self.selectedCharacter()) {
+            return self.selectedCharacter().obj[type]().includes(storage);
+        }
+
+        return false;
+    };
+
+
+    self.hasStorageTooltip = storage => {
+        return !!storage.tooltip();
+    };
+
+
     // #region Status Effects
 
-    //self.getStatusEffects = ko.computed(function () {
-    self.getStatusEffects = function () {
-        if (self.selectedCharacter()) {
-            // two things are happening here, one, ensuring that characters don't have objcts that reference each other,
-            // second, adding any unknown storage to the pool, i haven't found a better way to do this yet
-
-            const vmStatusEffects = ko.mapping.fromJS(ko.mapping.toJS(self.statusEffectList));
-            const charStatusEffects = self.selectedCharacter().obj.statusEffects;
-
-            //for (var i = 0; i < charStatusEffects().length; i++) {
-            //    const charStatusEffect = charStatusEffects()[i];
-            //    const vmStatusEffect = vmStatusEffects().find(p => p.storageName() === charStatusEffect.storageName());
-            //    if (!vmStatusEffect) {
-            //        const unknownStatusEffect = ko.mapping.fromJS(ko.mapping.toJS(new StorageClass()));
-            //        unknownStatusEffect.storageName(charStatusEffect.storageName());
-            //        unknownStatusEffect.tooltip(charStatusEffect.tooltip());
-            //        self.statusEffectList.push(unknownStatusEffect);
-            //    }
-            //    vmStatusEffects.remove(p => p.storageName() === charStatusEffects()[i].storageName());
-            //}
-
-            return charStatusEffects().concat(vmStatusEffects());//.sort((s1, s2) => s1.storageName().localeCompare(s2.storageName()));
-        }
-        //}, self);
-    };
-
     self.statusEffectList = ko.mapping.fromJS(StatusEffects);
-    //self.statusEffectList = ko.observableArray(StatusEffects);
-
-    self.hasStatusEffect = function (data) {
-        return self.selectedCharacter().obj.statusEffects().includes(data);
-    };
-
-    self.hasStatusEffectTooltip = function (data) {
-        return !!data.tooltip;
-    };
 
     // #endregion
 
 
-    self.expandStorage = function (data, event) {
-        $(event.target).next().collapse('toggle');
-    };
+
+    // #endregion
 
 
     // #region OnChanged

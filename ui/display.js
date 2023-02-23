@@ -331,7 +331,7 @@ function displayCrotch() {
 }
 
 function displayPerks() {
-    return new PerkContainer(char, 'perks');
+    //return new PerkContainer(char, 'perks');
 }
 
 function displayStatusEffects() {
