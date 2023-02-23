@@ -21,17 +21,25 @@ const loadMapping = {
 
 
 var ViewModel = function (data) {
+
     var self = this;
+
+
+    // Will (eventually) be used for loading indicators
+    self.busy = ko.observable(false);
+
+
+    self.save = {};
 
     self.saveLoaded = ko.observable(false);
 
-    self.busy = ko.observable(false);
-
     self.saveName = ko.observable('');
+
     self.originalSaveName = ko.observable('');
 
-    self.save = {};
+
     ko.mapping.fromJS(data, loadMapping, self.save);
+
 
     self.getGlobal = function (path) {
         var obj = Globals;
@@ -43,34 +51,73 @@ var ViewModel = function (data) {
         return obj;
     };
 
+
     self.a = function (data) {
         alert('a');
     };
 
+
     // #region Character
 
-    self.selectedCharacter = ko.observable();
 
+    self.selectedCharacter = ko.observable();
     self.selectedCharacter.subscribe(_ => {
+        if (self.selectedCharacter()) {
+
+            self.updateStorageForChar(self.statusEffectList, StatusEffects, 'statusEffects');
+            self.updateStorageForChar(self.perkList, Perks, 'perks');
+            self.updateStorageForChar(self.keyItemList, KeyItems, 'keyItems');
+
+        }
+    });
+
+    self.characters = ko.computed(function () {
+
+        return Object.keys(self.save.characters).map(key => ({
+            name: key,
+            obj: self.save.characters[key]
+        }));
+
+    }, self);
+
+
+    self.isPC = ko.computed(function () {
+
+        if (self.selectedCharacter()) {
+            return self.selectedCharacter().name === 'PC';
+        }
+
+        return false;
+
+    }, self);
+
+
+    // #endregion
+
+
+    // #region StorageClass
+
+
+    self.updateStorageForChar = (observableList, editorList, charListName) => {
 
         if (self.selectedCharacter()) {
 
-            var editorEffects = ko.mapping.fromJS(StatusEffects);
-            const charEffects = self.selectedCharacter().obj.statusEffects;
+            var editorStorages = ko.mapping.fromJS(editorList);
+            const charStorages = self.selectedCharacter().obj[charListName];
 
-            editorEffects = ko.utils.arrayFilter(editorEffects(), editorEffect => {
+            editorStorages = ko.utils.arrayFilter(editorStorages(), editorStorage => {
 
-                const match = ko.utils.arrayFirst(charEffects(), charEffect => {
-                    return charEffect.storageName() === editorEffect.storageName();
+                const match = ko.utils.arrayFirst(charStorages(), charStorage => {
+                    return charStorage.storageName() === editorStorage.storageName();
                 });
 
                 return match === undefined;
 
             });
 
-            self.statusEffectList(
-                editorEffects
-                    .concat(charEffects())
+            observableList(
+                editorStorages
+                    .concat(charStorages())
                     .sort((l, r) => {
                         if (l.storageName() < r.storageName()) {
                             return -1;
@@ -84,68 +131,7 @@ var ViewModel = function (data) {
 
         }
 
-    });
-
-
-    self.chars = ko.computed(function () {
-        return Object.keys(self.save.characters).map(key => ({
-            name: key,
-            obj: self.save.characters[key]
-        }));
-    }, self);
-
-    self.isPC = ko.computed(function () {
-        return self.selectedCharacter() && self.selectedCharacter().name == 'PC';
-    }, self);
-
-    // #endregion
-
-
-    // #region Perks
-
-    self.getPerks = ko.computed(function () {
-        if (self.selectedCharacter()) {
-            // two things are happening here, one, ensuring that characters don't have objcts that reference each other,
-            // second, adding any unknown storage to the pool, i haven't found a better way to do this yet
-
-            //let vmPerks = self.perkList;
-
-            const vmPerks = ko.mapping.fromJS(ko.mapping.toJS(self.perkList));
-            //return ko.mapping.fromJS(ko.mapping.toJS(self.perkList));
-            const charPerks = self.selectedCharacter().obj.perks;
-
-            for (var i = 0; i < charPerks().length; i++) {
-                const charPerk = charPerks()[i];
-                const vmPerk = vmPerks().find(p => p.storageName() === charPerk.storageName());
-                if (!vmPerk) {
-                    const unknownPerk = ko.mapping.fromJS(ko.mapping.toJS(new StorageClass()));
-                    unknownPerk.storageName(charPerk.storageName());
-                    unknownPerk.tooltip(charPerk.tooltip());
-                    self.perkList.push(unknownPerk);
-                }
-                vmPerks.remove(p => p.storageName() === charPerks()[i].storageName());
-            }
-
-            return charPerks().concat(vmPerks()).sort((p1, p2) => p1.storageName().localeCompare(p2.storageName()));
-        }
-    }, self);
-
-    //}).extend({ deferred: true });
-
-    self.perks = self.selectedCharacter()
-        ? ko.observableArray(self.selectedCharacter().obj.perks.concat(ko.mapping.fromJS(Perks)).sort((p1, p2) => p1.storageName().localeCompare(p2.storageName())))
-        : ko.observableArray([]);
-
-    self.perkList = ko.mapping.fromJS(Perks);
-
-    self.hasPerk = function (data) {
-        return self.selectedCharacter().obj.perks().find(p => p.storageName() === data.storageName()) !== undefined;
     };
-
-    // #endregion
-
-
-    // #region StorageClass
 
 
     self.hasStorage = (storage, type) => {
@@ -169,6 +155,19 @@ var ViewModel = function (data) {
 
     // #endregion
 
+
+    // #region Perks
+
+    self.perkList = ko.mapping.fromJS(Perks);
+
+    // #endregion
+
+
+    // #region Key Items
+
+    self.keyItemList = ko.mapping.fromJS(KeyItems);
+
+    // #endregion
 
 
     // #endregion
