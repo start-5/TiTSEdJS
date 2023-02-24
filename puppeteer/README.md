@@ -26,7 +26,8 @@
 	<li>Navigate to the <b>app</b> folder's path. <i>On Windows, type <code>cd &lt;path&gt;</code> and press <kbd>Enter</kbd></i></li>
 	<li>Type <code>npm install puppeteer</code> and press <kbd>Enter</kbd>. Wait for completion.</li>
 	<li>Type <code>npm install prettier</code> and press <kbd>Enter</kbd>. Wait for completion.</li>
-	<li>Running these two commands will create additional files and folders, you don't need to worry about those.</li>
+        <li>Type <code>npm install prettier-plugin-sort-json</code> and press <kbd>Enter</kbd>. Wait for completion.</li>
+	<li>Running these commands will create additional files and folders, you don't need to worry about those.</li>
 	<li><a href="https://raw.githubusercontent.com/start-5/TiTS.JS-Save-Editor/main/puppeteer/index.js" target="_blank">Download the <code>index.js</code> file</a> and place it in the <b>app</b> folder.</li>
 	<li>Return to the command prompt, still scoped to the <b>app</b> folder, type <code>node index</code> and press <kbd>Enter</kbd>. Wait for completion.</li>
 </ol>
