@@ -37,17 +37,21 @@ class Field {
 }
 
 class TextField extends Field {
-    constructor(obj, key, label, suffixText = null, onChanged = null, pcOnly = false) {
+    constructor(obj, key, label, suffixText = null, onChanged = null, pcOnly = false, visible = null) {
         super();
         this.content.className += ' editor-text';
 
         this.input.type = 'text';
         this.input.dataset.bind = 'textInput: ' + obj + (obj ? '.' : '') + key + ', enable: $root.saveLoaded';
+
         if (pcOnly) {
             this.input.dataset.bind += ' && $root.isPC';
         }
         if (onChanged) {
             this.input.dataset.bind += ', event: { change: ' + onChanged + ' }';
+        }
+        if (visible) {
+            this.content.dataset.bind = `, visible: ${visible}`;
         }
 
         this.label.innerText = label;
@@ -62,7 +66,7 @@ class TextField extends Field {
 }
 
 class IntegerField extends Field {
-    constructor(obj, key, label, suffixText = null, min = null, max = null, onChanged = null, pcOnly = false) {
+    constructor(obj, key, label, suffixText = null, min = null, max = null, onChanged = null, pcOnly = false, visible = null) {
         super();
         this.content.className += ' editor-integer';
 
@@ -83,6 +87,10 @@ class IntegerField extends Field {
 
         this.input.dataset.bind += ', event: { change: $root.' + (onChanged ? onChanged : 'validateNumberInput') + ' }';
 
+        if (visible) {
+            this.content.dataset.bind = `, visible: ${visible}`;
+        }
+
         this.label.innerText = label;
         this.resolveLabel(key, label);
 
@@ -95,7 +103,7 @@ class IntegerField extends Field {
 }
 
 class FloatField extends Field {
-    constructor(obj, key, label, suffixText = null, min = null, max = null, onChanged = null, pcOnly = false) {
+    constructor(obj, key, label, suffixText = null, min = null, max = null, onChanged = null, pcOnly = false, visible = null) {
         super();
         this.content.className += ' editor-float';
 
@@ -115,6 +123,10 @@ class FloatField extends Field {
 
         this.input.dataset.bind += ', event: { change: $root.' + (onChanged ? onChanged : 'validateNumberInput') + ' }';
 
+        if (visible) {
+            this.content.dataset.bind = `, visible: ${visible}`;
+        }
+
         this.label.innerText = label;
         this.resolveLabel(key, label);
 
@@ -127,7 +139,7 @@ class FloatField extends Field {
 }
 
 class SelectField extends Field {
-    constructor(path, obj, key, label, onChanged = null, pcOnly = false) {
+    constructor(path, obj, key, label, onChanged = null, pcOnly = false, visible = null) {
         super();
         this.content.className += ' editor-select';
 
@@ -147,6 +159,9 @@ class SelectField extends Field {
         if (onChanged) {
             this.input.dataset.bind += ', event: { change: ' + onChanged + ' }';
         }
+        if (visible) {
+            this.content.dataset.bind = `, visible: ${visible}`;
+        }
 
         this.select.setAttribute('disabled', true);
         this.select.value = '-999';
@@ -157,7 +172,7 @@ class SelectField extends Field {
 }
 
 class SwitchField extends Field {
-    constructor(obj, key, label, onChanged = null, pcOnly = false) {
+    constructor(obj, key, label, onChanged = null, pcOnly = false, visible = null) {
         super();
         this.content.className += ' editor-switch';
 
@@ -173,6 +188,9 @@ class SwitchField extends Field {
         }
         if (onChanged) {
             this.input.dataset.bind += ', event: { change: ' + onChanged + ' }';
+        }
+        if (visible) {
+            this.content.dataset.bind = `, visible: ${visible}`;
         }
 
         this.label.innerText = label;

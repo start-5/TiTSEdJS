@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,6 +20,7 @@
     <script type="text/javascript" src="data/global.js"></script>
     <script type="text/javascript" src="data/perks.js"></script>
     <script type="text/javascript" src="data/status.js"></script>
+    <script type="text/javascript" src="data/keyitems.js"></script>
     <script type="text/javascript" src="data/vm.js"></script>
 
     <script type="text/javascript" src="ui/display.js"></script>
@@ -161,7 +163,7 @@
                             }
 
                             if (!vm.isPC()) {
-                                vm.selectedCharacter(vm.chars().find(c => c.name == 'PC'));
+                                vm.selectedCharacter(vm.characters().find(c => c.name == 'PC'));
                             }
 
                             const fileName = file.name.replace(fileExtension, '');
@@ -222,18 +224,21 @@
             // #endregion
 
 
-            $('#tabGame').append(displayGame());
-            $('#tabStats').append(displayStats());
-            $('#tabHead').append(displayHead());
-            $('#tabBody').append(displayBody());
-            $('#tabCrotch').append(displayCrotch());
-            $('#tabPerks').append(displayPerks());
-            $('#tabStatusEffects').append(displayStatusEffects());
-            $('#tabFlags').append(displayFlags());
+            $('#tabGame').append(display.getGame());
+            $('#tabStats').append(display.getStats());
+            $('#tabHead').append(display.getHead());
+            $('#tabBody').append(display.getBody());
+            $('#tabCrotch').append(display.getCrotch());
+            $('#tabPerks').append(display.getPerks());
+            $('#tabStatusEffects').append(display.getStatusEffects());
+            $('#tabFlags').append(display.getFlags());
+            $('#tabKeyItems').append(display.getKeyItems());
+
+            $('#modalStorageBody').append(display.getStoragePopup());
 
             const lp = document.createElement('p').textContent = 'Low priority, this can be achieved through the game cheat menu.';
             $('#tabInventory').append(lp);
-            $('#tabKeyItems').append(lp);
+
 
             $('#content').show();
         }
@@ -241,7 +246,9 @@
     </script>
 </head>
 
+
 <body class="bg-secondary text-light">
+
 
     <div id="disclaimer" class="container-fluid text-center p-3 hidden">
         <h1 class="display-4">TiTS Save Editor</h1>
@@ -321,7 +328,7 @@
         <div class="text-light pb-2 px-3 w-100">
             <label class="label-sm" for="editField-character">Character</label>
             <select id="editField-character" class="form-select form-select-sm" disabled
-                    data-bind="options: chars, optionsText: 'name', value: selectedCharacter, enable: saveLoaded"></select>
+                    data-bind="options: characters, optionsText: 'name', value: selectedCharacter, enable: saveLoaded"></select>
         </div>
 
 
@@ -375,6 +382,13 @@
 
     </div>
 
+
+    <div class="modal fade" id="modalStorage" tabindex="-1" aria-hidden="true">
+        <div id="modalStorageBody" class="modal-dialog modal-dialog-centered" />
+    </div>
+
+
 </body>
+
 
 </html>

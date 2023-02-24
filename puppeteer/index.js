@@ -43,14 +43,9 @@ const path = require('path');
         },
 
         /**
-        * @callback execRegexOnContentsCallback
-        * @param {string} match
-        * @param {number} groupIndex
-        */
-        /**
         * Iterate through all contents using a regex
         * @param {RegExp} regex
-        * @param {execRegexOnContentsCallback} callback
+        * @param {Function} callback
         */
         execRegexOnContents: function (regex, callback) {
             for (var index = 0; index < contents.length; ++index) {
@@ -93,8 +88,50 @@ const path = require('path');
         * Format a 'StorageClass' flag array
         * @param {Array<StorageClass>} arr
         */
-        formatStorageClassArrayDefault: function (arr) {
-            return arr.filter((v, i, a) => a.findIndex(v2 => (v2.storageName === v.storageName)) === i).sort();
+        formatStorageClassArray: function (arr) {
+
+            function tryGetMaxValue(curr, existing, key, acc) {
+                if (curr[key] > existing[key]) {
+                    acc[key] = curr[key];
+                }
+            }
+
+            function tryGetMaxText(curr, existing, key, acc) {
+                if (curr[key].length > existing[key].length) {
+                    acc[key] = curr[key];
+                }
+            }
+
+            return arr
+                .reduce((acc, curr) => {
+
+                    const existingEffect = acc.find(e => e.storageName === curr.storageName);
+                    if (existingEffect) {
+                        const existingIndex = acc.indexOf(existingEffect);
+
+                        tryGetMaxValue(curr, existingEffect, 'value1', acc[existingIndex]);
+                        tryGetMaxValue(curr, existingEffect, 'value2', acc[existingIndex]);
+                        tryGetMaxValue(curr, existingEffect, 'value3', acc[existingIndex]);
+                        tryGetMaxValue(curr, existingEffect, 'value4', acc[existingIndex]);
+
+                        tryGetMaxText(curr, existingEffect, 'tooltip', acc[existingIndex]);
+                        tryGetMaxText(curr, existingEffect, 'iconName', acc[existingIndex]);
+
+                        tryGetMaxValue(curr, existingEffect, 'minutesLeft', acc[existingIndex]);
+
+                        const defaultShade = 'var(--textColor)';
+                        if (curr.iconShade != defaultShade && existingEffect.iconShade == defaultShade) {
+                            acc[existingIndex].iconShade = curr.iconShade;
+                        }
+                    }
+                    else {
+                        acc.push(curr);
+                    }
+
+                    return acc;
+
+                }, [])
+                .sort((l, r) => l.storageName.localeCompare(r.storageName));
         },
 
         /**
@@ -170,7 +207,6 @@ const path = require('path');
         */
         printOperationTime: function (msg, start, end, prefix = null) {
             console.log((prefix ?? 'got ') + msg + ', operation took ' + util.getElapsedTime(start, end) + ' to complete');
-
         }
 
     };
@@ -264,7 +300,8 @@ const path = require('path');
                         .map(key => ({
                             name: key.slice(prefix.length)
                                 .split('_')
-                                .map(str => str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase()).join(' '),
+                                .map(str => str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase())
+                                .join(' '),
                             value: window.GLOBAL[key]
                         }))
                         .filter(key => typeof key.value !== 'object');
@@ -325,6 +362,7 @@ const path = require('path');
                     NippleType: getGlobalsByPrefix('NIPPLE_TYPE_'),
                     SexPref: getGlobalsByPrefix('SEXPREF_'),
                     SkinType: getGlobalsByPrefix('SKIN_TYPE_'),
+                    StatusEffectShades: getGlobalsByPrefix('STATUS_'),
                     TailGenital: getGlobalsByPrefix('TAIL_GENITAL_'),
                     Upbringing: getGlobalsByPrefix('UPBRINGING_'),
                     ValidFlags: {},
@@ -365,6 +403,7 @@ const path = require('path');
 
 
                 return { global, pantyData, version };
+
             }
             catch (e) {
                 return { error: e };
@@ -415,104 +454,6 @@ const path = require('path');
         return index;
     }
 
-
-    // #endregion
-
-
-    // #region StorageClass
-
-    class StorageClass {
-        constructor() {
-            this.classInstance = 'StorageClass';
-            this.neverSerialize = false;
-            this.version = 1;
-            this.storageName = '';
-            this.value1 = 0;
-            this.value2 = 0;
-            this.value3 = 0;
-            this.value4 = 0;
-            this.hidden = true;
-            this.iconName = '';
-            this.tooltip = '';
-            this.combatOnly = false;
-            this.minutesLeft = 0;
-            this.iconShade = 'var(--textColor)';
-        }
-
-        /**
-        * Parse 'StorageClass' values using the default implementation
-        * @param {string} text
-        */
-        parseFromTextDefault(text) {
-            const texts = text.split('"');
-            const args = text.split(',');
-
-            this.storageName = texts[0] || '';
-
-            this.value1 = +args[1] || 0;
-            this.value2 = +args[2] || 0;
-            this.value3 = +args[3] || 0;
-            this.value4 = +args[4] || 0;
-
-            this.tooltip = texts[2] || '';
-        }
-    }
-
-    /**
-    * Parse game data into a 'StorageClass' array using the default implementation
-    * @param {RegExp} regex
-    * @param {boolean} skipFormat
-    */
-    function getStorageClassDataDefault(regex, skipFormat) {
-        var storageArray = [];
-
-        for (var index = 0; index < contents.length; ++index) {
-            var content = contents[index];
-
-            var m;
-            while ((m = regex.exec(content)) !== null) {
-                if (m.index === regex.lastIndex) {
-                    regex.lastIndex++;
-                }
-
-                m.forEach((match, groupIndex) => {
-                    if (groupIndex == 1) {
-                        const storage = new StorageClass();
-                        storage.parseFromTextDefault(match);
-                        storageArray.push(storage);
-                    }
-                });
-            }
-        }
-
-        if (!skipFormat) {
-            storageArray = util.formatStorageClassArrayDefault(storageArray);
-        }
-
-        return storageArray;
-    }
-
-    /**
-    * Get data for a StorageClass 'Value' field at the specified position from a string
-    * @param {number} position
-    * @param {string} str
-    */
-    function getStorageClassValue(position, str) {
-        var value = 0;
-
-        if (nthIndex(str, ',', position) > 0) {
-            if (nthIndex(str, ',', position + 1) > 0) {
-                value = str.slice(nthIndex(str, ',', position) + 1, nthIndex(str, ',', position + 1));
-            }
-            else {
-                value = str.slice(nthIndex(str, ',', position) + 1, nthIndex(str, ')', 1));
-            }
-
-            value = !isNaN(parseFloat(value)) ? parseFloat(value) : 0;
-        }
-
-        return value;
-    }
 
     // #endregion
 
@@ -794,12 +735,131 @@ const path = require('path');
     // #endregion
 
 
+    // #region StorageClass
+
+
+    // #region Class
+
+    class StorageClass {
+        constructor() {
+            this.classInstance = 'StorageClass';
+            this.neverSerialize = false;
+            this.version = 1;
+            this.storageName = '';
+            this.value1 = 0;
+            this.value2 = 0;
+            this.value3 = 0;
+            this.value4 = 0;
+            this.hidden = true;
+            this.iconName = '';
+            this.tooltip = '';
+            this.combatOnly = false;
+            this.minutesLeft = 0;
+            this.iconShade = 'var(--textColor)';
+        }
+
+        /**
+        * Parse 'StorageClass' values using the default implementation
+        * @param {string} text
+        */
+        parseFromTextDefault(text) {
+            const texts = text.split('"');
+
+            for (var i = 0; i < texts.length; i++) {
+                text = text.replace(`${i === 0 ? '' : '"'}${texts[i]}"`, '');
+            }
+
+            const args = text.split(',');
+
+            this.storageName = texts[0] || '';
+
+            this.value1 = +args[1] || 0;
+            this.value2 = +args[2] || 0;
+            this.value3 = +args[3] || 0;
+            this.value4 = +args[4] || 0;
+
+            this.tooltip = texts[2] || '';
+        }
+
+        /**
+        * Parse 'StorageClass' status effects
+        * @param {string} text
+        */
+        parseStatusEffect(text) {
+            const texts = text.split('"');
+
+            this.parseFromTextDefault(text);
+
+            for (var i = 0; i < texts.length; i++) {
+                text = text.replace(`${i === 0 ? '' : '"'}${texts[i]}"`, '');
+            }
+
+            const args = text.split(',');
+
+            this.tooltip = texts[4] || '';
+
+            this.hidden = args[5] ? args[5] === '!0' : true;
+            this.iconName = texts[2] || '';
+            this.combatOnly = args[8] ? args[8] === '!0' : false;
+            this.minutesLeft = +args[9] || 0;
+
+            // Icon Shade
+            // Some status effects have a shade like '12030916' or similar, which may be a remnant from the old version.
+            const iconShadeRaw = args[10];
+            if (iconShadeRaw && !+iconShadeRaw) {
+                if (iconShadeRaw.startsWith('"var')) { // already in var() format
+                    this.iconShade = iconShadeRaw.replaceAll('"', '') + ')';
+                }
+                else if (iconShadeRaw.startsWith('GLOBAL')) { // global.status_ format
+                    const shadeName = args[10].replace('GLOBAL.STATUS_', '').split('_')
+                        .map(str => str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase())
+                        .join(' ');
+
+                    this.iconShade = obj.StatusEffectShades.find(s => s.name === shadeName).value;
+                }
+            }
+        }
+    }
+
+    /**
+    * Parse game data into a 'StorageClass' array using the default implementation
+    * @param {RegExp} regex
+    * @param {boolean} skipFormat
+    * @param {Function} func
+    * @returns {Array<StorageClass>}
+    */
+    function getStorageClassData(regex, skipFormat = false, func = null) {
+        var storageArray = [];
+
+        util.execRegexOnContents(regex, (match, groupIndex) => {
+            if (groupIndex == 2) {
+                if (!func) {
+                    const storage = new StorageClass();
+                    storage.parseFromTextDefault(match);
+                    storageArray.push(storage);
+                }
+                else {
+                    storageArray.push(func(match));
+                }
+            }
+        });
+
+        if (!skipFormat) {
+            storageArray = util.formatStorageClassArray(storageArray);
+        }
+
+        return storageArray;
+    }
+
+    // #endregion
+
+
     // #region Perks
 
     console.log('\ngetting perks');
     const perksStart = Date.now();
 
-    const perks = getStorageClassDataDefault(/\.createPerk\("([\S ][^)]+)\)*/g);
+    const perks = getStorageClassData(/\.(create|has|remove)Perk\("([\S ][^)]+)\)*/g);
 
     const perksEnd = Date.now();
     util.printOperationTime('perks', perksStart, perksEnd);
@@ -809,88 +869,55 @@ const path = require('path');
 
     // #region Status Effects
 
-    // TODO: This is still kind of a mess
-
     console.log('\ngetting status effects');
     const statusEffectsStart = Date.now();
 
-    var statusEffects = [];
-
-    (function () {
-        for (var index = 0; index < contents.length; ++index) {
-            var content = contents[index];
-            const regex = /\.(create|has)StatusEffect\(([\"\w\ \,\+\%\.\'\-\’\!\?\$\#\@\/\&\*]+)\)/g;
-
-            var m;
-            while ((m = regex.exec(content)) !== null) {
-                if (m.index === regex.lastIndex) {
-                    regex.lastIndex++;
-                }
-
-                m.forEach(match => {
-                    var statusEffect = new StorageClass();
-
-                    if (match.startsWith('.create')) {
-                        if (nthIndex(match, '"', 1) === nthIndex(match, '(', 1) + 1) {
-                            statusEffect.storageName = match.slice(nthIndex(match, '"', 1) + 1, nthIndex(match, '"', 2));
-                        }
-
-                        statusEffect.value1 = getStorageClassValue(1, match);
-                        statusEffect.value2 = getStorageClassValue(2, match);
-                        statusEffect.value3 = getStorageClassValue(3, match);
-                        statusEffect.value4 = getStorageClassValue(4, match);
-
-                        if (nthIndex(match, '"', 5) > 0) {
-                            if (nthIndex(match, ',', 8) > 0) {
-                                statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, '"', 6));
-                            }
-                            else {
-                                if (nthIndex(match, ',', 9) > 0) {
-                                    statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ',', 9) - 1);
-                                }
-                                else {
-                                    statusEffect.tooltip = match.slice(nthIndex(match, '"', 5) + 1, nthIndex(match, ')', 1) - 1);
-                                }
-                            }
-                        }
-
-                        if (nthIndex(match, '"', 3) > 0) {
-                            statusEffect.iconName = match.slice(nthIndex(match, '"', 3) + 1, nthIndex(match, '"', 4));
-                        }
-
-                        if (nthIndex(match, ',', 5) > 0) {
-                            let strBool = '';
-                            let bool = false;
-                            if (nthIndex(match, ',', 6) > 0) {
-                                strBool = match.slice(nthIndex(match, ',', 5) + 1, nthIndex(match, ',', 6));
-                            }
-                            else {
-                                strBool = match.slice(nthIndex(match, ',', 5) + 1, nthIndex(match, ')', 1) - 1);
-
-                            }
-
-                            if (strBool === '!0' || strBool === '!1') {
-                                bool = strBool === '!0';
-                            }
-                            if (strBool === 'true' || strBool === 'false') {
-                                bool = strBool === 'true';
-                            }
-
-                            statusEffect.hidden = bool;
-                        }
-
-
-                        statusEffects.push(statusEffect);
-                    }
-                });
-            }
-        }
-    })();
-
-    statusEffects = util.formatStorageClassArrayDefault(statusEffects);
+    var statusEffects = getStorageClassData(/\.(create|has|remove)StatusEffect\("([\S ][^)]+)\)/g, false, match => {
+        const statusEffect = new StorageClass();
+        statusEffect.parseStatusEffect(match);
+        return statusEffect;
+    });
 
     const statusEffectsEnd = Date.now();
     util.printOperationTime('status effects', statusEffectsStart, statusEffectsEnd);
+
+    // #endregion
+
+
+    // #region Key Items
+
+    console.log('\ngetting key items');
+    const keyItemsStart = Date.now();
+
+    var keyitems = getStorageClassData(/\.(create|has|remove)KeyItem\("([\S ][^)]+)\)*/g, true);
+
+    const panties = [];
+
+    util.execRegexOnContents(/\.createKeyItem\((PantyData\.get\("([\S ][^")]+)"\)[^)][\S ][^)]+)\)*/g, (match, groupIndex, matches) => {
+        if (groupIndex == 2) {
+            const panty = new StorageClass();
+
+            // Handle tooltip
+            if (matches[0].indexOf(',') > -1) {
+                const texts = matches[1].split('"');
+                panty.tooltip = texts[3];
+            }
+
+            panty.storageName = pantyData[match];
+
+            panties.push(panty);
+        }
+    });
+
+    keyitems = keyitems.concat(panties);
+
+    keyitems = util.formatStorageClassArray(keyitems);
+
+    const keyItemsEnd = Date.now();
+    util.printOperationTime('key items', keyItemsStart, keyItemsEnd);
+
+    // #endregion
+
 
     // #endregion
 
@@ -927,59 +954,6 @@ const path = require('path');
 
     const codexEntriesEnd = Date.now();
     util.printOperationTime('codex entries', codexEntriesStart, codexEntriesEnd);
-
-    // #endregion
-
-
-    // #region Key Items
-
-    // Observations:
-    // 'Personalised Dice Set' is broken because it's created based on a variable
-
-    console.log('\ngetting key items');
-    const keyItemsStart = Date.now();
-
-    var keyitems = getStorageClassDataDefault(/\.createKeyItem\("([\S ][^)]+)\)*/g, true);
-
-    const panties = [];
-
-    (function () {
-        for (var index = 0; index < contents.length; ++index) {
-            var content = contents[index];
-            const regex = /\.createKeyItem\((PantyData\.get\("([\S ][^")]+)"\)[^)][\S ][^)]+)\)*/g;
-
-            var m;
-            while ((m = regex.exec(content)) !== null) {
-                if (m.index === regex.lastIndex) {
-                    regex.lastIndex++;
-                }
-
-                const panty = new StorageClass();
-
-                m.forEach((match, groupIndex) => {
-                    if (groupIndex == 1) {
-                        panty.parseFromTextDefault(match);
-
-                        const texts = match.split('"');
-                        panty.tooltip = texts[3] || '';
-
-                    }
-                    else if (groupIndex == 2) {
-                        panty.storageName = pantyData[match];
-                    }
-                });
-
-                panties.push(panty);
-            }
-        }
-    })();
-
-    keyitems = keyitems.concat(panties);
-
-    keyitems = util.formatStorageClassArrayDefault(keyitems);
-
-    const keyItemsEnd = Date.now();
-    util.printOperationTime('key items', keyItemsStart, keyItemsEnd);
 
     // #endregion
 
@@ -1063,7 +1037,11 @@ const path = require('path');
     // #endregion
 
 
-    // #region Other
+    // #region Misc
+
+
+    console.log('\ngetting misc');
+    const miscStart = Date.now();
 
 
     // #region Beard Style
@@ -1078,6 +1056,76 @@ const path = require('path');
     // #endregion
 
 
+    // #region Manual clean
+
+
+    // #region Key Items
+
+    [''].forEach(name => {
+        const index = keyitems.findIndex(k => k.storageName === name);
+        if (index > -1) {
+            keyitems.splice(index, 1);
+        }
+    });
+
+
+    // #endregion
+
+
+    // #endregion
+
+
+    // #region Counts
+
+    const objLength = o => Object.keys(o).length;
+    const arrLength = a => a.length;
+
+
+    const counts = {};
+
+
+    // Global
+    counts.Global = {};
+    counts.Global.ValidFlags = {};
+    counts.Global.ValidTypes = {};
+
+    Object.keys(obj).forEach(k => {
+        if (!k.toLocaleLowerCase().startsWith('valid')) {
+            counts.Global[k] = objLength(obj[k]);
+        }
+    });
+
+    Object.keys(obj.ValidFlags).forEach(k => {
+        counts.Global.ValidFlags[k] = objLength(obj.ValidFlags[k]);
+    });
+    Object.keys(obj.ValidTypes).forEach(k => {
+        counts.Global.ValidTypes[k] = objLength(obj.ValidTypes[k]);
+    });
+
+
+    // Codex
+    counts.Codex = objLength(codexEntries);
+
+    // Game Flags
+    counts.GameFlags = objLength(gameFlags);
+
+    // Key Items
+    counts.KeyItems = arrLength(keyitems);
+
+    // Perks
+    counts.Perks = arrLength(perks);
+
+    // Status Effects
+    counts.StatusEffects = arrLength(statusEffects);
+
+
+    // #endregion
+
+
+    const miscEnd = Date.now();
+    util.printOperationTime('misc', miscStart, miscEnd);
+
+
     // #endregion
 
 
@@ -1090,6 +1138,7 @@ const path = require('path');
     fs.writeFileSync('../data/status.js', util.formatToFile('StatusEffects', statusEffects));
     fs.writeFileSync('../data/codex.js', util.formatToFile('CodexEntries', codexEntries));
     fs.writeFileSync('../data/keyitems.js', util.formatToFile('KeyItems', keyitems));
+    fs.writeFileSync('../data/counts.js', util.formatToFile('Counts', counts));
 
     const writeEnd = Date.now();
     util.printOperationTime('written', writeStart, writeEnd, 'files ');

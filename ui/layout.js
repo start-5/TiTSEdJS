@@ -64,7 +64,7 @@ class ArrayGroup extends Group {
 class NestedGroup {
     constructor(titleText, fields) {
         this.root = document.createElement('div');
-        this.root.className = 'row g-0 nested-group my-n3';
+        this.root.className = 'row g-0 nested-group';
 
         if (titleText) {
             const titleElement = document.createElement('h5');
