@@ -71,7 +71,7 @@ var ViewModel = function (data) {
         }
     });
 
-    self.characters = ko.computed(function () {
+    self.characters = ko.computed(() => {
 
         return Object.keys(self.save.characters).map(key => ({
             name: key,
@@ -81,7 +81,7 @@ var ViewModel = function (data) {
     }, self);
 
 
-    self.isPC = ko.computed(function () {
+    self.isPC = ko.computed(() => {
 
         if (self.selectedCharacter()) {
             return self.selectedCharacter().name === 'PC';
@@ -118,15 +118,7 @@ var ViewModel = function (data) {
             observableList(
                 editorStorages
                     .concat(charStorages())
-                    .sort((l, r) => {
-                        if (l.storageName() < r.storageName()) {
-                            return -1;
-                        }
-                        if (l.storageName() > r.storageName()) {
-                            return 1;
-                        }
-                        return 0;
-                    })
+                    .sort((l, r) => l.storageName().localeCompare(r.storageName()))
             );
 
         }
@@ -147,6 +139,28 @@ var ViewModel = function (data) {
     self.hasStorageTooltip = storage => {
         return !!storage.tooltip();
     };
+
+
+    self.selectedStorage = ko.observable();
+
+    self.selectStorage = (storage, fields) => {
+
+        if (fields === undefined || fields[0] === 'all') {
+            fields = ['tooltip', 'value1', 'value2', 'value3', 'value4', 'iconName', 'iconShade', 'combatOnly', 'hidden', 'minutesLeft'];
+        }
+
+        self.selectedStorage({
+            fields: fields,
+            obj: storage
+        });
+
+        $('#modalStorage').modal('show');
+
+    };
+
+    self.hasSelectedStorage = ko.computed(() => {
+        return self.selectedStorage() !== undefined;
+    }, self);
 
 
     // #region Status Effects

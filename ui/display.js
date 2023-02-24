@@ -336,16 +336,72 @@ const display = {
     },
 
 
+    getStoragePopup: () => {
+
+        const dRoot = document.createElement('div');
+        dRoot.className = 'modal-content bg-secondary';
+        dRoot.dataset.bind = 'with: $root.selectedStorage';
+
+
+        const dHeader = document.createElement('div');
+        dHeader.className = 'modal-header';
+
+        const lblStorageName = document.createElement('h5');
+        lblStorageName.className = 'modal-title';
+        lblStorageName.dataset.bind = 'text: obj.storageName';
+
+        const btnClose = document.createElement('button');
+        btnClose.className = 'btn-close btn-danger';
+        btnClose.type = 'button';
+        btnClose.setAttribute('data-bs-dismiss', 'modal');
+        btnClose.ariaLabel = 'Close';
+
+        dHeader.appendChild(lblStorageName);
+        dHeader.appendChild(btnClose);
+
+
+        const dBody = document.createElement('div');
+        dBody.className = 'modal-body';
+
+        dBody.appendChild(new TextField('', 'obj.tooltip', 'Tooltip', null, null, null, 'fields.includes("tooltip")'));
+
+        dBody.appendChild(new NestedGroup('', [
+            new FloatField('', 'obj.value1', 'Value 1', null, null, null, null, null, 'fields.includes("value1")'),
+            new FloatField('', 'obj.value2', 'Value 2', null, null, null, null, null, 'fields.includes("value2")')
+        ]));
+        dBody.appendChild(new NestedGroup('', [
+            new FloatField('', 'obj.value3', 'Value 3', null, null, null, null, null, 'fields.includes("value3")'),
+            new FloatField('', 'obj.value4', 'Value 4', null, null, null, null, null, 'fields.includes("value4")')
+        ]));
+
+        dBody.appendChild(new NestedGroup('', [
+            new TextField('', 'obj.iconName', 'Icon Name', null, null, null, 'fields.includes("iconName")'),
+            new TextField('', 'obj.iconShade', 'Icon Shade', null, null, null, 'fields.includes("iconShade")')
+        ]));
+
+        dBody.appendChild(new IntegerField('', 'obj.minutesLeft', 'Minutes Left', 'minutes', 0, null, null, null, 'fields.includes("minutesLeft")'));
+
+        dBody.appendChild(new SwitchField('', 'obj.combatOnly', 'Combat Only', null, null, 'fields.includes("combatOnly")'));
+        dBody.appendChild(new SwitchField('', 'obj.hidden', 'Hidden', null, null, 'fields.includes("hidden")'));
+
+
+        dRoot.appendChild(dHeader);
+        dRoot.appendChild(dBody);
+
+
+        return dRoot;
+    },
+
     getPerks: () => {
-        return new StorageContainer(key_char, 'perks', 'perkList');
+        return new StorageContainer(key_char, 'perks', 'perkList', ['tooltip', 'value1', 'value2', 'value3', 'value4']);
     },
 
     getStatusEffects: () => {
-        return new StorageContainer(key_char, 'statusEffects', 'statusEffectList');
+        return new StorageContainer(key_char, 'statusEffects', 'statusEffectList', ['all']);
     },
 
     getKeyItems: () => {
-        return new StorageContainer(key_char, 'keyItems', 'keyItemList');
+        return new StorageContainer(key_char, 'keyItems', 'keyItemList', ['tooltip', 'value1', 'value2', 'value3', 'value4']);
     },
 
 

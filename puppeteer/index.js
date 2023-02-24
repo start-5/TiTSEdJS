@@ -117,6 +117,8 @@ const path = require('path');
                         tryGetMaxText(curr, existingEffect, 'tooltip', acc[existingIndex]);
                         tryGetMaxText(curr, existingEffect, 'iconName', acc[existingIndex]);
 
+                        tryGetMaxValue(curr, existingEffect, 'minutesLeft', acc[existingIndex]);
+
                         const defaultShade = 'var(--textColor)';
                         if (curr.iconShade != defaultShade && existingEffect.iconShade == defaultShade) {
                             acc[existingIndex].iconShade = curr.iconShade;
@@ -129,15 +131,7 @@ const path = require('path');
                     return acc;
 
                 }, [])
-                .sort((l, r) => {
-                    if (l.storageName < r.storageName) {
-                        return -1;
-                    }
-                    if (l.storageName > r.storageName) {
-                        return 1;
-                    }
-                    return 0;
-                });
+                .sort((l, r) => l.storageName.localeCompare(r.storageName));
         },
 
         /**

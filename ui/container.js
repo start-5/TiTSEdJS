@@ -3,7 +3,7 @@
 
 class StorageContainer {
 
-    constructor(obj, key, bindingSource) {
+    constructor(obj, key, bindingSource, fields) {
 
         this.root = document.createElement('div');
         this.root.className = 'text-light my-3 w-100';
@@ -36,7 +36,7 @@ class StorageContainer {
         const btnEdit = document.createElement('i');
         btnEdit.className = 'fa-solid fa-pen-to-square ms-3';
         btnEdit.role = 'button';
-        btnEdit.dataset.bind = 'click: function(data) { $root.a(data) }';
+        btnEdit.dataset.bind = `click: (storage, fields) => $root.selectStorage($data, ${JSON.stringify(fields)})`;
 
         header.appendChild(checkBox);
         header.appendChild(lblName);
