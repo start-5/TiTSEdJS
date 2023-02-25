@@ -583,6 +583,10 @@ const Globals = {
             { name: 'Plugged', value: 47 },
             { name: 'Hyper Pumped', value: 51 },
         ],
+        Crotch: [
+            { name: 'Genital Slit', value: 57 },
+            { name: 'Uniball', value: 58 },
+        ],
         Ear: [
             { name: 'Long', value: 1 },
             { name: 'Tapered', value: 7 },

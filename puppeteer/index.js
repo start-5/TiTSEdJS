@@ -609,7 +609,7 @@ const path = require('path');
 
 
     // Simple add|has checks
-    ['Areola', 'Arm', 'Ear', 'Face', 'Leg', 'Skin', 'Tail', 'Tongue'].forEach(name => {
+    ['Areola', 'Arm', 'Crotch', 'Ear', 'Face', 'Leg', 'Skin', 'Tail', 'Tongue'].forEach(name => {
         obj.ValidFlags[name] = getValidBodyFlagsDefault(getFlagCheckRegex(name));
     });
 

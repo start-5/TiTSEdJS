@@ -23,6 +23,7 @@ const Counts = {
             Areola: 4,
             Arm: 15,
             Butt: 6,
+            Crotch: 2,
             Ear: 4,
             Face: 12,
             Leg: 20,

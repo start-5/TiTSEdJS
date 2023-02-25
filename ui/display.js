@@ -173,7 +173,8 @@ const display = {
                     new NestedGroup('', [
                         new IntegerField(key_char, 'bellyRatingRaw', 'Belly Rating Raw', null, 0),
                         new IntegerField(key_char, 'bellyRatingMod', 'Belly Rating Mod', null, 0)
-                    ])
+                    ]),
+                    new FlagField('ValidFlags.Crotch', key_char, 'crotchFlags', 'Crotch Flags')
                 ]),
                 new Group('Skin', [
                     new SelectField('SkinType', key_char, 'skinType', 'Skin Type'),
