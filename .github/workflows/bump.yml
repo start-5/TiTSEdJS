@@ -47,6 +47,8 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
-          committer: start-5 <start-5@users.noreply.github.com>
-          title: '[Automated] Bump ${{ steps.current_version.outputs.prop }} => ${{ inputs.new_version }}'
+          author: GitHub <noreply@github.com>
+          title: '[Automated] Bump ${{ steps.current_version.outputs.prop }} --> ${{ inputs.new_version }}'
+          body: 'Bump ${{ steps.current_version.outputs.prop }} --> ${{ inputs.new_version }}'
+          commit-message: 'Bump ${{ steps.current_version.outputs.prop }} --> ${{ inputs.new_version }}'
           branch: bump-latest
