@@ -171,6 +171,18 @@ const path = require('path');
         },
 
         /**
+        * Format data when saving to a json file
+        * @param {any} data
+        */
+        formatToJSON: function (data) {
+            return prettier.format(JSON.stringify(data), {
+                endOfLine: 'crlf',
+                parser: 'json5',
+                tabWidth: 4
+            });
+        },
+
+        /**
         * Get a pretty print time elapsed result based on start and end time
         * @param {number} start
         * @param {number} end
@@ -430,7 +442,9 @@ const path = require('path');
 
     const obj = evalResult.global;
     const pantyData = evalResult.pantyData;
-    const version = evalResult.version;
+    const version = {
+        game: evalResult.version
+    };
 
 
     // #region Util
@@ -1139,6 +1153,7 @@ const path = require('path');
     fs.writeFileSync('../data/codex.js', util.formatToFile('CodexEntries', codexEntries));
     fs.writeFileSync('../data/keyitems.js', util.formatToFile('KeyItems', keyitems));
     fs.writeFileSync('../data/counts.js', util.formatToFile('Counts', counts));
+    fs.writeFileSync('version.json', util.formatToJSON(version));
 
     const writeEnd = Date.now();
     util.printOperationTime('written', writeStart, writeEnd, 'files ');
