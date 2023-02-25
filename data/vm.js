@@ -327,23 +327,22 @@ function koInit() {
     // Custom handler to write actual numbers and not strings when needed
     ko.bindingHandlers.numberInput = {
 
-        init: function (element, valueAccessor, allBindingsAccessor) {
-            var underlyingObservable = valueAccessor();
+        init: function (element, valueAccessor, allBindings) {
 
-            var interceptor = ko.pureComputed({
+            var interceptor = ko.computed({
                 owner: this,
-                read: underlyingObservable,
+                read: valueAccessor,
                 write: function (value) {
-                    underlyingObservable(+value);
+                    valueAccessor()(+value);
                 }
             });
 
             ko.bindingHandlers.textInput.init(element, function () {
                 return interceptor;
-            }, allBindingsAccessor);
+            }, allBindings);
         },
 
-        update: function (element, valueAccessor, allBindingsAccessor) {
+        update: function (element, valueAccessor) {
             element.value = valueAccessor()();
         }
 
