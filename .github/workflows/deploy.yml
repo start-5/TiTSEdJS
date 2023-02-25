@@ -3,7 +3,8 @@ name: Deploy
 on:
   workflow_dispatch:
   push:
-    branches: ['bump-latest']
+    branches:
+      - main
 
 permissions:
   contents: read
