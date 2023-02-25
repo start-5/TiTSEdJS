@@ -177,7 +177,7 @@ const path = require('path');
         formatToJSON: function (data) {
             return prettier.format(JSON.stringify(data), {
                 endOfLine: 'crlf',
-                parser: 'json5',
+                parser: 'json',
                 tabWidth: 4
             });
         },
