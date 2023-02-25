@@ -8,13 +8,27 @@ concurrency:
   cancel-in-progress: true
   
 jobs:
-  create_pr:
-    name: Create PR
+  bump:
+    name: Bump data
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+    
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        
+      - name: Install packages
+        run: npm ci
+        working-directory: ./puppeteer
+        
+      - name: Run script
+        run: node index
+        working-directory: ./puppeteer
+      
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
