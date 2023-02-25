@@ -14,8 +14,10 @@ concurrency:
 jobs:
   bump:
     name: Bump
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
+      - run: git config --global core.autocrlf true
+      
       - name: Checkout
         uses: actions/checkout@v3
       
@@ -25,29 +27,30 @@ jobs:
         with:
           path: versions.json
           prop_path: game
-        
+      
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         
       - name: Install packages
         run: npm ci
         working-directory: ./puppeteer
-        
+      
       - name: Run script
         run: node index
         working-directory: ./puppeteer
-        
+      
       - name: Update versions file
         uses: jossef/action-set-json-field@v2.1
         with:
           file: versions.json
           field: game
           value: '${{ inputs.new_version }}'
-        
+      
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
-          author: GitHub <noreply@github.com>
+          author: start-5 <start-5@users.noreply.github.com>
+          committer: start-5 <start-5@users.noreply.github.com>
           title: '[Automated] Bump ${{ steps.current_version.outputs.prop }} --> ${{ inputs.new_version }}'
           body: 'Bump ${{ steps.current_version.outputs.prop }} --> ${{ inputs.new_version }}'
           commit-message: 'Bump ${{ steps.current_version.outputs.prop }} --> ${{ inputs.new_version }}'
