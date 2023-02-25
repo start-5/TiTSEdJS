@@ -23,7 +23,7 @@ jobs:
         id: current_version
         uses: notiz-dev/github-action-json-property@release
         with:
-          path: version.json
+          path: versions.json
           prop_path: game
         
       - name: Setup Node.js environment
@@ -37,10 +37,10 @@ jobs:
         run: node index
         working-directory: ./puppeteer
         
-      - name: Update version file
+      - name: Update versions file
         uses: jossef/action-set-json-field@v2.1
         with:
-          file: version.json
+          file: versions.json
           field: game
           value: '${{ inputs.new_version }}'
         
