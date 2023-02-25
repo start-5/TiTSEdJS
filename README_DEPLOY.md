@@ -1,4 +1,4 @@
-<h3>Trials in Tainted Space Save Editor</h3>
+<h3 class="mt-4">Trials in Tainted Space Save Editor</h3>
 <p>
   A Save Editor for the JavaScript version of TiTS. View and edit your save files.
 </p>
