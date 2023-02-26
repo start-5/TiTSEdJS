@@ -42,9 +42,8 @@
     </style>
 
     <script>
-        //in case they switch to using a custom extension at some point like they do with coc2
+
         const fileExtension = '.json';
-        const minFileNameLength = 1;
 
 
         window.onerror = function (evt, src, ln, col, err) {
@@ -52,49 +51,141 @@
         }
 
 
-        $(() => {
+        // #region Load file
+
+        function loadFile(file) {
+
+            if (file.name.endsWith(fileExtension)) {
+                try {
+                    var fileReader = new FileReader();
+                    fileReader.readAsText(file);
+
+                    fileReader.addEventListener("loadend", () => {
+                        var json;
+
+                        if (typeof fileReader.result !== 'string') {
+                            alert('This file has an incorrect format, please check the file and try again.');
+                            return;
+                        }
+
+                        try {
+                            json = JSON.parse(fileReader.result);
+                            if (!json['classInstance']) { // this check should be enough for now
+                                alert('This file is not a valid TiTS file, please check the file and try again.');
+                                return;
+                            }
+                        }
+                        catch (e) {
+                            alert("An error ocurred while attempting parse the file\n\n" + e);
+                            return;
+                        }
+
+
+                        if (!vm) {
+                            vm = new ViewModel(json);
+                            koInit();
+                        }
+
+                        try {
+                            if (!vm.saveLoaded()) {
+                                vm.saveLoaded(true);
+                                ko.applyBindings(vm);
+                            }
+                            else {
+                                ko.mapping.fromJS(json, loadMapping, vm.save);
+                            }
+                        } catch (e) {
+                            alert('An internal error ocurred while processing the save data\n\n' + e)
+                        }
+
+                        if (!vm.isPC()) {
+                            vm.selectedCharacter(vm.characters().find(c => c.name == 'PC'));
+                        }
+
+                        const fileName = file.name.replace(fileExtension, '');
+                        vm.originalSaveName(fileName);
+                        vm.saveName(fileName);
+
+                        alert("Save file loaded!");
+                    });
+
+
+                } catch (e) {
+                    alert('Error reading file\n' + e)
+                }
+            }
+            else {
+                alert('Selected file is invalid, please select a ' + fileExtension + ' file and try again');
+            }
+
+        }
+
+        // #endregion
+
+
+        // #region GET
+
+        async function getRepoFile(path, func, type = 'text') {
+            try {
+                await $.get(`https://raw.githubusercontent.com/start-5/TiTS.JS-Save-Editor/main/${path}`, data => func(data), type);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        // #endregion
+
+
+        $(async () => {
+
             $('#toolbarContainer').collapse();
             $('#toolbarContainer').show();
 
-            if (localStorage.getItem('ignoreDisclaimer')) {
-                doLoad();
+
+            // #region About content
+
+            await getRepoFile('versions.json', data => {
+
+                const gameVersion = JSON.parse(data)?.game;
+                if (!!gameVersion) {
+                    $('#modalInfoBody').append(`<p>Supported game version: <b>${gameVersion}</b></p>`);
+                }
+
+            });
+
+            await getRepoFile('README_DEPLOY.md', data => {
+                $('#modalInfoBody').append(data);
+            });
+
+
+            const showAboutOnPageLoad = localStorage.getItem('showAboutOnPageLoad') === '1';
+            const checkShowAboutOnLoad = $('#checkShowAboutOnLoad');
+
+            checkShowAboutOnLoad.prop('checked', showAboutOnPageLoad);
+            checkShowAboutOnLoad.on('change', function () {
+                localStorage.setItem('showAboutOnPageLoad', this.checked ? '1' : '0');
+            })
+
+            if (showAboutOnPageLoad) {
+                $('#modalInfo').modal('show');
             }
-            else {
-                $('#disclaimer').show();
-
-                $('#btnDisclaimer').on('click', () => {
-
-                    if ($('#sellYourSoul').is(':checked')) {
-                        localStorage.setItem('ignoreDisclaimer', '1');
-                    }
-
-                    $('#disclaimer').hide();
-                    doLoad();
-                });
-            }
-        });
-
-        function doLoad() {
-            $('#loadFile').attr('accept', fileExtension);
 
 
-            //$('#editField-character').on('change', function () {
-            //    const key = $(this).val();
-            //    save.character = {
-            //        obj: save.saveObj.characters[key],
-            //        key: key
-            //    };
-            //    //$('.nav-tabs button:first').tab('show'); //this might be annoying
-            //});
+            // #endregion
 
 
             // #region File handling
 
-            $('body').on('dragenter dragleave dragover', (e) => {
+
+            $('#loadFile').attr('accept', fileExtension);
+
+
+            // Drag and Drop listener
+            $('body').on('dragenter dragleave dragover', e => {
                 e.preventDefault();
                 e.stopPropagation();
             });
-            $('body').on('drop', (e) => {
+            $('body').on('drop', e => {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -111,98 +202,23 @@
                 }
             });
 
-            function loadFile(file) {
-                if (file.name.endsWith(fileExtension)) {
-                    try {
-                        var fileReader = new FileReader();
-                        fileReader.readAsText(file);
 
-                        fileReader.addEventListener("loadend", () => {
-                            var json;
-
-                            if (typeof fileReader.result !== 'string') {
-                                alert('This file has an incorrect format, please check the file and try again.');
-                                return;
-                            }
-
-                            try {
-                                json = JSON.parse(fileReader.result);
-                                if (!json['classInstance']) { //this check should be enough for now
-                                    alert('This file is in an incorrect format, please check the file and try again.');
-                                    return;
-                                }
-                            }
-                            catch (e) {
-                                alert("An error ocurred while attempting parse the file\n\n" + e);
-                                return;
-                            }
-
-                            // this might be annoying
-                            //$('.nav-tabs button:first').tab('show');
-                            //window.scrollTo({
-                            //    top: 0,
-                            //    left: 0,
-                            //    behavior: 'smooth'
-                            //})
-
-                            if (!vm) {
-                                vm = new ViewModel(json);
-                                koInit();
-                            }
-
-                            try {
-                                if (!vm.saveLoaded()) {
-                                    vm.saveLoaded(true);
-                                    ko.applyBindings(vm);
-                                }
-                                else {
-                                    ko.mapping.fromJS(json, loadMapping, vm.save);
-                                }
-                            } catch (e) {
-                                alert('An internal error ocurred while processing the save data\n\n' + e)
-                            }
-
-                            if (!vm.isPC()) {
-                                vm.selectedCharacter(vm.characters().find(c => c.name == 'PC'));
-                            }
-
-                            const fileName = file.name.replace(fileExtension, '');
-                            vm.originalSaveName(fileName);
-                            vm.saveName(fileName);
-
-                            alert("Save file loaded!");
-                        });
-
-
-                    } catch (e) {
-                        alert('Error reading file\n' + e)
-                    }
-                }
-                else {
-                    alert('Selected file is invalid, please select a ' + fileExtension + ' file and try again');
-                }
-            }
-
+            // Input listener
             $('#loadFile').on('input', function () {
-                var file = $(this).prop('files')[0];
+
+                const file = $(this).prop('files')[0];
+
                 if (!file) {
                     alert('Error loading the file, please try again.');
                 }
                 else {
                     loadFile(file);
                 }
-            });
 
-            $('#inputSaveName').on('change', function () {
-                // alert('File name must be ' + requiredLength + ' character' + (requiredLength > 1 ? 's' : '') + ' or longer');                //
-
-                const name = $(this).val();
-                if (name.length <= minFileNameLength) {
-                    vm.saveName(vm.originalSaveName());
-                }
             });
 
 
+            // Save
             $('#btnSaveFile').on('click', () => {
 
                 var saveObj = ko.mapping.toJS(vm.save);
@@ -221,8 +237,23 @@
 
             });
 
+
+            // Prevent saving a file with an empty file name
+            $('#inputSaveName').on('change', function () {
+
+                const name = $(this).val();
+
+                if (name.length < 1) {
+                    vm.saveName(vm.originalSaveName());
+                }
+
+            });
+
+
             // #endregion
 
+
+            // #region Display
 
             $('#tabGame').append(display.getGame());
             $('#tabStats').append(display.getStats());
@@ -236,45 +267,21 @@
 
             $('#modalStorageBody').append(display.getStoragePopup());
 
-            const lp = document.createElement('p').textContent = 'Low priority, this can be achieved through the game cheat menu.';
-            $('#tabInventory').append(lp);
+            $('#tabInventory').append('<p>Low priority, this can be achieved through the game cheat menu.</p>');
 
 
             $('#content').show();
-        }
+
+            // #endregion
+
+        });
+
 
     </script>
 </head>
 
 
 <body class="bg-secondary text-light">
-
-
-    <div id="disclaimer" class="container-fluid text-center p-3 hidden">
-        <h1 class="display-4">TiTS Save Editor</h1>
-        <p>Edit saves at your own risk. If you break or corrupt your savefile don't blame the editor!</p>
-        <p>Only JavaScript version save files are supported.</p>
-
-        <br /><br />
-
-        <div class="p-3">
-            <h1 class="display-6">This project is still in development</h1>
-            <p>
-                Although this page is published and is usable, in its current state it does not represent a finished product, you can track
-                its progress through <a class="link-warning" href="https://github.com/start-5/TiTS.JS-Save-Editor" target="_blank">Github</a>.
-                If you have any issue, suggestion, or feature request please post them in the
-                <a class="link-warning" href="https://github.com/start-5/TiTS.JS-Save-Editor/issues" target="_blank">Issues</a> tab on
-                the Github page.
-            </p>
-        </div>
-
-        <div class="form-check form-switch d-flex justify-content-center">
-            <input id="sellYourSoul" type="checkbox" role="switch" class="form-check-input storage-switch" />
-            <label class="form-check-label ps-1" for="sellYourSoul">Don't show this disclaimer again</label>
-        </div>
-
-        <button id="btnDisclaimer" type="button" class="btn btn-info">Continue</button>
-    </div>
 
 
     <div id="content" class="container-fluid hidden">
@@ -291,6 +298,15 @@
                             <label class="visually-hidden" for="inputSaveName">Save File Name</label>
                             <input type="text" class="form-control form-control-sm" id="inputSaveName" disabled data-bind="textInput: $data.saveName, enable: $data.saveLoaded" />
                         </div>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="col-sm-auto py-2 text-center">
+
+                        <button id="btnOpenAbout" type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalInfo" title="Click to view more info">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </button>
+
                     </div>
 
                     <!-- Load / Save -->
@@ -383,8 +399,38 @@
     </div>
 
 
+    <div class="modal fade" id="modalInfo" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-secondary">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">About</h5>
+                    <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div id="modalInfoBody" class="modal-body fs-6">
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <div class="form-check form-switch me-4">
+                        <input id="checkShowAboutOnLoad" type="checkbox" role="switch" class="form-check-input storage-switch" />
+                        <label class="form-check-label ps-1" for="checkShowAboutOnLoad">Show on page load</label>
+                    </div>
+
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
     <div class="modal fade" id="modalStorage" tabindex="-1" aria-hidden="true">
-        <div id="modalStorageBody" class="modal-dialog modal-dialog-centered" />
+        <div id="modalStorageBody" class="modal-dialog modal-dialog-centered">
+
+        </div>
     </div>
 
 

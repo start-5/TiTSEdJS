@@ -220,3 +220,7 @@ input[type=number] {
 .input-as-textarea {
     word-break: break-word;
 }
+
+#modalInfoBody a {
+    color: #ffc107;
+}
