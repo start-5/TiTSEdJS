@@ -178,7 +178,7 @@
             // #region File handling
 
 
-            $('#loadFile').attr('accept', fileExtension);
+            $('#btnLoadFile').attr('accept', fileExtension);
 
 
             // Drag and Drop listener
@@ -205,7 +205,7 @@
 
 
             // Input listener
-            $('#loadFile').on('input', function () {
+            $('#btnLoadFile').on('input', function () {
 
                 const file = $(this).prop('files')[0];
 
@@ -314,11 +314,11 @@
                     <div class="col-sm-auto p-2 text-center">
 
                         <div id="divLoadFile" class="d-inline-block">
-                            <button type="button" class="btn btn-sm btn-primary" onclick="loadFile.click()">
+                            <button type="button" class="btn btn-sm btn-primary" onclick="btnLoadFile.click()">
                                 <i class="fa-solid fa-upload"></i>  Load file
                             </button>
-                            <label class="visually-hidden" for="loadFile">Load File</label>
-                            <input class="form-control" type="file" id="loadFile" hidden="hidden">
+                            <label class="visually-hidden" for="btnLoadFile">Load File</label>
+                            <input class="form-control" type="file" id="btnLoadFile" hidden="hidden">
                         </div>
 
                         <div class="d-inline-block">
