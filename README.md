@@ -4,23 +4,6 @@
 </p>
 
 
-<h2><a href="https://github.com/start-5/TiTS.JS-Save-Editor/blob/main/LICENSE">Disclaimer</a></h2>
-<p><b>
-  You can easily break your save if you go crazy while editing it!
-  Don’t come to me, and especially don’t come to the maintainers of TiTS if you break your save using this tool!
-</b></p>
-
-<p>
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  SOFTWARE.
-</p>
-
-
 <h2>How to Use</h2>
 
 [![Deploy](https://github.com/start-5/TiTS.JS-Save-Editor/actions/workflows/deploy.yml/badge.svg)](https://start-5.github.io/TiTS.JS-Save-Editor/)
@@ -53,4 +36,21 @@
 <p>
   The project is open source.
   If you really want something added and you know how to implement it, or just want to help out, open a PR and I’ll be happy to merge.
+</p>
+
+
+<h2><a href="https://github.com/start-5/TiTS.JS-Save-Editor/blob/main/LICENSE">Disclaimer</a></h2>
+<p><b>
+  You can easily break your save if you go crazy while editing it!
+  Don’t come to me, and especially don’t come to the maintainers of TiTS if you break your save using this tool!
+</b></p>
+
+<p>
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
 </p>
