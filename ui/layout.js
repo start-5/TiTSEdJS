@@ -18,7 +18,7 @@ class Row {
         if (groups.length) {
             groups.forEach(g => {
                 g.className += ' col-sm-' + 12 / groups.length + ' px-3';
-                this.root.appendChild(g)
+                this.root.appendChild(g);
             });
         }
 

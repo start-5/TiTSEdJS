@@ -1,333 +1,604 @@
-/* eslint-disable no-useless-escape */
-/* eslint-disable no-unused-vars */
+/**
+ * @typedef {Object} FieldOptions
+ * @property {string} [labelText] The field's label
+ * @property {string} [suffixText] Text to show in the input's suffix area
+ * @property {boolean} [pcOnly] Whether this field should apply to the PC only
+ * @property {string} [koChanged] KO func to run when the field's value changes
+ * @property {string} [koVisible] KO func to run to determine whether the field should be visible
+ */
 
+
+/**
+ * @typedef {Object} NumericFieldOptions
+ * @property {string} [labelText] The field's label
+ * @property {string} [suffixText] Text to show in the input's suffix area
+ * @property {boolean} [pcOnly] Whether this field should apply to the PC only
+ * @property {string} [koChanged] KO func to run when the field's value changes
+ * @property {string} [koVisible] KO func to run to determine whether the field should be visible
+ * @property {number} [min] The minimum value allowed for the field
+ * @property {number} [max] The maximum value allowed for the field
+ */
+
+
+/**
+ * The base for all editor fields
+ */
 class Field {
+
     constructor() {
+
+        /**
+        * Contains all the field content
+        * @type {HTMLDivElement}
+        */
         this.content = document.createElement('div');
-        this.content.className = 'text-light my-3';
+        this.content.classList.add('my-3');
 
+        /**
+        * The field's label element
+        * @type {HTMLLabelElement}
+        */
         this.label = document.createElement('label');
-        this.label.className = 'label-sm';
+        this.label.classList.add('label-sm');
 
-        this.inputWrapper = document.createElement('div');
-        this.inputWrapper.className = 'input-group input-group-sm';
+        /**
+        * The field's input element
+        * @type {HTMLInputElement}
+        */
         this.input = document.createElement('input');
-        this.input.className = 'form-control form-control-sm';
+        this.input.classList.add('form-control', 'form-control-sm');
+        util.setKoBinding(this.input, 'enable', '$root.saveLoaded');
         this.input.setAttribute('disabled', true);
+
+        /**
+        * Contains the field's input and label
+        * @type {HTMLDivElement}
+        */
+        this.inputWrapper = document.createElement('div');
+        this.inputWrapper.classList.add('input-group', 'input-group-sm');
         this.inputWrapper.appendChild(this.input);
 
         this.content.appendChild(this.label);
         this.content.appendChild(this.inputWrapper);
+
     }
 
-    resolveLabel(key, label) {
-        //this.input.id = 'editField-' + key;
-        //this.select && (this.select.id = 'editField-' + key);
-        this.label.innerText = label;
-        //this.label.htmlFor = this.input.id;
+
+    /**
+    * Returns the field and all its content
+    */
+    build() {
+        return this.content;
     }
 
-    resolveSuffix(text) {
-        const suffix = document.createElement('span');
-        suffix.className = 'input-group-text';
-        suffix.textContent = text;
-        this.input.className += ' form-control-suffix';
-        this.inputWrapper.appendChild(suffix);
+
+    /**
+    * Resolve editor label
+    * @param {string} key
+    * @param {string} labelText
+    */
+    resolveLabel(key, labelText) {
+        this.input.id = `edit-${key}`;
+        this.label.innerText = labelText;
+        this.label.htmlFor = this.input.id;
     }
+
+    /**
+    * Resolve editor suffix
+    * @param {string} suffixText
+    */
+    resolveSuffix(suffixText) {
+
+        const spanSuffix = document.createElement('span');
+        spanSuffix.classList.add('input-group-text');
+        spanSuffix.textContent = suffixText;
+
+        this.input.classList.add('form-control-suffix');
+        this.inputWrapper.appendChild(spanSuffix);
+
+    }
+
+    /**
+    * Resolve multiple editor options
+    * @param {FieldOptions} options
+    */
+    resolveOptions(options) {
+        this.resolveVisible(options.koVisible);
+        this.resolvePcOnly(options.pcOnly);
+        this.resolveSuffix(options.suffixText);
+    }
+
+    /**
+    * Resolve a KO PcOnly binding
+    * @param {boolean} pcOnly
+    */
+    resolvePcOnly(pcOnly) {
+        if (pcOnly) {
+            const previousBinding = util.getKoBinding(this.input, 'enable');
+            util.setKoBinding(this.input, 'enable', `${previousBinding} && $root.isPC`);
+        }
+    }
+
+    /**
+    * Resolve a KO OnChanged binding
+    * @param {string} koChanged
+    */
+    resolveOnChanged(koChanged) {
+        if (koChanged) {
+            util.setKoBinding(this.input, 'event', `{ change: $root.${koChanged} }`);
+        }
+    }
+
+    /**
+    * Resolve a KO visible binding
+    * @param {string} koVisible
+    */
+    resolveVisible(koVisible) {
+        if (koVisible) {
+            util.setKoBinding(this.input, 'visible', koVisible);
+        }
+    }
+
 }
 
+
+/**
+* A text field
+*/
 class TextField extends Field {
-    constructor(obj, key, label, suffixText = null, onChanged = null, pcOnly = false, visible = null) {
+
+    /**
+    * Creates an editor text field
+    * @param {string} root The root object to modify
+    * @param {string} key The object key to modify
+    * @param {FieldOptions} options
+    */
+    constructor(root, key, options) {
+
         super();
-        this.content.className += ' editor-text';
 
         this.input.type = 'text';
-        this.input.dataset.bind = 'textInput: ' + obj + (obj ? '.' : '') + key + ', enable: $root.saveLoaded';
 
-        if (pcOnly) {
-            this.input.dataset.bind += ' && $root.isPC';
-        }
-        if (onChanged) {
-            this.input.dataset.bind += ', event: { change: ' + onChanged + ' }';
-        }
-        if (visible) {
-            this.content.dataset.bind = `, visible: ${visible}`;
-        }
+        util.setKoBinding(this.input, 'textInput', util.getObjPath(root, key));
 
-        this.label.innerText = label;
-        this.resolveLabel(key, label);
+        this.resolveOptions(options);
 
-        if (suffixText) {
-            this.resolveSuffix(suffixText);
-        }
+        this.resolveLabel(key, options.labelText);
 
-        return this.content;
     }
+
 }
 
-class IntegerField extends Field {
-    constructor(obj, key, label, suffixText = null, min = null, max = null, onChanged = null, pcOnly = false, visible = null) {
+
+/**
+* A numeric field
+*/
+class NumericField extends Field {
+
+    /**
+    * Creates an editor numeric field
+    * @param {string} root The root object to modify
+    * @param {string} key The object key to modify
+    * @param {NumericFieldOptions} options
+    */
+    constructor(root, key, options) {
+
         super();
-        this.content.className += ' editor-integer';
 
         this.input.type = 'number';
+
+        util.setKoBinding(this.input, 'numberInput', util.getObjPath(root, key));
+
+        if (options.koChanged) {
+            options.koChanged =
+                `function() {
+                    $root.${options.koChanged};
+                    $root.validateNumberInput;
+                }`;
+        }
+        else {
+            options.koChanged = 'validateNumberInput';
+        }
+
+        this.resolveOptions(options);
+
+        this.resolveLabel(key, options.labelText);
+
+        if (!isNaN(parseFloat(options.min))) {
+            this.input.min = options.min;
+        }
+        if (!isNaN(parseFloat(options.max))) {
+            this.input.max = options.max;
+        }
+
+    }
+
+}
+
+
+/**
+* An integer specific numeric field
+*/
+class IntegerField extends NumericField {
+
+    /**
+    * Creates an editor integer field
+    * @param {string} root The root object to modify
+    * @param {string} key The object key to modify
+    * @param {NumericFieldOptions} options
+    */
+    constructor(root, key, options) {
+
+        super(root, key, options);
+
         this.input.step = 1;
         this.input.pattern = '\d*';
-        if (!isNaN(parseFloat(min))) {
-            this.input.min = min;
-        }
-        if (!isNaN(parseFloat(max))) {
-            this.input.max = max;
-        }
 
-        this.input.dataset.bind = 'numberInput: ' + obj + (obj ? '.' : '') + key + ', enable: $root.saveLoaded';
-        if (pcOnly) {
-            this.input.dataset.bind += ' && $root.isPC';
-        }
-
-        this.input.dataset.bind += ', event: { change: $root.' + (onChanged ? onChanged : 'validateNumberInput') + ' }';
-
-        if (visible) {
-            this.content.dataset.bind = `, visible: ${visible}`;
-        }
-
-        this.label.innerText = label;
-        this.resolveLabel(key, label);
-
-        if (suffixText) {
-            this.resolveSuffix(suffixText);
-        }
-
-        return this.content;
     }
+
 }
 
+
+/**
+* A float specific numeric field
+*/
 class FloatField extends Field {
-    constructor(obj, key, label, suffixText = null, min = null, max = null, onChanged = null, pcOnly = false, visible = null) {
-        super();
-        this.content.className += ' editor-float';
 
-        this.input.type = 'number';
+    /**
+    * Creates an editor float field
+    * @param {string} root The root object to modify
+    * @param {string} key The object key to modify
+    * @param {NumericFieldOptions} options
+    */
+    constructor(root, key, options) {
+
+        super(root, key, options);
+
         this.input.step = 'any';
-        if (!isNaN(parseFloat(min))) {
-            this.input.min = min;
-        }
-        if (!isNaN(parseFloat(max))) {
-            this.input.max = max;
-        }
-
-        this.input.dataset.bind = 'numberInput: ' + obj + (obj ? '.' : '') + key + ', enable: $root.saveLoaded';
-        if (pcOnly) {
-            this.input.dataset.bind += ' && $root.isPC';
-        }
-
-        this.input.dataset.bind += ', event: { change: $root.' + (onChanged ? onChanged : 'validateNumberInput') + ' }';
-
-        if (visible) {
-            this.content.dataset.bind = `, visible: ${visible}`;
-        }
-
-        this.label.innerText = label;
-        this.resolveLabel(key, label);
-
-        if (suffixText) {
-            this.resolveSuffix(suffixText);
-        }
-
-        return this.content;
     }
+
 }
 
+
+/**
+* A multiple selection drop down field
+*/
 class SelectField extends Field {
-    constructor(path, obj, key, label, onChanged = null, pcOnly = false, visible = null) {
+
+    /**
+    * Creates an editor drop down select field
+    * @param {string} root The root object to modify
+    * @param {string} key The object key to modify
+    * @param {string} source The object path of the drop down items source
+    * @param {FieldOptions} options
+    */
+    constructor(root, key, source, options) {
+
         super();
-        this.content.className += ' editor-select';
 
-        this.label.innerText = label;
-        this.resolveLabel(key, label);
-
+        /**
+        * The field's select element
+        * @type {HTMLSelectElement}
+        */
         this.select = document.createElement('select');
-        this.select.className = 'form-select form-select-sm';
-        this.select.dataset.bind = "options: $root.getGlobal('" + path + `'),
-                                    optionsText: 'name',
-                                    optionsValue: 'value',
-                                    value: ` + obj + (obj ? '.' : '') + key + `,
-                                    enable: $root.saveLoaded`;
-        if (pcOnly) {
-            this.input.dataset.bind += ' && $root.isPC';
-        }
-        if (onChanged) {
-            this.input.dataset.bind += ', event: { change: ' + onChanged + ' }';
-        }
-        if (visible) {
-            this.content.dataset.bind = `, visible: ${visible}`;
-        }
-
+        this.select.classList.add('form-select', 'form-select-sm');
         this.select.setAttribute('disabled', true);
         this.select.value = '-999';
         this.inputWrapper.replaceChild(this.select, this.input);
 
-        return this.content;
+        util.setKoBinding(this.select, 'options', `$root.getGlobal('${source}')`);
+        util.setKoBinding(this.select, 'optionsText', 'name');
+        util.setKoBinding(this.select, 'optionsValue', 'value');
+        util.setKoBinding(this.select, 'value', util.getObjPath(root, key));
+        util.setKoBinding(this.select, 'enable', '$root.saveLoaded');
+
+        this.resolveOptions(options);
+
+        this.resolveSelectLabel(key, options.labelText);
+
     }
+
+
+    /**
+    * Resolve editor drop down label
+    * @param {string} key
+    * @param {string} labelText
+    */
+    resolveSelectLabel(key, labelText) {
+        this.select.id = `edit-${key}`;
+        this.label.innerText = labelText;
+        this.label.htmlFor = this.select.id;
+    }
+
 }
 
-class SwitchField extends Field {
-    constructor(obj, key, label, onChanged = null, pcOnly = false, visible = null) {
-        super();
-        this.content.className += ' editor-switch';
 
-        this.inputWrapper.className = 'form-check form-switch';
+/**
+* A bool field
+*/
+class SwitchField extends Field {
+
+    /**
+    * Creates an editor bool field
+    * @param {string} root The root object to modify
+    * @param {string} key The object key to modify
+    * @param {string} source The object path of the drop down items source
+    * @param {NumericFieldOptions} options
+    */
+    constructor(root, key, options) {
+
+        super();
+
+        this.inputWrapper.classList.add('form-check', 'form-switch');
 
         this.input.type = 'checkbox';
         this.input.role = 'switch';
-        this.input.className = 'form-check-input';
+        this.input.classList.add('form-check-input');
 
-        this.input.dataset.bind = 'checked: ' + obj + (obj ? '.' : '') + key + ', enable: $root.saveLoaded';
-        if (pcOnly) {
-            this.input.dataset.bind += ' && $root.isPC';
-        }
-        if (onChanged) {
-            this.input.dataset.bind += ', event: { change: ' + onChanged + ' }';
-        }
-        if (visible) {
-            this.content.dataset.bind = `, visible: ${visible}`;
-        }
+        util.setKoBinding(this.input, 'checked', util.getObjPath(root, key));
 
-        this.label.innerText = label;
-        this.label.className += ' form-check-label';
+        this.resolveOptions(options);
+
+        this.resolveLabel(key, options.labelText);
+
+        this.label.classList.add('form-check-label');
         this.inputWrapper.appendChild(this.label);
 
-        return this.content;
     }
+
 }
 
+
+/**
+* A body flag field
+*/
 class FlagField {
-    constructor(path, obj, key, label, onChanged = null, pcOnly = false) {
-        const expanded = true;
 
+    /**
+    * Creates an editor body flag field
+    * @param {string} root The root object to modify
+    * @param {string} key The object key to modify
+    * @param {string} source The object path of the drop down items source
+    * @param {FieldOptions} options
+    */
+    constructor(root, key, source, options) {
+
+        /**
+        * Contains all the field content
+        * @type {HTMLDivElement}
+        */
         this.content = document.createElement('div');
-        this.content.className = 'accordion text-light my-3 w-100 pt-2 editor-flag';
-        this.content.id = 'editFlag-' + key;
+        this.content.classList.add('accordion', 'w-100', 'pt-2', 'my-3');
+        this.content.id = `edit-${key}`;
 
-        this.item = document.createElement('div');
-        this.item.className = 'accordion-item';
-        this.header = document.createElement('h6');
-        this.header.className = 'accordion-header';
-        this.header.id = this.content.id + '-header';
+        /**
+        * The accordion item wrapper
+        * @type {HTMLDivElement}
+        */
+        this.accordionItem = document.createElement('div');
+        this.accordionItem.className = 'accordion-item';
 
-        this.button = document.createElement('button');
-        this.button.className = 'accordion-button' + (expanded ? '' : ' collapsed');
-        this.button.type = 'button';
-        this.button.setAttribute('data-bs-toggle', 'collapse');
-        this.button.setAttribute('aria-expanded', expanded);
-        this.button.textContent = label;
+        /**
+        * The accordion header
+        * @type {HTMLHeadingElement}
+        */
+        this.accordionHeader = document.createElement('h6');
+        this.accordionHeader.className = 'accordion-header';
+        this.accordionHeader.id = `${this.content.id}-header`;
 
-        this.bodyContainer = document.createElement('div');
-        this.bodyContainer.className = 'accordion-collapse collapse' + (expanded ? ' show' : '');
-        this.bodyContainer.setAttribute('aria-labelledby', '#' + this.header.id);
-        this.bodyContainer.setAttribute('data-bs-parent', '#' + this.header.id);
-        this.bodyContainer.id = this.content.id + '-body';
+        /**
+        * The accordion collapse/expand toggle button
+        * @type {HTMLButtonElement}
+        */
+        this.accordionButton = document.createElement('button');
+        this.accordionButton.type = 'button';
+        this.accordionButton.classList.add('accordion-button');
+        this.accordionButton.setAttribute('data-bs-toggle', 'collapse');
+        this.accordionButton.setAttribute('aria-expanded', 'true');
+        this.accordionButton.textContent = options.labelText;
 
-        this.button.setAttribute('aria-controls', this.bodyContainer.id);
-        this.button.setAttribute('data-bs-target', '#' + this.bodyContainer.id);
+        /**
+        * The accordion body wrapper
+        * @type {HTMLDivElement}
+        */
+        this.accordionBodyContainer = document.createElement('div');
+        this.accordionBodyContainer.classList.add('accordion-collapse', 'collapse', 'show');
+        this.accordionBodyContainer.setAttribute('aria-labelledby', `#${this.accordionHeader.id}`);
+        this.accordionBodyContainer.setAttribute('data-bs-parent', `#${this.accordionHeader.id}`);
+        this.accordionBodyContainer.id = `${this.content.id}-body`;
 
-        this.body = document.createElement('div');
-        this.body.className = 'accordion-body d-flex flex-wrap';
-        this.body.dataset.bind = 'foreach: $root.getGlobal("' + path + '")';
+        this.accordionButton.setAttribute('aria-controls', this.accordionBodyContainer.id);
+        this.accordionButton.setAttribute('data-bs-target', `#${this.accordionBodyContainer.id}`);
 
-        const container = document.createElement('div');
-        container.className = 'form-check form-switch flag-switch-row';
+        /**
+        * The accordion actual body
+        * @type {HTMLDivElement}
+        */
+        this.accordionBody = document.createElement('div');
+        this.accordionBody.classList.add('accordion-body', 'd-flex', 'flex-wrap');
+        util.setKoBinding(this.accordionBody, 'foreach', `$root.getGlobal('${source}')`);
 
-        const checkBox = document.createElement('input');
-        checkBox.type = 'checkbox';
-        checkBox.role = 'switch';
-        checkBox.className = 'form-check-input';
-        checkBox.setAttribute('disabled', true);
-        checkBox.dataset.bind = 'checked: $parent.' + obj + (obj ? '.' : '') + key + `,
-                                 checkedValue: $data.value,
-                                 enable: $root.saveLoaded`;
-        if (pcOnly) {
-            checkBox.dataset.bind += ' && $root.isPC';
+        /**
+        * Holds the foreach template
+        * @type {HTMLDivElement}
+        */
+        this.templateContainer = document.createElement('div');
+        this.templateContainer.classList.add('form-check', 'form-switch', 'flag-switch-row');
+
+        /**
+        * Templated checkbox
+        * @type {HTMLInputElement}
+        */
+        this.templateCheckbox = document.createElement('input');
+        this.templateCheckbox.type = 'checkbox';
+        this.templateCheckbox.role = 'switch';
+        this.templateCheckbox.className = 'form-check-input';
+        this.templateCheckbox.setAttribute('disabled', true);
+        util.setKoBinding(this.templateCheckbox, 'checked', `parent.${util.getObjPath(root, key)}`);
+        util.setKoBinding(this.templateCheckbox, 'checkedValue', '$data.value');
+        util.setKoBinding(this.templateCheckbox, 'enable', '$root.saveLoaded');
+
+        if (options.koChanged) {
+            util.setKoBinding(this.templateCheckbox, 'event', `{ change: ${options.koChanged} }`);
         }
-        if (onChanged) {
-            checkBox.dataset.bind += ', event: { change: ' + onChanged + ' }';
-        }
 
-        const chkLabel = document.createElement('label');
-        chkLabel.className = 'form-check-label label-sm';
-        chkLabel.dataset.bind = 'text: name';
+        /**
+        * Templated checkbox
+        * @type {HTMLInputElement}
+        */
+        this.templateCheckboxLabel = document.createElement('label');
+        this.templateCheckboxLabel.classList.add('form-check-label', 'label-sm');
+        util.setKoBinding(this.templateCheckboxLabel, 'text', 'name');
 
-        container.appendChild(checkBox);
-        container.appendChild(chkLabel);
+        this.templateContainer.appendChild(this.templateCheckbox);
+        this.templateContainer.appendChild(this.templateCheckboxLabel);
 
-        this.body.appendChild(container);
+        this.accordionBody.appendChild(this.templateContainer);
 
-        this.header.appendChild(this.button);
-        this.bodyContainer.appendChild(this.body);
+        this.accordionHeader.appendChild(this.accordionButton);
+        this.accordionBodyContainer.appendChild(this.accordionBody);
 
-        this.item.appendChild(this.header);
-        this.item.appendChild(this.bodyContainer);
+        this.accordionItem.appendChild(this.accordionHeader);
+        this.accordionItem.appendChild(this.accordionBodyContainer);
 
-        this.content.appendChild(this.item);
+        this.content.appendChild(this.accordionItem);
 
+    }
+
+    /**
+    * Returns the field and all its content
+    */
+    build() {
         return this.content;
     }
+
 }
 
+
+/**
+* An array field
+*/
 class ArrayField {
-    constructor(obj, key, nameFunc, deleteFunc, fields) {
-        const keyDisplayText = key.replace('(', '').replace(')', '');
 
+    /**
+    * Creates an editor array field
+    * @param {string} root The root object to modify
+    * @param {string} key The object key to modify
+    * @param {string} koDescript The KO Func to use to describe items
+    * @param {string} koDelete The KO Func to remove an item from the array
+    * @param {Array<Field>} fields The list of fields modifiable for each item
+    */
+    constructor(root, key, koDescript, koDelete, fields) {
+
+        /**
+        * Contains all the field content
+        * @type {HTMLDivElement}
+        */
         this.content = document.createElement('div');
-        this.content.id = keyDisplayText + '-accordion';
-        this.content.dataset.bind = 'foreach: ' + obj + (obj ? '.' : '') + key;
-        this.content.className = 'text-light my-3 w-100 editor-array';
+        this.content.classList.add('my-3', 'w-100');
+        util.setKoBinding(this.content, 'foreach', util.getObjPath(root, key));
 
-        this.item = document.createElement('div');
-        this.item.className = 'accordion-item';
-        this.header = document.createElement('h6');
-        this.header.className = 'accordion-header';
+        /**
+        * Templated accordion item wrapper
+        * @type {HTMLDivElement}
+        */
+        this.templateAccordionItem = document.createElement('div');
+        this.templateAccordionItem.classList.add('accordion-item');
 
-        this.button = document.createElement('button');
-        this.button.type = 'button';
-        this.button.setAttribute('data-bs-toggle', 'collapse');
-        this.button.setAttribute('aria-expanded', false);
-        this.button.dataset.bind = 'text: $root.' + nameFunc + `($index),
-                                    class: 'accordion-button' + ($index() === 0 ? '' : ' collapsed'),
-                                    attr: { 'data-bs-target': '#accordion-body-` + keyDisplayText + "-' + $index() }";
+        /**
+        * Templated accordion item wrapper
+        * @type {HTMLHeadingElement}
+        */
+        this.templateAccordionHeader = document.createElement('h6');
+        this.templateAccordionHeader.classList.add('accordion-header');
+        util.setKoBinding(this.templateAccordionHeader, 'attr', `{ id: 'edit-${key}-' + $index() + '-header' }`);
 
-        this.bodyContainer = document.createElement('div');
-        this.bodyContainer.setAttribute('data-bs-parent', '#' + keyDisplayText + '-accordion');
-        this.bodyContainer.dataset.bind = "attr: { id: 'accordion-body-" + keyDisplayText + `-' + $index() },
-                                           class: 'accordion-collapse collapse' + ($index() === 0 ? ' show' : '')`;
+        /**
+        * Templated accordion collapse/expand toggle button
+        * @type {HTMLButtonElement}
+        */
+        this.templateAccordionButton = document.createElement('button');
+        this.templateAccordionButton.type = 'button';
+        this.templateAccordionButton.classList.add('accordion-button');
+        this.templateAccordionButton.setAttribute('data-bs-toggle', 'collapse');
+        this.templateAccordionButton.setAttribute('aria-expanded', 'false');
+        util.setKoBinding(this.templateAccordionButton, 'text', `$root.${koDescript}($index)`);
+        util.setKoBinding(this.templateAccordionButton, 'attr',
+            `{
+                'aria-controls': 'edit-${key}-' + $index() + '-body',
+                'data-bs-target': '#edit-${key}-' + $index() + '-body'
+             }`
+        );
 
-        this.body = document.createElement('div');
-        this.body.className = 'accordion-body';
-        const rbContainer = document.createElement('div');
-        rbContainer.className = 'd-flex justify-content-end';
-        const removeButton = document.createElement('button');
-        removeButton.innerHTML = 'Remove <i class="fa-solid fa-trash"></i>';
-        removeButton.type = 'button';
-        removeButton.disabled = true;
-        removeButton.className = 'btn btn-danger btn-sm';
-        removeButton.dataset.bind = 'click: $root.' + deleteFunc + ', enable: $root.saveLoaded';
-        rbContainer.appendChild(removeButton);
-        this.body.appendChild(rbContainer);
+        /**
+        * Templated accordion body wrapper
+        * @type {HTMLButtonElement}
+        */
+        this.templateAccordionBodyContainer = document.createElement('div');
+        this.templateAccordionBodyContainer.classList.add('accordion-collapse', 'collapse');
+        util.setKoBinding(this.templateAccordionBodyContainer, 'attr',
+            `{
+                'id': 'edit-${key}-' + $index() + '-body'
+                'aria-labelledby': '#edit-${key}-' + $index() + '-header',
+                'data-bs-parent': '#edit-${key}-' + $index() + '-header'
+            }`
+        );
 
-        fields[0].className += ' mt-0';
+        /**
+        * Templated accordion actual body
+        * @type {HTMLButtonElement}
+        */
+        this.templateAccordionBody = document.createElement('div');
+        this.templateAccordionBody.classList.add('accordion-body');
 
-        fields.forEach(f => {
-            this.body.appendChild(f);
-        });
+        const btnRemoveContainer = document.createElement('div');
+        btnRemoveContainer.classList.add('d-flex', 'justify-content-end');
 
-        this.header.appendChild(this.button);
-        this.bodyContainer.appendChild(this.body);
+        /**
+        * Templated delete buttn
+        * @type {HTMLButtonElement}
+        */
+        this.btnDelete = document.createElement('button');
+        this.btnDelete.innerHTML = 'Remove <i class="fa-solid fa-trash"></i>';
+        this.btnDelete.type = 'button';
+        this.btnDelete.disabled = true;
+        this.btnDelete.classList.add('btn', 'btn-danger', 'btn-sm');
+        util.setKoBinding(this.btnDelete, 'click', `$root.${koDelete}`);
+        util.setKoBinding(this.btnDelete, 'enable', '$root.saveLoaded');
 
-        this.item.appendChild(this.header);
-        this.item.appendChild(this.bodyContainer);
+        btnRemoveContainer.appendChild(this.btnDelete);
 
-        this.content.appendChild(this.item);
+        this.templateAccordionBody.appendChild(btnRemoveContainer);
+
+
+        for (var i = 0; i < fields.length; i++) {
+
+            const content = fields[i].build();
+
+            if (i === 0) {
+                content.classList.add('mt-0');
+            }
+
+            this.templateAccordionBody.appendChild(content);
+        }
+
+
+        this.templateAccordionHeader.appendChild(this.templateAccordionButton);
+        this.templateAccordionBodyContainer.appendChild(this.templateAccordionBody);
+
+        this.templateAccordionItem.appendChild(this.templateAccordionHeader);
+        this.templateAccordionItem.appendChild(this.templateAccordionBodyContainer);
+
+        this.content.appendChild(this.templateAccordionItem);
 
         return this.content;
     }
+
+    /**
+    * Returns the field and all its content
+    */
+    build() {
+        return this.content;
+    }
+
 }
