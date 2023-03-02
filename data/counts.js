@@ -2,7 +2,7 @@
 
 const Counts = {
     Codex: 156,
-    GameFlags: 5135,
+    GameFlags: 5151,
     Global: {
         BeardStyle: 12,
         BodyFlag: 65,
