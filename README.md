@@ -7,6 +7,7 @@
 <h2>How to Use</h2>
 
 [![Deploy](https://github.com/start-5/TiTS.JS-Save-Editor/actions/workflows/deploy.yml/badge.svg)](https://start-5.github.io/TiTS.JS-Save-Editor/)
+![Supported game version](https://img.shields.io/badge/dynamic/json?color=%238D31B0&label=Supported%20game%20version&query=%24.game&url=https%3A%2F%2Fraw.githubusercontent.com%2Fstart-5%2FTiTS.JS-Save-Editor%2Fmain%2Fversions.json)
 
 <p>
   The editor is hosted on a website right here on GitHub.
