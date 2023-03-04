@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
+
 /**
  * @typedef {Object} FieldOptions
- * @property {string} [labelText] The field's label
  * @property {string} [suffixText] Text to show in the input's suffix area
  * @property {boolean} [pcOnly] Whether this field should apply to the PC only
  * @property {string} [koChanged] KO func to run when the field's value changes
@@ -10,7 +12,6 @@
 
 /**
  * @typedef {Object} NumericFieldOptions
- * @property {string} [labelText] The field's label
  * @property {string} [suffixText] Text to show in the input's suffix area
  * @property {boolean} [pcOnly] Whether this field should apply to the PC only
  * @property {string} [koChanged] KO func to run when the field's value changes
@@ -25,7 +26,24 @@
  */
 class Field {
 
-    constructor() {
+    /**
+    * Creates a base editor field
+    * @param {string} root The root object to modify
+    * @param {string} key The object key to modify
+    */
+    constructor(root, key) {
+
+        /**
+        * The object being modified by this field
+        * @type {string}
+        */
+        this.root = root;
+        /**
+        * The key being modified by this field
+        * @type {string}
+        */
+        this.key = key;
+
 
         /**
         * Contains all the field content
@@ -34,12 +52,14 @@ class Field {
         this.content = document.createElement('div');
         this.content.classList.add('my-3');
 
+
         /**
         * The field's label element
         * @type {HTMLLabelElement}
         */
         this.label = document.createElement('label');
         this.label.classList.add('label-sm');
+
 
         /**
         * The field's input element
@@ -50,6 +70,7 @@ class Field {
         util.setKoBinding(this.input, 'enable', '$root.saveLoaded');
         this.input.setAttribute('disabled', true);
 
+
         /**
         * Contains the field's input and label
         * @type {HTMLDivElement}
@@ -57,6 +78,7 @@ class Field {
         this.inputWrapper = document.createElement('div');
         this.inputWrapper.classList.add('input-group', 'input-group-sm');
         this.inputWrapper.appendChild(this.input);
+
 
         this.content.appendChild(this.label);
         this.content.appendChild(this.inputWrapper);
@@ -88,14 +110,14 @@ class Field {
     * @param {string} suffixText
     */
     resolveSuffix(suffixText) {
+        if (suffixText) {
+            const spanSuffix = document.createElement('span');
+            spanSuffix.classList.add('input-group-text');
+            spanSuffix.textContent = suffixText;
 
-        const spanSuffix = document.createElement('span');
-        spanSuffix.classList.add('input-group-text');
-        spanSuffix.textContent = suffixText;
-
-        this.input.classList.add('form-control-suffix');
-        this.inputWrapper.appendChild(spanSuffix);
-
+            this.input.classList.add('form-control-suffix');
+            this.inputWrapper.appendChild(spanSuffix);
+        }
     }
 
     /**
@@ -103,9 +125,12 @@ class Field {
     * @param {FieldOptions} options
     */
     resolveOptions(options) {
-        this.resolveVisible(options.koVisible);
-        this.resolvePcOnly(options.pcOnly);
-        this.resolveSuffix(options.suffixText);
+        if (options) {
+            this.resolveVisible(options.koVisible);
+            this.resolvePcOnly(options.pcOnly);
+            this.resolveSuffix(options.suffixText);
+            this.resolveOnChanged(options.koChanged);
+        }
     }
 
     /**
@@ -125,7 +150,7 @@ class Field {
     */
     resolveOnChanged(koChanged) {
         if (koChanged) {
-            util.setKoBinding(this.input, 'event', `{ change: $root.${koChanged} }`);
+            util.setKoBinding(this.input, 'event', `{ 'change': $root.${koChanged} }`); //todo fix the event with index shit
         }
     }
 
@@ -135,7 +160,7 @@ class Field {
     */
     resolveVisible(koVisible) {
         if (koVisible) {
-            util.setKoBinding(this.input, 'visible', koVisible);
+            util.setKoBinding(this.content, 'visible', koVisible);
         }
     }
 
@@ -151,11 +176,12 @@ class TextField extends Field {
     * Creates an editor text field
     * @param {string} root The root object to modify
     * @param {string} key The object key to modify
-    * @param {FieldOptions} options
+    * @param {string} labelText The editor's label
+    * @param {FieldOptions} options The editor options
     */
-    constructor(root, key, options) {
+    constructor(root, key, labelText, options = {}) {
 
-        super();
+        super(root, key);
 
         this.input.type = 'text';
 
@@ -163,10 +189,9 @@ class TextField extends Field {
 
         this.resolveOptions(options);
 
-        this.resolveLabel(key, options.labelText);
+        this.resolveLabel(key, labelText);
 
     }
-
 }
 
 
@@ -179,11 +204,12 @@ class NumericField extends Field {
     * Creates an editor numeric field
     * @param {string} root The root object to modify
     * @param {string} key The object key to modify
-    * @param {NumericFieldOptions} options
+    * @param {string} labelText The editor's label
+    * @param {NumericFieldOptions} options The editor options
     */
-    constructor(root, key, options) {
+    constructor(root, key, labelText, options = {}) {
 
-        super();
+        super(root, key);
 
         this.input.type = 'number';
 
@@ -200,9 +226,13 @@ class NumericField extends Field {
             options.koChanged = 'validateNumberInput';
         }
 
+        if (options.min === undefined) {
+            options.min = 0;
+        }
+
         this.resolveOptions(options);
 
-        this.resolveLabel(key, options.labelText);
+        this.resolveLabel(key, labelText);
 
         if (!isNaN(parseFloat(options.min))) {
             this.input.min = options.min;
@@ -225,11 +255,12 @@ class IntegerField extends NumericField {
     * Creates an editor integer field
     * @param {string} root The root object to modify
     * @param {string} key The object key to modify
-    * @param {NumericFieldOptions} options
+    * @param {string} labelText The editor's label
+    * @param {NumericFieldOptions} options The editor options
     */
-    constructor(root, key, options) {
+    constructor(root, key, labelText, options = {}) {
 
-        super(root, key, options);
+        super(root, key, labelText, options);
 
         this.input.step = 1;
         this.input.pattern = '\d*';
@@ -242,17 +273,18 @@ class IntegerField extends NumericField {
 /**
 * A float specific numeric field
 */
-class FloatField extends Field {
+class FloatField extends NumericField {
 
     /**
     * Creates an editor float field
     * @param {string} root The root object to modify
     * @param {string} key The object key to modify
+    * @param {string} labelText The editor's label
     * @param {NumericFieldOptions} options
     */
-    constructor(root, key, options) {
+    constructor(root, key, labelText, options) {
 
-        super(root, key, options);
+        super(root, key, labelText, options);
 
         this.input.step = 'any';
     }
@@ -270,11 +302,12 @@ class SelectField extends Field {
     * @param {string} root The root object to modify
     * @param {string} key The object key to modify
     * @param {string} source The object path of the drop down items source
+    * @param {string} labelText The editor's label
     * @param {FieldOptions} options
     */
-    constructor(root, key, source, options) {
+    constructor(root, key, source, labelText, options = {}) {
 
-        super();
+        super(root, key);
 
         /**
         * The field's select element
@@ -284,17 +317,19 @@ class SelectField extends Field {
         this.select.classList.add('form-select', 'form-select-sm');
         this.select.setAttribute('disabled', true);
         this.select.value = '-999';
+
         this.inputWrapper.replaceChild(this.select, this.input);
 
         util.setKoBinding(this.select, 'options', `$root.getGlobal('${source}')`);
-        util.setKoBinding(this.select, 'optionsText', 'name');
-        util.setKoBinding(this.select, 'optionsValue', 'value');
+        util.setKoBinding(this.select, 'optionsText', '"name"');
+        util.setKoBinding(this.select, 'optionsValue', '"value"');
         util.setKoBinding(this.select, 'value', util.getObjPath(root, key));
         util.setKoBinding(this.select, 'enable', '$root.saveLoaded');
 
+
         this.resolveOptions(options);
 
-        this.resolveSelectLabel(key, options.labelText);
+        this.resolveSelectLabel(key, labelText);
 
     }
 
@@ -322,24 +357,24 @@ class SwitchField extends Field {
     * Creates an editor bool field
     * @param {string} root The root object to modify
     * @param {string} key The object key to modify
-    * @param {string} source The object path of the drop down items source
-    * @param {NumericFieldOptions} options
+    * @param {string} labelText The editor's label
+    * @param {FieldOptions} options the editor options
     */
-    constructor(root, key, options) {
+    constructor(root, key, labelText, options = {}) {
 
-        super();
+        super(root, key);
 
-        this.inputWrapper.classList.add('form-check', 'form-switch');
+        this.inputWrapper.className = 'form-check, form-switch';
 
         this.input.type = 'checkbox';
         this.input.role = 'switch';
-        this.input.classList.add('form-check-input');
+        this.input.className = 'form-check-input';
 
         util.setKoBinding(this.input, 'checked', util.getObjPath(root, key));
 
         this.resolveOptions(options);
 
-        this.resolveLabel(key, options.labelText);
+        this.resolveLabel(key, labelText);
 
         this.label.classList.add('form-check-label');
         this.inputWrapper.appendChild(this.label);
@@ -359,9 +394,22 @@ class FlagField {
     * @param {string} root The root object to modify
     * @param {string} key The object key to modify
     * @param {string} source The object path of the drop down items source
-    * @param {FieldOptions} options
+    * @param {string} labelText The editor's label
+    * @param {FieldOptions} options the editor options
     */
-    constructor(root, key, source, options) {
+    constructor(root, key, source, labelText, options = {}) {
+
+        /**
+        * The object being modified by this field
+        * @type {string}
+        */
+        this.root = root;
+        /**
+        * The key being modified by this field
+        * @type {string}
+        */
+        this.key = key;
+
 
         /**
         * Contains all the field content
@@ -371,12 +419,14 @@ class FlagField {
         this.content.classList.add('accordion', 'w-100', 'pt-2', 'my-3');
         this.content.id = `edit-${key}`;
 
+
         /**
         * The accordion item wrapper
         * @type {HTMLDivElement}
         */
         this.accordionItem = document.createElement('div');
         this.accordionItem.className = 'accordion-item';
+
 
         /**
         * The accordion header
@@ -385,6 +435,7 @@ class FlagField {
         this.accordionHeader = document.createElement('h6');
         this.accordionHeader.className = 'accordion-header';
         this.accordionHeader.id = `${this.content.id}-header`;
+
 
         /**
         * The accordion collapse/expand toggle button
@@ -395,7 +446,8 @@ class FlagField {
         this.accordionButton.classList.add('accordion-button');
         this.accordionButton.setAttribute('data-bs-toggle', 'collapse');
         this.accordionButton.setAttribute('aria-expanded', 'true');
-        this.accordionButton.textContent = options.labelText;
+        this.accordionButton.textContent = labelText;
+
 
         /**
         * The accordion body wrapper
@@ -410,6 +462,7 @@ class FlagField {
         this.accordionButton.setAttribute('aria-controls', this.accordionBodyContainer.id);
         this.accordionButton.setAttribute('data-bs-target', `#${this.accordionBodyContainer.id}`);
 
+
         /**
         * The accordion actual body
         * @type {HTMLDivElement}
@@ -418,12 +471,14 @@ class FlagField {
         this.accordionBody.classList.add('accordion-body', 'd-flex', 'flex-wrap');
         util.setKoBinding(this.accordionBody, 'foreach', `$root.getGlobal('${source}')`);
 
+
         /**
         * Holds the foreach template
         * @type {HTMLDivElement}
         */
         this.templateContainer = document.createElement('div');
         this.templateContainer.classList.add('form-check', 'form-switch', 'flag-switch-row');
+
 
         /**
         * Templated checkbox
@@ -434,21 +489,25 @@ class FlagField {
         this.templateCheckbox.role = 'switch';
         this.templateCheckbox.className = 'form-check-input';
         this.templateCheckbox.setAttribute('disabled', true);
-        util.setKoBinding(this.templateCheckbox, 'checked', `parent.${util.getObjPath(root, key)}`);
-        util.setKoBinding(this.templateCheckbox, 'checkedValue', '$data.value');
+        util.setKoBinding(this.templateCheckbox, 'checked', `$parent.${util.getObjPath(root, key)}`);
+        util.setKoBinding(this.templateCheckbox, 'checkedValue', 'value');
         util.setKoBinding(this.templateCheckbox, 'enable', '$root.saveLoaded');
+        util.setKoBinding(this.templateCheckbox, 'attr', `{ 'id': 'edit-${key}-' + $data.value }`);
 
         if (options.koChanged) {
             util.setKoBinding(this.templateCheckbox, 'event', `{ change: ${options.koChanged} }`);
         }
 
+
         /**
-        * Templated checkbox
-        * @type {HTMLInputElement}
+        * Templated checkbox labels
+        * @type {HTMLLabelElement}
         */
         this.templateCheckboxLabel = document.createElement('label');
         this.templateCheckboxLabel.classList.add('form-check-label', 'label-sm');
         util.setKoBinding(this.templateCheckboxLabel, 'text', 'name');
+        util.setKoBinding(this.templateCheckboxLabel, 'attr', `{ 'for': 'edit-${key}-' + $data.value }`);
+
 
         this.templateContainer.appendChild(this.templateCheckbox);
         this.templateContainer.appendChild(this.templateCheckboxLabel);
@@ -491,12 +550,25 @@ class ArrayField {
     constructor(root, key, koDescript, koDelete, fields) {
 
         /**
+        * The object being modified by this field
+        * @type {string}
+        */
+        this.root = root;
+        /**
+        * The key being modified by this field
+        * @type {string}
+        */
+        this.key = key;
+
+
+        /**
         * Contains all the field content
         * @type {HTMLDivElement}
         */
         this.content = document.createElement('div');
         this.content.classList.add('my-3', 'w-100');
         util.setKoBinding(this.content, 'foreach', util.getObjPath(root, key));
+
 
         /**
         * Templated accordion item wrapper
@@ -505,6 +577,7 @@ class ArrayField {
         this.templateAccordionItem = document.createElement('div');
         this.templateAccordionItem.classList.add('accordion-item');
 
+
         /**
         * Templated accordion item wrapper
         * @type {HTMLHeadingElement}
@@ -512,6 +585,7 @@ class ArrayField {
         this.templateAccordionHeader = document.createElement('h6');
         this.templateAccordionHeader.classList.add('accordion-header');
         util.setKoBinding(this.templateAccordionHeader, 'attr', `{ id: 'edit-${key}-' + $index() + '-header' }`);
+
 
         /**
         * Templated accordion collapse/expand toggle button
@@ -530,6 +604,7 @@ class ArrayField {
              }`
         );
 
+
         /**
         * Templated accordion body wrapper
         * @type {HTMLButtonElement}
@@ -538,11 +613,12 @@ class ArrayField {
         this.templateAccordionBodyContainer.classList.add('accordion-collapse', 'collapse');
         util.setKoBinding(this.templateAccordionBodyContainer, 'attr',
             `{
-                'id': 'edit-${key}-' + $index() + '-body'
+                'id': 'edit-${key}-' + $index() + '-body',
                 'aria-labelledby': '#edit-${key}-' + $index() + '-header',
                 'data-bs-parent': '#edit-${key}-' + $index() + '-header'
             }`
         );
+
 
         /**
         * Templated accordion actual body
@@ -553,6 +629,7 @@ class ArrayField {
 
         const btnRemoveContainer = document.createElement('div');
         btnRemoveContainer.classList.add('d-flex', 'justify-content-end');
+
 
         /**
         * Templated delete buttn
@@ -573,7 +650,18 @@ class ArrayField {
 
         for (var i = 0; i < fields.length; i++) {
 
-            const content = fields[i].build();
+            const field = fields[i];
+
+            if (field instanceof NestedGroup) {
+                field.fields.forEach(nestedField => {
+                    this.resolveArrayFieldID(key, nestedField);
+                });
+            }
+            else {
+                this.resolveArrayFieldID(key, field);
+            }
+
+            const content = field.build();
 
             if (i === 0) {
                 content.classList.add('mt-0');
@@ -591,7 +679,31 @@ class ArrayField {
 
         this.content.appendChild(this.templateAccordionItem);
 
-        return this.content;
+    }
+
+    /**
+    * Resolve array IDs
+    * @param {string} arrayKey
+    * @param {Field} field
+    * @param {string} labelText
+    */
+    resolveArrayFieldID(arrayKey, field) {
+
+        if (field instanceof FlagField) {
+
+            util.setKoBinding(field.templateCheckbox, 'attr', `{ 'id': 'edit-${arrayKey}-' + $index() + '-${field.key}-' + $data.value }`);
+            util.setKoBinding(field.templateCheckboxLabel, 'attr', `{ 'for': 'edit-${arrayKey}-' + $index() + '-${field.key}-' + $data.value }`);
+
+        }
+        else {
+
+            const element = field instanceof SelectField ? field.select : field.input;
+
+            util.setKoBinding(element, 'attr', `{ 'id': 'edit-${arrayKey}-' + $index() + '-${field.key}' }`);
+            util.setKoBinding(field.label, 'attr', `{ 'for': 'edit-${arrayKey}-' + $index() + '-${field.key}' }`);
+
+        }
+
     }
 
     /**

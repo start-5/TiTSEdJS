@@ -189,7 +189,8 @@ var ViewModel = function (data) {
 
     // #region OnChanged
 
-    self.nameChanged = function (data, event) {
+    self.nameChanged = function (_, event) {
+
         const char = self.selectedCharacter().obj;
         const name = event.target.value;
 
@@ -206,6 +207,7 @@ var ViewModel = function (data) {
                 }
             }
         }
+
     };
 
     self.emailChanged = function (data, event) {
@@ -259,11 +261,16 @@ var ViewModel = function (data) {
     // #region Penis
 
     self.getPenisName = function (index) {
-        const i = self.selectedCharacter().obj.cocks()[index()];
-        const color = i.cockColor();
-        const len = +i.cLengthRaw() + +i.cLengthMod();
-        const type = Globals.BodyType.find(t => t.value == i.cType()).name.toLowerCase();
-        return `a ${color} ${len}" ${type} penis`;
+
+        const c = self.selectedCharacter().obj.cocks()[index()];
+
+        if (c) {
+            const color = c.cockColor();
+            const len = +c.cLengthRaw() + +c.cLengthMod();
+            const type = Globals.BodyType.find(t => t.value == c.cType()).name.toLowerCase();
+            return `a ${color} ${len}" ${type} penis`;
+        }
+
     };
 
     self.addPenis = function () {
@@ -280,10 +287,15 @@ var ViewModel = function (data) {
     // #region Vagina
 
     self.getVaginaName = function (index) {
-        const i = self.selectedCharacter().obj.vaginas()[index()];
-        const color = i.vaginaColor();
-        const type = Globals.BodyType.find(t => t.value == i.type()).name.toLowerCase();
-        return 'a ' + color + ' ' + type + ' vagina';
+
+        const v = self.selectedCharacter().obj.vaginas()[index()];
+
+        if (v) {
+            const color = v.vaginaColor();
+            const type = Globals.BodyType.find(t => t.value == v.type()).name.toLowerCase();
+            return `a ${color} ${type} vagina`;
+        }
+
     };
 
     self.addVagina = function () {
@@ -300,10 +312,15 @@ var ViewModel = function (data) {
     // #region Breasts
 
     self.getBreastName = function (index) {
-        const i = self.selectedCharacter().obj.breastRows()[index()];
-        const count = +i.breasts();
-        const rating = +i.breastRatingRaw() + +i.breastRatingMod();
-        return count + ' ' + util.getCupSize(rating) + ' breast' + (count > 1 ? 's' : '');
+
+        const b = self.selectedCharacter().obj.breastRows()[index()];
+
+        if (b) {
+            const count = +b.breasts();
+            const rating = +b.breastRatingRaw() + +b.breastRatingMod();
+            return `${count} ${util.getCupSize(rating)} breast${(count > 1 ? 's' : '')}`;
+        }
+
     };
 
     self.addBreastRow = function () {

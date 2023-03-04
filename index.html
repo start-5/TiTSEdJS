@@ -48,7 +48,11 @@
 
 
         window.onerror = function (evt, src, ln, col, err) {
-            alert(`An unhandled exception ocurred:\n\n${err}`);
+            if (err !== null) {
+
+                alert(`An unhandled exception ocurred! If you can, please open a GitHub issue so it can be fixed:\n\n${err}`);
+
+            }
         }
 
 
@@ -57,63 +61,55 @@
         function loadFile(file) {
 
             if (file.name.endsWith(fileExtension)) {
-                try {
-                    var fileReader = new FileReader();
-                    fileReader.readAsText(file);
 
-                    fileReader.addEventListener("loadend", () => {
-                        var json;
+                var fileReader = new FileReader();
+                fileReader.readAsText(file);
 
-                        if (typeof fileReader.result !== 'string') {
-                            alert('This file has an incorrect format, please check the file and try again.');
+                fileReader.addEventListener("loadend", () => {
+                    var json;
+
+                    if (typeof fileReader.result !== 'string') {
+                        alert('This file has an incorrect format, please check the file and try again.');
+                        return;
+                    }
+
+                    try {
+                        json = JSON.parse(fileReader.result);
+                        if (!json['classInstance']) { // this check should be enough for now
+                            alert('This file is not a valid TiTS file, please check the file and try again.');
                             return;
                         }
-
-                        try {
-                            json = JSON.parse(fileReader.result);
-                            if (!json['classInstance']) { // this check should be enough for now
-                                alert('This file is not a valid TiTS file, please check the file and try again.');
-                                return;
-                            }
-                        }
-                        catch (e) {
-                            alert("An error ocurred while attempting parse the file\n\n" + e);
-                            return;
-                        }
+                    }
+                    catch (e) {
+                        alert("An error ocurred while attempting parse the file\n\n" + e);
+                        return;
+                    }
 
 
-                        if (!vm) {
-                            vm = new ViewModel(json);
-                            koInit();
-                        }
+                    if (!vm) {
+                        vm = new ViewModel(json);
+                        koInit();
+                    }
 
-                        try {
-                            if (!vm.saveLoaded()) {
-                                vm.saveLoaded(true);
-                                ko.applyBindings(vm);
-                            }
-                            else {
-                                ko.mapping.fromJS(json, loadMapping, vm.save);
-                            }
-                        } catch (e) {
-                            alert('An internal error ocurred while processing the save data\n\n' + e)
-                        }
+                    if (!vm.saveLoaded()) {
+                        vm.saveLoaded(true);
+                        ko.applyBindings(vm);
+                    }
+                    else {
+                        ko.mapping.fromJS(json, loadMapping, vm.save);
+                    }
 
-                        if (!vm.isPC()) {
-                            vm.selectedCharacter(vm.characters().find(c => c.name == 'PC'));
-                        }
+                    if (!vm.isPC()) {
+                        vm.selectedCharacter(vm.characters().find(c => c.name == 'PC'));
+                    }
 
-                        const fileName = file.name.replace(fileExtension, '');
-                        vm.originalSaveName(fileName);
-                        vm.saveName(fileName);
+                    const fileName = file.name.replace(fileExtension, '');
+                    vm.originalSaveName(fileName);
+                    vm.saveName(fileName);
 
-                        alert("Save file loaded!");
-                    });
+                    alert("Save file loaded!");
+                });
 
-
-                } catch (e) {
-                    alert('Error reading file\n' + e)
-                }
             }
             else {
                 alert('Selected file is invalid, please select a ' + fileExtension + ' file and try again');
@@ -297,14 +293,15 @@
                     <div class="col p-2">
                         <div>
                             <label class="visually-hidden" for="inputSaveName">Save File Name</label>
-                            <input type="text" class="form-control form-control-sm" id="inputSaveName" disabled data-bind="textInput: $data.saveName, enable: $data.saveLoaded" />
+                            <input type="text" class="form-control form-control-sm" id="inputSaveName" disabled data-bind="textInput: saveName, enable: saveLoaded" />
                         </div>
                     </div>
 
                     <!-- Info -->
                     <div class="col-sm-auto py-2 text-center">
 
-                        <button id="btnOpenAbout" type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalInfo" title="Click to view more info">
+                        <button id="btnOpenAbout" type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalInfo"
+                                title="View more info">
                             <i class="fa-solid fa-circle-info"></i>
                         </button>
 
@@ -322,9 +319,10 @@
                         </div>
 
                         <div class="d-inline-block">
-                            <button id="btnSaveFile" type="button" class="btn btn-sm btn-primary" disabled data-bind="enable: $data.saveLoaded">
+                            <button id="btnSaveFile" type="button" class="btn btn-sm btn-primary" disabled data-bind="enable: saveLoaded">
                                 <i class="fa-solid fa-floppy-disk"></i>  Save file
                             </button>
+                            <label class="visually-hidden" for="btnSaveFile">Save File</label>
                         </div>
 
                     </div>
@@ -333,9 +331,11 @@
             </div>
 
             <!-- Show / Hide -->
-            <div class="bg-info text-center mx-auto px-3 py-1 expand-icon rounded-bottom position-relative opacity-50">
-                <a data-bs-toggle="collapse" href="#toolbarContainer" role="button" aria-expanded="true" aria-controls="toolbarContainer"
-                   class="link-light underline text-decoration-none stretched-link"><i class="fa-solid fa-arrows-up-down"></i></a>
+            <div class="text-center mx-auto expand-icon rounded-bottom position-relative opacity-50">
+                <button data-bs-toggle="collapse" href="#toolbarContainer" type="button" aria-expanded="true" aria-controls="toolbarContainer" class="btn btn-info px-3"
+                        title="Collapse/Expand toolbar">
+                    <i class="fa-solid fa-arrows-up-down"></i>
+                </button>
             </div>
 
         </div>
