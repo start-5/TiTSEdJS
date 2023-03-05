@@ -1,10 +1,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 
+
+/**
+* A StorageClass array editor
+*/
 class StorageContainer {
 
     /**
-    * Creates an editor array field
+    * Creates an editor StorageClass array editor
     * @param {string} root The root object to modify
     * @param {string} key The object key to modify
     * @param {string} bindingSource The KO object to build the list from
@@ -98,72 +102,6 @@ class StorageContainer {
     */
     build() {
         return this.content;
-    }
-
-}
-
-class FlagContainer {
-
-    //---------------------------------
-    //TODO: NEXT UP!
-    //---------------------------------
-
-    constructor() {
-        this.root = document.createElement('div');
-
-        this.body = document.createElement('div');
-        //this.body = document.createElement('table');
-        this.body.dataset.bind = 'foreach: $root.save.flags.items';
-
-        //this.flagItem = document.createElement('tr');
-        this.flagItem = document.createElement('div');
-        this.flagItem.className = 'row g-0';
-
-        this.row = document.createElement('tr');
-
-        //this.flagNameContainer = document.createElement('td');
-        this.flagNameContainer = document.createElement('div');
-        this.flagNameContainer.className = 'col-6';
-        this.flagNameContainer.dataset.bind = 'text: key';
-        //this.flagName = document.createElement('p');
-        //this.flagName.dataset.bind = 'text: key';
-        //this.flagNameContainer.appendChild(this.flagName);
-
-        //this.flagValueContainer = document.createElement('td');
-        this.flagValueContainer = document.createElement('div');
-        this.flagValueContainer.className = 'col-6';
-        this.flagValue = document.createElement('input');
-        this.flagValue.type = 'text';
-        this.flagValue.className = 'form-control form-control-sm';
-        //this.flagValue.disabled = true;
-        //this.flagValue.dataset.bind = 'value: value, enable: $root.isEnabled';
-        this.flagValue.dataset.bind = 'value: value';
-        this.flagValueContainer.appendChild(this.flagValue);
-
-        this.flagItem.appendChild(this.flagNameContainer);
-        this.flagItem.appendChild(this.flagValueContainer);
-
-        //this.flagItem.appendChild(this.row);
-        //this.flagItem.appendChild(this.flagNameContainer);
-        //this.flagItem.appendChild(this.flagValueContainer);
-
-        this.body.appendChild(this.flagItem);
-        this.root.appendChild(this.body);
-
-        return this.root;
-
-        //this.root = document.createElement('div');
-
-        //this.body = document.createElement('div');
-        //this.body.dataset.bind = 'foreach: $root.getFlags()';
-
-        //this.flagName = document.createElement('p');
-        //this.flagName.dataset.bind = 'text: $data';
-
-        //this.body.appendChild(this.flagName);
-        //this.root.appendChild(this.body);
-
-        //return this.root;
     }
 
 }

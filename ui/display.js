@@ -395,6 +395,7 @@ const display = {
         return divRoot;
     },
 
+
     getPerks: () => new StorageContainer(key_char, 'perks', 'perkList', ['tooltip', 'value1', 'value2', 'value3', 'value4']).build(),
 
     getStatusEffects: () => new StorageContainer(key_char, 'statusEffects', 'statusEffectList', ['all']).build(),
@@ -403,6 +404,43 @@ const display = {
 
 
     getFlags: () => {
-        return new FlagContainer();
+
+        const divRoot = document.createElement('div');
+        util.setKoBinding(divRoot, 'foreach', '$root.save.flags.items');
+
+        const templateFlagContainer = document.createElement('div');
+        templateFlagContainer.classList.add('row', 'g-0');
+
+
+        const templateFlagNameContainer = document.createElement('div');
+        templateFlagNameContainer.classList.add('col-6');
+
+        const templateFlagName = document.createElement('label');
+        templateFlagName.classList.add('text-break');
+        util.setKoBinding(templateFlagName, 'text', 'key');
+        util.setKoBinding(templateFlagName, 'attr', "{ 'for': 'edit-flags-' + $index() }");
+
+        templateFlagNameContainer.appendChild(templateFlagName);
+
+
+        const templateFlagValueContainer = document.createElement('div');
+        templateFlagValueContainer.classList.add('col-6');
+
+        const templateFlagValue = document.createElement('input');
+        templateFlagValue.type = 'text';
+        templateFlagValue.classList.add('form-control', 'form-control-sm');
+        util.setKoBinding(templateFlagValue, 'value', 'value');
+        util.setKoBinding(templateFlagValue, 'attr', "{ 'id': 'edit-flags-' + $index() }");
+
+        templateFlagValueContainer.appendChild(templateFlagValue);
+
+
+        templateFlagContainer.appendChild(templateFlagNameContainer);
+        templateFlagContainer.appendChild(templateFlagValueContainer);
+
+        divRoot.appendChild(templateFlagContainer);
+
+        return divRoot;
+
     }
 };
