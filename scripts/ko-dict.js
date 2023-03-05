@@ -216,7 +216,7 @@ function isNumeric(n) {
 function tryConvert(value) {
     if (isNumeric(value)) return parseFloat(value);
     else if (value === 'true' || value === 'false') return value === 'true';
-    else if (value === '') return null;
+    else if (value === '') return undefined;
     else return value;
 }
 

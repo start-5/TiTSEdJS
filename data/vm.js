@@ -52,11 +52,6 @@ var ViewModel = function (data) {
     };
 
 
-    self.a = function (data) {
-        alert('a');
-    };
-
-
     // #region Character
 
 
@@ -183,6 +178,35 @@ var ViewModel = function (data) {
 
     // #endregion
 
+
+    // #endregion
+
+
+    // #region State Flags
+
+    self.stateFlagUndesired = ['artistOverrides', 'customMannequin', 'pathOverrides'];
+
+    self.stateFlagList = ko.computed(() => {
+
+        if (self.save && self.save.flags) {
+
+            const flags = [];
+
+            self.save.flags.items().forEach(dictionaryItem => {
+
+                if (self.stateFlagUndesired.includes(dictionaryItem.key())) {
+                    return;
+                }
+
+                flags.push(dictionaryItem);
+
+            });
+
+            return flags;
+
+        }
+
+    }, self);
 
     // #endregion
 

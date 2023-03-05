@@ -395,6 +395,7 @@ const display = {
         return divRoot;
     },
 
+
     getPerks: () => new StorageContainer(key_char, 'perks', 'perkList', ['tooltip', 'value1', 'value2', 'value3', 'value4']).build(),
 
     getStatusEffects: () => new StorageContainer(key_char, 'statusEffects', 'statusEffectList', ['all']).build(),
@@ -403,6 +404,55 @@ const display = {
 
 
     getFlags: () => {
-        return new FlagContainer();
+
+        const divRoot = document.createElement('div');
+        util.setKoBinding(divRoot, 'foreach', '$root.stateFlagList');
+
+
+        const templateRootContainer = document.createElement('div');
+        templateRootContainer.classList.add('state-flag-container');
+
+
+        const templateFlagContainer = document.createElement('div');
+        templateFlagContainer.classList.add('row', 'g-0', 'py-2');
+
+
+        const templateFlagNameContainer = document.createElement('div');
+        templateFlagNameContainer.classList.add('col-6', 'd-flex', 'align-items-center', 'pe-1');
+
+        const templateFlagName = document.createElement('label');
+        templateFlagName.classList.add('text-break');
+        util.setKoBinding(templateFlagName, 'text', 'key');
+        util.setKoBinding(templateFlagName, 'attr', "{ 'for': 'edit-flags-' + $index() }");
+
+        templateFlagNameContainer.appendChild(templateFlagName);
+
+
+        const templateFlagValueContainer = document.createElement('div');
+        templateFlagValueContainer.classList.add('col-6', 'd-flex', 'align-items-center', 'ps-1');
+
+        const templateFlagValue = document.createElement('input');
+        templateFlagValue.type = 'text';
+        templateFlagValue.classList.add('form-control', 'form-control-sm');
+        util.setKoBinding(templateFlagValue, 'value', 'value');
+        util.setKoBinding(templateFlagValue, 'attr', "{ 'id': 'edit-flags-' + $index() }");
+
+        templateFlagValueContainer.appendChild(templateFlagValue);
+
+
+        const templateHorizontalLine = document.createElement('hr');
+        templateHorizontalLine.classList.add('m-0');
+
+
+        templateFlagContainer.appendChild(templateFlagNameContainer);
+        templateFlagContainer.appendChild(templateFlagValueContainer);
+
+        templateRootContainer.appendChild(templateFlagContainer);
+        templateRootContainer.appendChild(templateHorizontalLine);
+
+        divRoot.appendChild(templateRootContainer);
+
+        return divRoot;
+
     }
 };
