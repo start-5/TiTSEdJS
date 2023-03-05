@@ -20,139 +20,141 @@ const display = {
                 new Group('Internal', [
                     //new TextField(flags, 'PC_EMAIL_ADDRESS', 'E-Mail', null, 'emailChanged'), TODO: This doesn't work at the moment
                     new TextField(key_instance, 'note', 'Note'),
-                    new IntegerField(key_save, 'days', 'Days', 'days', 0),
-                    new IntegerField(key_save, 'hours', 'Hours', 'hours', 0, 23),
-                    new IntegerField(key_save, 'minutes', 'Minutes', 'minutes', 0, 59),
+                    new IntegerField(key_save, 'days', 'Days', { suffixText: 'days' }),
+                    new IntegerField(key_save, 'hours', 'Hours', { suffixText: 'hours', max: 23 }),
+                    new IntegerField(key_save, 'minutes', 'Minutes', { suffixText: 'minutes', max: 59 }),
                 ]),
                 new Group('Game Settings', [
                     new SwitchField(key_save, 'easyMode', 'Easy Mode'),
                     new SwitchField(key_save, 'sillyMode', 'Silly Mode'),
+                    new SwitchField(key_save, 'debugMode', 'Debug Mode'),
                     new SwitchField(key_instance, 'miniMapVisible', 'Minimap visible'),
                     new SwitchField(key_instance, 'minimapRolledOut', 'Minimap rolled out'),
+                    new SwitchField(key_instance, 'hideNavControls', 'Hide nav controls'),
                     new SwitchField(key_instance, 'bustRolledOut', 'Bust rolled out'),
                     new SwitchField(key_instance, 'dateTimeVisible', 'Date and Time visible')
                 ])
             ])
-        ]);
+        ]).build();
     },
 
     getStats: () => {
         return new Tab([
             new Row([
                 new Group('General', [
-                    new TextField(key_char, 'short', 'Name', null, 'nameChanged'),
-                    new IntegerField(key_char, 'credits', 'Credits', null, 0),
-                    new IntegerField(key_char, 'personality', 'Personality', null, 0, 100),
-                    new IntegerField(key_char, 'exhibitionismRaw', 'Exhibitionism', null, 0, 100)
+                    new TextField(key_char, 'short', 'Name', { koChanged: 'nameChanged' }),
+                    new IntegerField(key_char, 'credits', 'Credits'),
+                    new IntegerField(key_char, 'personality', 'Personality', { max: 100 }),
+                    new IntegerField(key_char, 'exhibitionismRaw', 'Exhibitionism', { max: 100 })
                 ]),
                 new Group('Advancement', [
-                    new IntegerField(key_char, 'level', 'Level', null, 0, 10),
-                    new IntegerField(key_pc, 'XPRaw', 'XP', null, 0, null, null, true),
-                    new IntegerField(key_pc, 'unspentStatPoints', 'Stat Points', null, 0, null, null, true)
+                    new IntegerField(key_char, 'level', 'Level', { max: 10 }),
+                    new IntegerField(key_pc, 'XPRaw', 'XP', { pcOnly: true }),
+                    new IntegerField(key_pc, 'unspentStatPoints', 'Stat Points', { pcOnly: true })
                 ]),
                 new Group('Appearance', [
-                    new IntegerField(key_char, 'tallness', 'Height', 'inches', 0),
-                    new IntegerField(key_char, 'thickness', 'Thickness', null, 0, 100),
-                    new IntegerField(key_char, 'tone', 'Tone', null, 0, 100),
-                    new IntegerField(key_char, 'femininity', 'Femininity', null, 0, 100)
+                    new IntegerField(key_char, 'tallness', 'Height', { suffixText: 'inches' }),
+                    new IntegerField(key_char, 'thickness', 'Height', { max: 100 }),
+                    new IntegerField(key_char, 'tone', 'Tone', { max: 100 }),
+                    new IntegerField(key_char, 'femininity', 'Femininity', { max: 100 })
                 ]),
             ]),
             new Row([
                 new Group('Core', [
-                    new NestedGroup('', [
-                        new FloatField(key_char, 'Internal_aimRaw', 'Aim Raw', null, 0),
-                        new IntegerField(key_char, 'aimMod', 'Aim Mod', null, 0),
+                    new NestedGroup([
+                        new FloatField(key_char, 'Internal_aimRaw', 'Aim Raw'),
+                        new IntegerField(key_char, 'aimMod', 'Aim Modifier')
                     ]),
-                    new NestedGroup('', [
-                        new FloatField(key_char, 'Internal_intelligenceRaw', 'Intelligence Raw', null, 0),
-                        new IntegerField(key_char, 'intelligenceMod', 'Intelligence Mod', null, 0),
+                    new NestedGroup([
+                        new FloatField(key_char, 'Internal_intelligenceRaw', 'Intelligence Raw'),
+                        new IntegerField(key_char, 'intelligenceMod', 'Intelligence Modifier')
                     ]),
-                    new NestedGroup('', [
-                        new FloatField(key_char, 'Internal_physiqueRaw', 'Physique Raw', null, 0),
-                        new IntegerField(key_char, 'physiqueMod', 'Physique Mod', null, 0),
+                    new NestedGroup([
+                        new FloatField(key_char, 'Internal_physiqueRaw', 'Physique Raw'),
+                        new IntegerField(key_char, 'physiqueMod', 'Physique Modifier')
                     ]),
-                    new NestedGroup('', [
-                        new FloatField(key_char, 'Internal_reflexesRaw', 'Reflexes Raw', null, 0),
-                        new IntegerField(key_char, 'reflexesMod', 'Reflexes Mod', null, 0),
+                    new NestedGroup([
+                        new FloatField(key_char, 'Internal_reflexesRaw', 'Reflexes Raw'),
+                        new IntegerField(key_char, 'reflexesMod', 'Reflexes Modifier')
                     ]),
-                    new NestedGroup('', [
-                        new FloatField(key_char, 'Internal_willpowerRaw', 'Willpower Raw', null, 0),
-                        new IntegerField(key_char, 'willpowerMod', 'Willpower Mod', null, 0),
+                    new NestedGroup([
+                        new FloatField(key_char, 'Internal_willpowerRaw', 'Willpower Raw'),
+                        new IntegerField(key_char, 'willpowerMod', 'Willpower Modifier')
                     ]),
-                    new NestedGroup('', [
-                        new FloatField(key_char, 'Internal_libidoRaw', 'Libido Raw', null, 0, 100),
-                        new IntegerField(key_char, 'libidoMod', 'Libido Mod', null, 0, 100),
+                    new NestedGroup([
+                        new FloatField(key_char, 'Internal_libidoRaw', 'Libido Raw'),
+                        new IntegerField(key_char, 'libidoMod', 'Libido Modifier')
                     ]),
-                    new NestedGroup('', [
-                        new FloatField(key_char, 'Internal_taintRaw', 'Taint Raw', null, 0, 100),
-                        new IntegerField(key_char, 'taintMod', 'Taint Mod', null, 0, 100)
+                    new NestedGroup([
+                        new FloatField(key_char, 'Internal_taintRaw', 'Taint Raw', { max: 100 }),
+                        new IntegerField(key_char, 'taintMod', 'Taint Modifier', { max: 100 })
                     ])
                 ]),
                 new Group('Combat', [
-                    new NestedGroup('', [
-                        new IntegerField(key_char, 'HPRaw', 'HP Raw', null, 0),
-                        new IntegerField(key_char, 'HPMod', 'HP Mod', null, 0)
+                    new NestedGroup([
+                        new IntegerField(key_char, 'HPRaw', 'HP Raw'),
+                        new IntegerField(key_char, 'HPMod', 'HP Modifier')
                     ]),
-                    new NestedGroup('', [
-                        new IntegerField(key_char, 'energyRaw', 'Energy Raw', null, 0),
-                        new IntegerField(key_char, 'energyMod', 'Energy Mod', null, 0)
+                    new NestedGroup([
+                        new IntegerField(key_char, 'energyRaw', 'Energy Raw'),
+                        new IntegerField(key_char, 'energyMod', 'Energy Modifier')
                     ]),
-                    new NestedGroup('', [
-                        new IntegerField(key_char, 'lustRaw', 'Lust Raw', null, 0, 100),
-                        new IntegerField(key_char, 'lustMod', 'Lust Mod', null, 0)
+                    new NestedGroup([
+                        new IntegerField(key_char, 'lustRaw', 'Lust Raw'),
+                        new IntegerField(key_char, 'lustMod', 'Lust Modifier')
                     ]),
-                    new IntegerField(key_char, 'shieldsRaw', 'Shields Raw', null, 0)
+                    new IntegerField(key_char, 'shieldsRaw', 'Shields Raw')
                 ]),
             ]),
-        ]);
+        ]).build();
     },
 
     getHead: () => {
         return new Tab([
             new Row([
                 new Group('Head', [
-                    new SelectField('ValidTypes.Antennae', key_char, 'antennaeType', 'Antennae Type'),
-                    new IntegerField(key_char, 'antennae', 'Antennae Count', null, 0),
-                    new SelectField('ValidTypes.Horn', key_char, 'hornType', 'Horn Type'),
-                    new IntegerField(key_char, 'horns', 'Horn Count', null, 0),
-                    new FloatField(key_char, 'hornLength', 'Horn Length', 'inches', 0)
+                    new SelectField(key_char, 'antennaeType', 'ValidTypes.Antennae', 'Antennae Type'),
+                    new IntegerField(key_char, 'antennae', 'Antennae Count'),
+                    new SelectField(key_char, 'hornType', 'ValidTypes.Horn', 'Horn Type'),
+                    new IntegerField(key_char, 'horns', 'Horn Count'),
+                    new FloatField(key_char, 'hornLength', 'Horn Length', { suffixText: 'inches' })
                 ]),
                 new Group('Hair', [
-                    new SelectField('HairType', key_char, 'hairType', 'Hair Type'),
-                    new FloatField(key_char, 'hairLength', 'Hair Length', 'inches', 0),
+                    new SelectField(key_char, 'hairType', 'HairType', 'Hair Type'),
+                    new FloatField(key_char, 'hairLength', 'Hair Length', { suffixText: 'inches' }),
                     new TextField(key_char, 'hairColor', 'Hair Color'),
-                    new SelectField('HairStyle', key_char, 'hairStyle', 'Hair Style'),
-                    new FloatField(key_char, 'beardLength', 'Beard Length', 'inches', 0),
-                    new SelectField('HairType', key_char, 'beardType', 'Beard Type'),
-                    new SelectField('BeardStyle', key_char, 'beardStyle', 'Beard Style')
+                    new SelectField(key_char, 'hairStyle', 'HairStyle', 'Hair Style'),
+                    new FloatField(key_char, 'beardLength', 'Beard Length', { suffixText: 'inches' }),
+                    new SelectField(key_char, 'beardType', 'HairType', 'Beard Type'),
+                    new SelectField(key_char, 'beardStyle', 'BeardStyle', 'Beard Style')
                 ])
             ]),
             new Row([
                 new Group('Face', [
-                    new SelectField('ValidTypes.Face', key_char, 'faceType', 'Face Type'),
-                    new FlagField('ValidFlags.Face', key_char, 'faceFlags', 'Face Flags')
+                    new SelectField(key_char, 'faceType', 'ValidTypes.Face', 'Face Type'),
+                    new FlagField(key_char, 'faceFlags', 'ValidFlags.Face', 'Face Flags')
                 ]),
                 new Group('Tongue', [
-                    new SelectField('ValidTypes.Tongue', key_char, 'tongueType', 'Tongue Type'),
-                    new FlagField('ValidFlags.Tongue', key_char, 'tongueFlags', 'Tongue Flags')
+                    new SelectField(key_char, 'tongueType', 'ValidTypes.Tongue', 'Tongue Type'),
+                    new FlagField(key_char, 'tongueFlags', 'ValidFlags.Tongue', 'Tongue Flags')
                 ])
             ]),
             new Row([
                 new Group('Lips', [
                     new TextField(key_char, 'lipColor', 'Lip Color'),
-                    new IntegerField(key_char, 'lipMod', 'Lip Mod', null, 0)
+                    new IntegerField(key_char, 'lipMod', 'Lip Modifier')
                 ]),
                 new Group('Ears', [
-                    new SelectField('ValidTypes.Ear', key_char, 'earType', 'Ear Type'),
-                    new FloatField(key_char, 'earLength', 'Ear Length', 'inches', 0),
-                    new FlagField('ValidFlags.Ear', key_char, 'earFlags', 'Ear Flags'),
+                    new SelectField(key_char, 'earType', 'ValidTypes.Ear', 'Ear Type'),
+                    new FloatField(key_char, 'earLength', 'Ear Length', { suffixText: 'inches' }),
+                    new FlagField(key_char, 'earFlags', 'ValidFlags.Ear', 'Ear Flags'),
                 ]),
                 new Group('Eyes', [
-                    new SelectField('ValidTypes.Eye', key_char, 'eyeType', 'Eye Type'),
+                    new SelectField(key_char, 'eyeType', 'ValidTypes.Eye', 'Eye Type'),
                     new TextField(key_char, 'eyeColor', 'Eye Color')
                 ])
             ])
-        ]);
+        ]).build();
     },
 
     getBody: () => {
@@ -160,250 +162,244 @@ const display = {
             new Row([
                 new Group('General', [
                     new SwitchField(key_char, 'gills', 'Has Gills'),
-                    new FloatField(key_char, 'elasticity', 'Elasticity', null, 0),
-                    new SelectField('GenitalSpot', key_char, 'genitalSpot', 'Genital Spot'),
-                    new NestedGroup('', [
-                        new IntegerField(key_char, 'hipRatingRaw', 'Hip Rating Raw', null, 0),
-                        new IntegerField(key_char, 'hipRatingMod', 'Hip Rating Mod', null, 0),
+                    new FloatField(key_char, 'elasticity', 'Elasticity'),
+                    new SelectField(key_char, 'genitalSpot', 'GenitalSpot', 'Genital Spot'),
+                    new NestedGroup([
+                        new IntegerField(key_char, 'hipRatingRaw', 'Hip Rating Raw'),
+                        new IntegerField(key_char, 'hipRatingMod', 'Hip Rating Modifier')
                     ]),
-                    new NestedGroup('', [
-                        new IntegerField(key_char, 'buttRatingRaw', 'Butt Rating Raw', null, 0),
-                        new IntegerField(key_char, 'buttRatingMod', 'Butt Rating Mod', null, 0)
+                    new NestedGroup([
+                        new IntegerField(key_char, 'buttRatingRaw', 'Butt Rating Raw'),
+                        new IntegerField(key_char, 'buttRatingMod', 'Butt Rating Modifier')
                     ]),
-                    new NestedGroup('', [
-                        new IntegerField(key_char, 'bellyRatingRaw', 'Belly Rating Raw', null, 0),
-                        new IntegerField(key_char, 'bellyRatingMod', 'Belly Rating Mod', null, 0)
+                    new NestedGroup([
+                        new IntegerField(key_char, 'bellyRatingRaw', 'Belly Rating Raw'),
+                        new IntegerField(key_char, 'bellyRatingMod', 'Belly Rating Modifier')
                     ]),
-                    new FlagField('ValidFlags.Crotch', key_char, 'crotchFlags', 'Crotch Flags')
+                    new FlagField(key_char, 'crotchFlags', 'ValidFlags.Crotch', 'Crotch Flags')
                 ]),
                 new Group('Skin', [
-                    new SelectField('SkinType', key_char, 'skinType', 'Skin Type'),
+                    new SelectField(key_char, 'skinType', 'SkinType', 'Skin Type'),
                     new TextField(key_char, 'skinTone', 'Skin Tone'),
                     new TextField(key_char, 'skinAccent', 'Skin Accent'),
                     new TextField(key_char, 'furColor', 'Fur Color'),
                     new TextField(key_char, 'scaleColor', 'Scale Color'),
-                    new FlagField('ValidFlags.Skin', key_char, 'skinFlags', 'Skin Flags'),
+                    new FlagField(key_char, 'skinFlags', 'ValidFlags.Skin', 'Skin Flags'),
                 ])
             ]),
             new Row([
                 new Group('Wings', [
-                    new SelectField('ValidTypes.Wing', key_char, 'wingType', 'Wing Type'),
-                    new IntegerField(key_char, 'wingCount', 'Wing Count', null, 0)
+                    new SelectField(key_char, 'wingType', 'ValidTypes.Wing', 'Wing Type'),
+                    new IntegerField(key_char, 'wingCount', 'Wing Count')
                 ]),
                 new Group('Arms', [
-                    new SelectField('ValidTypes.Arm', key_char, 'armType', 'Arm Type'),
-                    new FlagField('ValidFlags.Arm', key_char, 'armFlags', 'Arm Flags')
+                    new SelectField(key_char, 'armType', 'ValidTypes.Arm', 'Arm Type'),
+                    new FlagField(key_char, 'armFlags', 'ValidFlags.Arm', 'Arm Flags')
                 ]),
                 new Group('Legs', [
-                    new SelectField('ValidTypes.Leg', key_char, 'legType', 'Leg Type'),
-                    new IntegerField(key_char, 'legCount', 'Leg Count', null, 0),
-                    new FlagField('ValidFlags.Leg', key_char, 'legFlags', 'Leg Flags')
+                    new SelectField(key_char, 'legType', 'ValidTypes.Leg', 'Leg Type'),
+                    new IntegerField(key_char, 'legCount', 'Leg Count'),
+                    new FlagField(key_char, 'legFlags', 'ValidFlags.Leg', 'Leg Flags')
                 ])
             ]),
             new Row([
                 new Group('Butt', [
                     new SwitchField(key_char, 'analVirgin', 'Anal Virgin'),
-                    new IntegerField(key_butt, 'minLooseness', 'Min Looseness', null, 0),
-                    new IntegerField(key_butt, 'bonusCapacity', 'Bonus Capacity', null, 0),
-                    new FlagField('ValidFlags.Butt', key_butt, 'flags', 'Butt Flags'),
-                    new NestedGroup('', [
-                        new IntegerField(key_butt, 'loosenessRaw', 'Looseness Raw', null, 0),
-                        new IntegerField(key_butt, 'loosenessMod', 'Looseness Mod', null, 0)
+                    new IntegerField(key_butt, 'minLooseness', 'Minimum Looseness'),
+                    new IntegerField(key_butt, 'bonusCapacity', 'Bonus Capacity'),
+                    new FlagField(key_butt, 'flags', 'ValidFlags.Butt', 'Butt Flags'),
+                    new NestedGroup([
+                        new IntegerField(key_butt, 'loosenessRaw', 'Looseness Raw'),
+                        new IntegerField(key_butt, 'loosenessMod', 'Looseness Modifier')
                     ]),
-                    new NestedGroup('', [
-                        new IntegerField(key_butt, 'wetnessRaw', 'Wetness Raw', null, 0),
-                        new IntegerField(key_butt, 'wetnessMod', 'Wetness Mod', null, 0)
+                    new NestedGroup([
+                        new IntegerField(key_butt, 'wetnessRaw', 'Wetness Raw'),
+                        new IntegerField(key_butt, 'wetnessMod', 'Wetness Modifier')
                     ])
                 ]),
                 new Group('Tail', [
-                    new SelectField('ValidTypes.Tail', key_char, 'tailType', 'Tail Type'),
-                    new IntegerField(key_char, 'tailCount', 'Tail Count', null, 0),
-                    new FlagField('ValidFlags.Tail', key_char, 'tailFlags', 'Tail Flags')
+                    new SelectField(key_char, 'tailType', 'ValidTypes.Tail', 'Tail Type'),
+                    new IntegerField(key_char, 'tailCount', 'Tail Count'),
+                    new FlagField(key_char, 'tailFlags', 'ValidFlags.Tail', 'Tail Flags')
                 ])
             ]),
             new Row([
                 new Group('Milk', [
-                    new SelectField('FluidType', key_char, 'milkType', 'Milk Type'),
-                    new FloatField(key_char, 'milkFullness', 'Milk Fullness', null, 0),
-                    new IntegerField(key_char, 'milkRate', 'Milk Rate', null, 0),
-                    new IntegerField(key_char, 'milkMultiplier', 'Milk Multiplier', null, 0),
-                    new IntegerField(key_char, 'milkStorageMultiplier', 'Milk Storage Multiplier', null, 0)
+                    new SelectField(key_char, 'milkType', 'FluidType', 'Milk Type'),
+                    new FloatField(key_char, 'milkFullness', 'Milk Fullness'),
+                    new IntegerField(key_char, 'milkRate', 'Milk Rate'),
+                    new IntegerField(key_char, 'milkMultiplier', 'Milk Multiplier'),
+                    new IntegerField(key_char, 'milkStorageMultiplier', 'Milk Storage Multiplier')
                 ]),
                 new Group('Nipples', [
                     new TextField(key_char, 'nippleColor', 'Nipple Color'),
-                    new IntegerField(key_char, 'nipplesPerBreast', 'Nipples Per Breast', null, 0),
-                    new FloatField(key_char, 'nippleLengthRatio', 'Nipple Length Ratio', null, 0),
-                    new FloatField(key_char, 'nippleWidthRatio', 'Nipple Width Ratio', null, 0),
-                    new SelectField('ValidTypes.Penis', key_char, 'dickNippleType', 'Dicknipple type'),
-                    new IntegerField(key_char, 'dickNippleMultiplier', 'Dicknipple Multiplier', null, 0)
+                    new IntegerField(key_char, 'nipplesPerBreast', 'Nipples Per Breast'),
+                    new FloatField(key_char, 'nippleLengthRatio', 'Nipple Length Ratio'),
+                    new FloatField(key_char, 'nippleWidthRatio', 'Nipple Width Ratio'),
+                    new SelectField(key_char, 'dickNippleType', 'ValidTypes.Penis', 'Dicknipple type'),
+                    new IntegerField(key_char, 'dickNippleMultiplier', 'Dicknipple Multiplier')
                 ]),
                 new ArrayGroup('Breasts', 'addBreastRow', [
-                    new ArrayField(key_char, 'breastRows()', 'getBreastName', 'removeBreastRow', [
-                        new IntegerField('', 'breasts', 'Count', null, 0),
-                        new IntegerField('', 'breastRatingRaw', 'Rating Raw', null, 0),
-                        new IntegerField('', 'breastRatingMod', 'Rating Mod', null, 0),
-                        new IntegerField('', 'breastRatingLactationMod', 'Lactation Mod', null, 0),
-                        new IntegerField('', 'breastRatingHoneypotMod', 'Honeypot Mod', null, 0),
-                        new SelectField('NippleType', '', 'nippleType', 'Nipple Type'),
-                        new FloatField('', 'fullness', 'Fullness', null, 0),
-                        new FlagField('ValidFlags.Areola', '', 'areolaFlags', 'Areola Flags')
+                    new ArrayField(key_char, 'breastRows', 'getBreastName', 'removeBreastRow', [
+                        new IntegerField('', 'breasts', 'Count'),
+                        new IntegerField('', 'breastRatingRaw', 'Rating Raw'),
+                        new IntegerField('', 'breastRatingMod', 'Rating Modifier'),
+                        new IntegerField('', 'breastRatingLactationMod', 'Lactation Modifier'),
+                        new IntegerField('', 'breastRatingHoneypotMod', 'Honeypot Modifier'),
+                        new SelectField('', 'nippleType', 'NippleType', 'Nipple Type'),
+                        new FloatField('', 'fullness', 'Fullness'),
+                        new FlagField('', 'areolaFlags', 'ValidFlags.Areola', 'Areola Flags')
                     ])
                 ])
             ])
-        ]);
+        ]).build();
     },
 
     getCrotch: () => {
         return new Tab([
             new Row([
                 new Group('Male Organs', [
-                    new IntegerField(key_char, 'balls', 'Balls', null, 0),
-                    new NestedGroup('', [
-                        new FloatField(key_char, 'ballSizeRaw', 'Ball Size Raw', null, 0),
-                        new IntegerField(key_char, 'ballSizeMod', 'Ball Size Mod', null, 0)
+                    new IntegerField(key_char, 'balls', 'Balls'),
+                    new NestedGroup([
+                        new FloatField(key_char, 'ballSizeRaw', 'Ball Size Raw'),
+                        new IntegerField(key_char, 'ballSizeMod', 'Ball Size Modifier')
                     ]),
-                    new FloatField(key_char, 'Internal_ballFullness', 'Ball Fullness', null, 0, 100),
-                    new FloatField(key_char, 'Internal_ballEfficiency', 'Ball Efficiency', null, 0),
-                    new FloatField(key_char, 'refractoryRate', 'Refractory Rate', null, 0),
-                    new SelectField('FluidType', key_char, 'cumType', 'Cum Type'),
-                    new NestedGroup('', [
-                        new FloatField(key_char, 'cumMultiplierRaw', 'Cum Multiplier Raw', null, 0),
-                        new IntegerField(key_char, 'cumMultiplierMod', 'Cum Multiplier Raw', null, 0)
+                    new FloatField(key_char, 'Internal_ballFullness', 'Ball Fullness', { max: 100 }),
+                    new FloatField(key_char, 'Internal_ballEfficiency', 'Ball Efficiency'),
+                    new FloatField(key_char, 'refractoryRate', 'Refractory Rate'),
+                    new SelectField(key_char, 'cumType', 'FluidType', 'Cum Type'),
+                    new NestedGroup([
+                        new FloatField(key_char, 'cumMultiplierRaw', 'Cum Multiplier Raw'),
+                        new IntegerField(key_char, 'cumMultiplierMod', 'Cum Multiplier Raw')
                     ]),
-                    new NestedGroup('', [
-                        new FloatField(key_char, 'cumQualityRaw', 'Cum Quality Raw', null, 0),
-                        new IntegerField(key_char, 'cumQualityMod', 'Cum Quality Mod', null, 0)
+                    new NestedGroup([
+                        new FloatField(key_char, 'cumQualityRaw', 'Cum Quality Raw'),
+                        new IntegerField(key_char, 'cumQualityMod', 'Cum Quality Modifier')
                     ]),
                     new SwitchField(key_char, 'cockVirgin', 'Penis Virgin')
                 ]),
                 new ArrayGroup('Penises', 'addPenis', [
-                    new ArrayField(key_char, 'cocks()', 'getPenisName', 'removePenis', [
-                        new NestedGroup('', [
-                            new FloatField('', 'cLengthRaw', 'Length Raw', null, 0),
-                            new FloatField('', 'cLengthMod', 'Length Mod', null, 0),
+                    new ArrayField(key_char, 'cocks', 'getPenisName', 'removePenis', [
+                        new NestedGroup([
+                            new FloatField('', 'cLengthRaw', 'Length Raw'),
+                            new FloatField('', 'cLengthMod', 'Length Modifier'),
                         ]),
-                        new NestedGroup('', [
-                            new FloatField('', 'cThicknessRatioRaw', 'Thickness Ratio Raw', null, 0),
-                            new FloatField('', 'cThicknessRatioMod', 'Thickness Ratio Mod', null, 0),
+                        new NestedGroup([
+                            new FloatField('', 'cThicknessRatioRaw', 'Thickness Ratio Raw'),
+                            new FloatField('', 'cThicknessRatioMod', 'Thickness Ratio Modifier'),
                         ]),
-                        new SelectField('ValidTypes.Penis', '', 'cType', 'Type'),
+                        new SelectField('', 'cType', 'ValidTypes.Penis', 'Type'),
                         new TextField('', 'cockColor', 'Color'),
-                        new FloatField('', 'knotMultiplier', 'Knot Multiplier', null, 0),
-                        new FloatField('', 'flaccidMultiplier', 'Flaccid Multiplier', null, 0),
+                        new FloatField('', 'knotMultiplier', 'Knot Multiplier'),
+                        new FloatField('', 'flaccidMultiplier', 'Flaccid Multiplier'),
                         new SwitchField('', 'virgin', 'Virgin'),
-                        new FlagField('ValidFlags.Penis', '', 'flags', 'Flags')
+                        new FlagField('', 'flags', 'ValidFlags.Penis', 'Flags')
                         //todo piercing
                     ])
                 ])
             ]),
             new Row([
                 new Group('Female Organs', [
-                    new NestedGroup('', [
-                        new FloatField(key_char, 'fertilityRaw', 'Fertility Raw', null, 0),
-                        new IntegerField(key_char, 'fertilityMod', 'Fertility Mod', null, 0)
+                    new NestedGroup([
+                        new FloatField(key_char, 'fertilityRaw', 'Fertility Raw'),
+                        new IntegerField(key_char, 'fertilityMod', 'Fertility Modifier')
                     ]),
-                    new SelectField('FluidType', key_char, 'girlCumType', 'Cum Type'),
-                    new NestedGroup('', [
-                        new FloatField(key_char, 'girlCumMultiplierRaw', 'Cum Multiplier Raw', null, 0),
-                        new IntegerField(key_char, 'girlCumMultiplierMod', 'Cum Multiplier Mod', null, 0)
+                    new SelectField(key_char, 'girlCumType', 'FluidType', 'Cum Type'),
+                    new NestedGroup([
+                        new FloatField(key_char, 'girlCumMultiplierRaw', 'Cum Multiplier Raw'),
+                        new IntegerField(key_char, 'girlCumMultiplierMod', 'Cum Multiplier Modifier')
                     ]),
-                    new FloatField(key_char, 'clitLength', 'Clit Length', null, 0),
+                    new FloatField(key_char, 'clitLength', 'Clit Length'),
                     new SwitchField(key_char, 'vaginalVirgin', 'Vaginal Virgin')
                 ]),
                 new ArrayGroup('Vaginas', 'addVagina', [
-                    new ArrayField(key_char, 'vaginas()', 'getVaginaName', 'removeVagina', [
-                        new IntegerField('', 'minLooseness', 'Min Looseness', null, 0),
-                        new NestedGroup('', [
-                            new IntegerField('', 'loosenessRaw', 'Looseness Raw', null, 0),
-                            new IntegerField('', 'loosenessMod', 'Looseness Mod', null, 0)
+                    new ArrayField(key_char, 'vaginas', 'getVaginaName', 'removeVagina', [
+                        new IntegerField('', 'minLooseness', 'Minimum Looseness'),
+                        new NestedGroup([
+                            new IntegerField('', 'loosenessRaw', 'Looseness Raw'),
+                            new IntegerField('', 'loosenessMod', 'Looseness Modifier')
                         ]),
-                        new NestedGroup('', [
-                            new IntegerField('', 'wetnessRaw', 'Wetness Raw', null, 0),
-                            new IntegerField('', 'wetnessMod', 'Wetness Mod', null, 0)
+                        new NestedGroup([
+                            new IntegerField('', 'wetnessRaw', 'Wetness Raw'),
+                            new IntegerField('', 'wetnessMod', 'Wetness Modifier')
                         ]),
-                        new IntegerField('', 'bonusCapacity', 'Bonus Capacity', null, 0),
-                        new SelectField('ValidTypes.Vagina', '', 'type', 'Type'),
+                        new IntegerField('', 'bonusCapacity', 'Bonus Capacity'),
+                        new SelectField('', 'type', 'ValidTypes.Vagina', 'Type'),
                         new TextField('', 'vaginaColor', 'Color'),
-                        new IntegerField('', 'clits', 'Clits', null, 1),
-                        new FloatField('', 'fullness', 'Fullness', null, 0),
-                        new IntegerField('', 'shrinkCounter', 'Shrink Counter', null, 0),
+                        new IntegerField('', 'clits', 'Clits', { min: 1 }),
+                        new FloatField('', 'fullness', 'Fullness'),
+                        new IntegerField('', 'shrinkCounter', 'Shrink Counter'),
                         new SwitchField('', 'hymen', 'Hymen'),
-                        new FlagField('ValidFlags.Vagina', '', 'flags', 'Flags')
+                        new FlagField('', 'flags', 'ValidFlags.Vagina', 'Flags')
                         //todo piercing
                     ])
                 ]),
             ])
-        ]);
+        ]).build();
     },
 
 
     getStoragePopup: () => {
 
-        const dRoot = document.createElement('div');
-        dRoot.className = 'modal-content bg-secondary';
-        dRoot.dataset.bind = 'with: $root.selectedStorage';
+        const divRoot = document.createElement('div');
+        divRoot.className = 'modal-content bg-secondary';
+        divRoot.dataset.bind = 'with: $root.selectedStorage';
 
 
-        const dHeader = document.createElement('div');
-        dHeader.className = 'modal-header';
+        const divHeader = document.createElement('div');
+        divHeader.className = 'modal-header';
 
-        const lblStorageName = document.createElement('h5');
-        lblStorageName.className = 'modal-title';
-        lblStorageName.dataset.bind = 'text: obj.storageName';
+        const h5StorageName = document.createElement('h5');
+        h5StorageName.className = 'modal-title';
+        h5StorageName.dataset.bind = 'text: obj.storageName';
 
         const btnClose = document.createElement('button');
-        btnClose.className = 'btn-close btn-danger';
+        btnClose.classList.add('btn-close', 'btn-danger');
         btnClose.type = 'button';
         btnClose.setAttribute('data-bs-dismiss', 'modal');
         btnClose.ariaLabel = 'Close';
 
-        dHeader.appendChild(lblStorageName);
-        dHeader.appendChild(btnClose);
+        divHeader.appendChild(h5StorageName);
+        divHeader.appendChild(btnClose);
 
 
-        const dBody = document.createElement('div');
-        dBody.className = 'modal-body';
+        const divBody = document.createElement('div');
+        divBody.className = 'modal-body';
 
-        dBody.appendChild(new TextField('', 'obj.tooltip', 'Tooltip', null, null, null, 'fields.includes("tooltip")'));
+        divBody.appendChild(new TextField('', 'obj.tooltip', 'Tooltip', { koVisible: 'fields.includes("tooltip")' }).build());
 
-        dBody.appendChild(new NestedGroup('', [
-            new FloatField('', 'obj.value1', 'Value 1', null, null, null, null, null, 'fields.includes("value1")'),
-            new FloatField('', 'obj.value2', 'Value 2', null, null, null, null, null, 'fields.includes("value2")')
-        ]));
-        dBody.appendChild(new NestedGroup('', [
-            new FloatField('', 'obj.value3', 'Value 3', null, null, null, null, null, 'fields.includes("value3")'),
-            new FloatField('', 'obj.value4', 'Value 4', null, null, null, null, null, 'fields.includes("value4")')
-        ]));
+        divBody.appendChild(new NestedGroup([
+            new FloatField('', 'obj.value1', 'Value 1', { min: null, koVisible: 'fields.includes("value1")' }),
+            new FloatField('', 'obj.value2', 'Value 2', { min: null, koVisible: 'fields.includes("value2")' })
+        ]).build());
+        divBody.appendChild(new NestedGroup([
+            new FloatField('', 'obj.value3', 'Value 3', { min: null, koVisible: 'fields.includes("value3")' }),
+            new FloatField('', 'obj.value4', 'Value 4', { min: null, koVisible: 'fields.includes("value4")' })
+        ]).build());
 
-        dBody.appendChild(new NestedGroup('', [
-            new TextField('', 'obj.iconName', 'Icon Name', null, null, null, 'fields.includes("iconName")'),
-            new TextField('', 'obj.iconShade', 'Icon Shade', null, null, null, 'fields.includes("iconShade")')
-        ]));
+        divBody.appendChild(new NestedGroup([
+            new TextField('', 'obj.iconName', 'Icon Name', { koVisible: 'fields.includes("iconName")' }),
+            new TextField('', 'obj.iconShade', 'Icon Shade', { koVisible: 'fields.includes("iconShade")' })
+        ]).build());
 
-        dBody.appendChild(new IntegerField('', 'obj.minutesLeft', 'Minutes Left', 'minutes', 0, null, null, null, 'fields.includes("minutesLeft")'));
+        divBody.appendChild(new IntegerField('', 'obj.minutesLeft', 'Minutes Left', { suffixText: 'minutes', koVisible: 'fields.includes("minutesLeft")' }).build());
 
-        dBody.appendChild(new SwitchField('', 'obj.combatOnly', 'Combat Only', null, null, 'fields.includes("combatOnly")'));
-        dBody.appendChild(new SwitchField('', 'obj.hidden', 'Hidden', null, null, 'fields.includes("hidden")'));
-
-
-        dRoot.appendChild(dHeader);
-        dRoot.appendChild(dBody);
+        divBody.appendChild(new SwitchField('', 'obj.combatOnly', 'Combat Only', { koVisible: 'fields.includes("combatOnly")' }).build());
+        divBody.appendChild(new SwitchField('', 'obj.hidden', 'Hidden', { koVisible: 'fields.includes("hidden")' }).build());
 
 
-        return dRoot;
+        divRoot.appendChild(divHeader);
+        divRoot.appendChild(divBody);
+
+
+        return divRoot;
     },
 
-    getPerks: () => {
-        return new StorageContainer(key_char, 'perks', 'perkList', ['tooltip', 'value1', 'value2', 'value3', 'value4']);
-    },
+    getPerks: () => new StorageContainer(key_char, 'perks', 'perkList', ['tooltip', 'value1', 'value2', 'value3', 'value4']).build(),
 
-    getStatusEffects: () => {
-        return new StorageContainer(key_char, 'statusEffects', 'statusEffectList', ['all']);
-    },
+    getStatusEffects: () => new StorageContainer(key_char, 'statusEffects', 'statusEffectList', ['all']).build(),
 
-    getKeyItems: () => {
-        return new StorageContainer(key_char, 'keyItems', 'keyItemList', ['tooltip', 'value1', 'value2', 'value3', 'value4']);
-    },
+    getKeyItems: () => new StorageContainer(key_char, 'keyItems', 'keyItemList', ['tooltip', 'value1', 'value2', 'value3', 'value4']).build(),
 
 
     getFlags: () => {

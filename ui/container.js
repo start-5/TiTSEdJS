@@ -3,55 +3,110 @@
 
 class StorageContainer {
 
-    constructor(obj, key, bindingSource, fields) {
+    /**
+    * Creates an editor array field
+    * @param {string} root The root object to modify
+    * @param {string} key The object key to modify
+    * @param {string} bindingSource The KO object to build the list from
+    * @param {Array<string>} fields The list of fields that can be edited on the storage popup
+    */
+    constructor(root, key, bindingSource, fields) {
 
-        this.root = document.createElement('div');
-        this.root.className = 'text-light my-3 w-100';
-        this.root.dataset.bind = `foreach: $root.${bindingSource}`;
+        const koHas = `$root.hasStorage($data, '${key}')`;
 
-        const header = document.createElement('div');
-        header.className = 'form-check form-switch mt-4';
 
-        const checkBox = document.createElement('input');
-        checkBox.type = 'checkbox';
-        checkBox.role = 'switch';
-        checkBox.className = 'form-check-input storage-switch';
-        checkBox.setAttribute('disabled', true);
-        checkBox.dataset.bind = 'checked: $root.' + obj + (obj ? '.' : '') + key + `,
-                                 checkedValue: $data,
-                                 enable: $root.saveLoaded`;
+        /**
+        * Contains all the container content
+        * @type {HTMLDivElement}
+        */
+        this.content = document.createElement('div');
+        this.content.classList.add('text-light', 'my-3', 'w-100');
+        util.setKoBinding(this.content, 'foreach', `$root.${bindingSource}`);
 
-        const hasFunc = `$root.hasStorage($data, '${key}')`;
 
-        const lblName = document.createElement('label');
-        lblName.className = 'form-check-label';
-        lblName.dataset.bind = `text: storageName,
-                                class: ${hasFunc} ? 'fw-bold' : ''`;
+        /**
+        * Holds the foreach template
+        * @type {HTMLDivElement}
+        */
+        this.templateContainer = document.createElement('div');
+        this.templateContainer.classList.add('form-check', 'form-switch', 'mt-4');
 
-        const pToolTip = document.createElement('p');
-        pToolTip.className = 'p-sm';
-        pToolTip.dataset.bind = `text: $data.tooltip,
-                                 class: ${hasFunc} ? '' : 'text-muted'`;
 
-        const btnEdit = document.createElement('i');
-        btnEdit.className = 'fa-solid fa-pen-to-square ms-3';
-        btnEdit.role = 'button';
-        btnEdit.dataset.bind = `click: (storage, fields) => $root.selectStorage($data, ${JSON.stringify(fields)})`;
+        /**
+        * Templated checkbox
+        * @type {HTMLInputElement}
+        */
+        this.templateCheckbox = document.createElement('input');
+        this.templateCheckbox.type = 'checkbox';
+        this.templateCheckbox.role = 'switch';
+        this.templateCheckbox.classList.add('form-check-input', 'storage-switch');
+        this.templateCheckbox.setAttribute('disabled', true);
+        util.setKoBinding(this.templateCheckbox, 'checked', `$root.${util.getObjPath(root, key)}`);
+        util.setKoBinding(this.templateCheckbox, 'checkedValue', '$data');
+        util.setKoBinding(this.templateCheckbox, 'enable', '$root.saveLoaded');
 
-        header.appendChild(checkBox);
-        header.appendChild(lblName);
-        util.appendKoIfBlock(header, btnEdit, hasFunc);
 
-        this.root.appendChild(header);
-        util.appendKoIfBlock(this.root, pToolTip, '$root.hasStorageTooltip($data)');
+        /**
+        * Templated checkbox label (StorageName)
+        * @type {HTMLLabelElement}
+        */
+        this.templateCheckboxLabel = document.createElement('label');
+        this.templateCheckboxLabel.classList.add('form-check-label');
+        util.setKoBinding(this.templateCheckboxLabel, 'text', 'storageName');
+        util.setKoBinding(this.templateCheckboxLabel, 'class', `${koHas} ? 'fw-bold' : ''`);
 
-        return this.root;
 
+        // I don't think it'd be a good idea to use the storageName as an id because
+        // it might contain spaces and other weird characters so it'll use its index instead
+        util.setKoBinding(this.templateCheckbox, 'attr', `{ 'id': 'edit-${key}-' + $index() }`);
+        util.setKoBinding(this.templateCheckboxLabel, 'attr', `{ 'for': 'edit-${key}-' + $index() }`);
+
+
+        /**
+        * Templated paragraph (Tooltip)
+        * @type {HTMLParagraphElement}
+        */
+        this.templateTooltip = document.createElement('p');
+        this.templateTooltip.classList.add('p-sm');
+        util.setKoBinding(this.templateTooltip, 'text', 'tooltip');
+        util.setKoBinding(this.templateTooltip, 'class', `${koHas} ? '' : 'text-muted'`);
+
+
+        /**
+        * Templated edit button
+        * @type {HTMLButtonElement}
+        */
+        this.templateBtnEdit = document.createElement('button');
+        this.templateBtnEdit.type = 'button';
+        this.templateBtnEdit.title = 'Edit storage data';
+        this.templateBtnEdit.innerHTML = '<i class="fa-solid fa-pen-to-square"></i>';
+        this.templateBtnEdit.classList.add('btn', 'btn-sm', 'btn-secondary', 'ms-2', 'px-1', 'py-0');
+        util.setKoBinding(this.templateBtnEdit, 'click', `(storage, fields) => $root.selectStorage($data, ${JSON.stringify(fields)})`);
+
+
+        this.templateContainer.appendChild(this.templateCheckbox);
+        this.templateContainer.appendChild(this.templateCheckboxLabel);
+        util.appendKoIfBlock(this.templateContainer, this.templateBtnEdit, koHas);
+
+        this.content.appendChild(this.templateContainer);
+        util.appendKoIfBlock(this.content, this.templateTooltip, '$root.hasStorageTooltip($data)');
+
+    }
+
+    /**
+    * Returns the container and all its content
+    */
+    build() {
+        return this.content;
     }
 
 }
 
 class FlagContainer {
+
+    //---------------------------------
+    //TODO: NEXT UP!
+    //---------------------------------
 
     constructor() {
         this.root = document.createElement('div');
@@ -111,27 +166,4 @@ class FlagContainer {
         //return this.root;
     }
 
-}
-
-function createStorageField(labelText, key, bindingType) {
-    const div = document.createElement('div');
-    div.className = 'w-50 px-1';
-
-    const label = document.createElement('label');
-    label.className = 'label-sm';
-    label.textContent = labelText;
-
-    const input = document.createElement('input');
-    input.className = 'form-control form-control-sm';
-    input.disabled = true;
-    if (bindingType === 'numberInput') {
-        input.type = 'number';
-    }
-
-    input.dataset.bind = bindingType + ': $data.' + key + ' , enable: $root.saveLoaded';
-
-    div.appendChild(label);
-    div.appendChild(input);
-
-    return div;
 }

@@ -1,3 +1,5 @@
+/* #region Inputs */
+
 .form-select {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 11'%3e%3cpath fill='white' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
 }
@@ -35,31 +37,58 @@
     font-size: 0.875rem;
 }
 
-.suffix-wrapper {
-    display: block;
-    position: relative;
-    width: 100%;
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
-.suffix {
-    position: absolute;
-    left: 0;
-    top: 0.3rem;
-    color: #ccc;
-    padding-left: 5px;
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.input-group-text {
+    background-color: rgba(32, 39, 53, 0.2) !important;
+    border: 1px solid #aaa !important;
+    border-left: none !important;
+    color: #ddd !important;
     user-select: none;
 }
 
-.hidden {
-    display: none;
+.form-check-input:not(:checked) {
+    background-color: #333E52 !important;
+    border: 1px solid #aaa;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='white'/%3e%3c/svg%3e")
 }
 
-.centered {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    -webkit-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
+    .form-check-input:not(:checked):hover {
+        background-color: #8D31B0A6 !important;
+    }
+
+.form-check-input:not(:disabled) {
+    cursor: pointer !important;
+}
+
+/* #endregion */
+
+
+/* #region Nav */
+
+.nav {
+    flex-wrap: nowrap !important;
+    /* overflow-y: scroll !important;
+    overflow-y: scroll; */
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+    .nav::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+    }
+
+.nav-item button {
+    white-space: nowrap !important;
 }
 
 .nav-link {
@@ -83,6 +112,11 @@
         border-bottom-color: #fff !important;
     }
 
+/* #endregion */
+
+
+/* #region BS Container */
+
 .container, .container-fluid, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
     padding-left: 0 !important;
     padding-right: 0 !important;
@@ -90,70 +124,10 @@
     margin-right: 0 !important;
 }
 
-.nav {
-    flex-wrap: nowrap !important;
-    /* overflow-y: scroll !important;
-    overflow-y: scroll; */
-    overflow-y: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-    .nav::-webkit-scrollbar {
-        width: 0;
-        height: 0;
-    }
-
-hr {
-    margin-top: 0 !important;
-    opacity: 0.5 !important;
-}
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-input[type=number] {
-    -moz-appearance: textfield;
-}
-
-.input-group-text {
-    background-color: rgba(32, 39, 53, 0.2) !important;
-    border: 1px solid #aaa !important;
-    border-left: none !important;
-    color: #ddd !important;
-    user-select: none;
-}
-
-.expand-icon {
-    width: 3em;
-    transition-duration: 350ms;
-}
-
-    .expand-icon:hover, .expand-icon:active, .expand-icon:focus {
-        opacity: 1 !important;
-        transition-duration: 350ms;
-    }
-
-.accordion-button {
-    background-color: rgba(32, 39, 53, 0.2) !important;
-    color: #fff !important;
-    padding: .5rem !important;
-    font-size: 0.875rem !important;
-    /*border: 1px solid #aaa !important;*/
-}
-
-    .accordion-button::after {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='white' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
-    }
+/* #endregion */
 
 
-.accordion-item {
-    border: 1px solid #aaa !important;
-    background-color: transparent !important;
-}
+/* #region FlagField */
 
 .flag-switch-row {
     width: 33.33%;
@@ -165,62 +139,85 @@ input[type=number] {
     }
 }
 
-.form-check-input:not(:checked) {
-    background-color: #333E52 !important;
-    border: 1px solid #aaa;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='white'/%3e%3c/svg%3e")
-}
+/* #endregion */
+
+
+/* #region Accordion */
 
 .accordion-body {
     padding: 1rem 0.5rem;
 }
 
-.my-n3 {
-    margin-top: -1rem !important;
-    margin-bottom: -1rem !important;
+.accordion-item {
+    border: 1px solid #aaa !important;
+    background-color: transparent !important;
 }
+
+.accordion-button {
+    background-color: rgba(32, 39, 53, 0.2) !important;
+    color: #fff !important;
+    padding: .5rem !important;
+    font-size: 0.875rem !important;
+}
+
+    .accordion-button::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='white' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+    }
+
+/* #endregion */
+
+
+.hidden {
+    display: none;
+}
+
+
+hr {
+    margin-top: 0 !important;
+    opacity: 0.5 !important;
+}
+
+
+.expand-icon {
+    width: 3em;
+    transition-duration: 350ms;
+}
+
+    .expand-icon:hover, .expand-icon:active, .expand-icon:focus {
+        opacity: 1 !important;
+        transition-duration: 350ms;
+    }
+
 
 .text-muted {
     color: #ddd !important;
 }
+
 
 .storage-switch {
     height: 1.1rem !important;
     width: 2.2rem !important;
 }
 
-.nav-item button {
-    white-space: nowrap !important;
-}
-
-.btn-xs {
-    font-size: 0.7rem !important;
-}
-
-.storage-item {
-    width: 50%;
-}
-
-.form-check-input:not(:disabled) {
-    cursor: pointer !important;
-}
 
 .p-sm {
     font-size: 0.9rem !important;
 }
 
-/*input:disabled, input:disabled ~ label, select:disabled, select:disabled ~ label, input[type=checkbox]:disabled {
-    cursor: not-allowed !important;
-}*/
 
 .btn-close {
     background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
 }
 
-.input-as-textarea {
-    word-break: break-word;
-}
 
 #modalInfoBody a {
     color: #ffc107;
+}
+
+
+/* Disable iOS auto-zooming on input fields, this might take a few tries... */
+@media screen and (-webkit-min-device-pixel-ratio:0) and (max-width:992px) {
+    select, input {
+        font-size: 16px;
+    }
 }

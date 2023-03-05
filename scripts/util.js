@@ -224,6 +224,97 @@ const util = {
         else if (rating < 198) return 'hyper ZZZ-cup';
         else if (rating < 199) return 'hyper large ZZZ-cup';
         else if (rating >= 199) return 'Jacques00-cup';
+    },
+
+
+    /**
+    * Get a KO binding declaration of the specified type on the specified element
+    * @param {HTMLElement} element
+    * @param {string} type
+    * @param {boolean} trimType 
+    */
+    getKoBinding(element, type) {
+
+        const bindings = this.getKoBindings(element);
+        return bindings[type] || '';
+
+    },
+
+    /**
+    * Get an object with of all KO binding declarations on the specified element
+    * @param {HTMLElement} element
+    * @returns {Object.<string, string>}
+    */
+    getKoBindings(element) {
+
+        const bindings = {};
+
+        const bindingsRaw = element.dataset.bind;
+        if (bindingsRaw) {
+            const bindingsText = bindingsRaw.split(', ');
+
+            bindingsText.forEach(binding => {
+
+                const parts = binding.split(': ');
+
+                if (parts.length > 2) {
+
+                    parts[1] += ': ';
+
+                    while (parts.length > 2) {
+                        parts[1] += parts[2];
+                        parts.splice(2, 1);
+                    }
+
+                }
+
+                const type = parts[0];
+                const declaration = parts[1];
+
+                bindings[type] = declaration;
+
+            });
+        }
+
+        return bindings;
+
+    },
+
+    /**
+    * Set a KO binding declaration of the specified type on the specified element
+    * @param {HTMLElement} element
+    * @param {string} type
+    * @param {string} binding
+    */
+    setKoBinding(element, type, binding) {
+
+        const bindings = this.getKoBindings(element);
+
+        bindings[type] = binding;
+
+        var declaration = '';
+
+        Object.keys(bindings).forEach(key => {
+
+            if (declaration) {
+                declaration += ', ';
+            }
+
+            declaration += `${key}: ${bindings[key]}`;
+
+        });
+
+        element.dataset.bind = declaration;
+    },
+
+
+    /**
+    * Get a string representation of the path to an object key
+    * @param {string} root
+    * @param {string} key
+    */
+    getObjPath(root, key) {
+        return root + (root ? '.' : '') + key;
     }
 
 };
