@@ -124,7 +124,7 @@
 
         async function getRepoFile(path, func, type = 'text') {
             try {
-                await $.get(`https://raw.githubusercontent.com/start-5/TiTS.JS-Save-Editor/main/${path}`, data => func(data), type);
+                await $.get(`https://raw.githubusercontent.com/start-5/TiTS.JS-Save-Editor/main/${path}?killCache=${Date.now()}`, data => func(data), type);
             } catch (e) {
                 console.log(e);
             }
@@ -139,13 +139,43 @@
             $('#toolbarContainer').show();
 
 
-            // #region About content
+            $.ajaxSetup({
+                cache: false
+            });
+
+
+            // #region Menu content
 
             await getRepoFile('versions.json', data => {
 
-                const gameVersion = JSON.parse(data)?.game;
+                const versionData = JSON.parse(data ?? '');
+
+                const gameVersion = versionData.game;
+                const gameBreakingVersion = versionData.gameBreaking;
+
                 if (!!gameVersion) {
+
                     $('#modalInfoBody').append(`<p>Supported game version: <b>${gameVersion}</b></p>`);
+
+                    if (!!gameBreakingVersion) {
+
+                        if (gameVersion.localeCompare(gameBreakingVersion, undefined, { numeric: true, sensitivity: 'base' }) < 0) {
+
+                            const btnMenu = document.getElementById('btnMenu');
+                            const iconMenu = document.getElementById('iconMenu');
+
+                            btnMenu.classList.remove('btn-primary')
+                            btnMenu.classList.add('btn-danger')
+
+                            iconMenu.classList.remove('fa-bars');
+                            iconMenu.classList.add('fa-triangle-exclamation');
+
+                            $('#modalInfoBody').append(`<div class='alert alert-danger'>Version <b>${gameBreakingVersion}</b> of the game introduced breaking changes for the editor. It is very likely that most, if not all, of the editor features won't work for the current version. Please stand by, the issue has been acknowledged and fixes are on the way.</div>`);
+
+                        }
+
+                    }
+
                 }
 
             });
@@ -300,8 +330,8 @@
                     <div class="col-sm-auto m-2 ms-0 text-center">
 
                         <!-- Info -->
-                        <button type="button" class="btn btn-sm btn-primary mx-2 mx-sm-0" data-bs-toggle="modal" data-bs-target="#modalInfo" title="Menu">
-                            <i class="fa-solid fa-bars"></i>
+                        <button id="btnMenu" type="button" class="btn btn-sm btn-primary mx-2 mx-sm-0" data-bs-toggle="modal" data-bs-target="#modalInfo" title="Menu">
+                            <i id="iconMenu" class="fa-solid fa-bars"></i>
                         </button>
 
                         <!-- Load -->
