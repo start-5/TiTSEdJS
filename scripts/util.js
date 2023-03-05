@@ -257,6 +257,17 @@ const util = {
 
                 const parts = binding.split(': ');
 
+                if (parts.length > 2) {
+
+                    parts[1] += ': ';
+
+                    while (parts.length > 2) {
+                        parts[1] += parts[2];
+                        parts.splice(2, 1);
+                    }
+
+                }
+
                 const type = parts[0];
                 const declaration = parts[1];
 

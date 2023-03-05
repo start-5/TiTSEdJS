@@ -20,7 +20,7 @@ class StorageContainer {
         * @type {HTMLDivElement}
         */
         this.content = document.createElement('div');
-        this.content.classList.add('text-light', 'py-3', 'w-100');
+        this.content.classList.add('text-light', 'my-3', 'w-100');
         util.setKoBinding(this.content, 'foreach', `$root.${bindingSource}`);
 
 
@@ -56,6 +56,12 @@ class StorageContainer {
         util.setKoBinding(this.templateCheckboxLabel, 'class', `${koHas} ? 'fw-bold' : ''`);
 
 
+        // I don't think it'd be a good idea to use the storageName as an id because
+        // it might contain spaces and other weird characters so it'll use its index instead
+        util.setKoBinding(this.templateCheckbox, 'attr', `{ 'id': 'edit-${key}-' + $index() }`);
+        util.setKoBinding(this.templateCheckboxLabel, 'attr', `{ 'for': 'edit-${key}-' + $index() }`);
+
+
         /**
         * Templated paragraph (Tooltip)
         * @type {HTMLParagraphElement}
@@ -68,11 +74,13 @@ class StorageContainer {
 
         /**
         * Templated edit button
-        * @type {HTMLElement}
+        * @type {HTMLButtonElement}
         */
-        this.templateBtnEdit = document.createElement('i');
-        this.templateBtnEdit.classList.add('fa-solid', 'fa-pen-to-square', 'ms-3');
-        this.templateBtnEdit.role = 'button';
+        this.templateBtnEdit = document.createElement('button');
+        this.templateBtnEdit.type = 'button';
+        this.templateBtnEdit.title = 'Edit storage data';
+        this.templateBtnEdit.innerHTML = '<i class="fa-solid fa-pen-to-square"></i>';
+        this.templateBtnEdit.classList.add('btn', 'btn-sm', 'btn-secondary', 'ms-2', 'px-1', 'py-0');
         util.setKoBinding(this.templateBtnEdit, 'click', `(storage, fields) => $root.selectStorage($data, ${JSON.stringify(fields)})`);
 
 

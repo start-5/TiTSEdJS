@@ -61,7 +61,7 @@ class Row {
         * @type {HTMLDivElement}
         */
         this.content = document.createElement('div');
-        this.content.classList.add('row', 'py-3', 'mb-2', 'g-0');
+        this.content.classList.add('row', 'g-0');
 
         /**
         * Contains all the rows's groups
@@ -112,7 +112,7 @@ class Group {
         * @type {HTMLDivElement}
         */
         this.content = document.createElement('div');
-        this.content.classList.add('px-3');
+        this.content.classList.add('px-3', 'my-3');
 
         /**
         * The group's header

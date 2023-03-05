@@ -364,7 +364,7 @@ class SwitchField extends Field {
 
         super(root, key);
 
-        this.inputWrapper.className = 'form-check, form-switch';
+        this.inputWrapper.className = 'form-check form-switch';
 
         this.input.type = 'checkbox';
         this.input.role = 'switch';
@@ -455,8 +455,8 @@ class FlagField {
         */
         this.accordionBodyContainer = document.createElement('div');
         this.accordionBodyContainer.classList.add('accordion-collapse', 'collapse', 'show');
-        this.accordionBodyContainer.setAttribute('aria-labelledby', `#${this.accordionHeader.id}`);
-        this.accordionBodyContainer.setAttribute('data-bs-parent', `#${this.accordionHeader.id}`);
+        this.accordionBodyContainer.setAttribute('aria-labelledby', this.accordionHeader.id);
+        this.accordionBodyContainer.setAttribute('data-bs-parent', this.accordionHeader.id);
         this.accordionBodyContainer.id = `${this.content.id}-body`;
 
         this.accordionButton.setAttribute('aria-controls', this.accordionBodyContainer.id);
@@ -593,7 +593,7 @@ class ArrayField {
         */
         this.templateAccordionButton = document.createElement('button');
         this.templateAccordionButton.type = 'button';
-        this.templateAccordionButton.classList.add('accordion-button');
+        this.templateAccordionButton.classList.add('accordion-button', 'collapsed');
         this.templateAccordionButton.setAttribute('data-bs-toggle', 'collapse');
         this.templateAccordionButton.setAttribute('aria-expanded', 'false');
         util.setKoBinding(this.templateAccordionButton, 'text', `$root.${koDescript}($index)`);
@@ -614,8 +614,8 @@ class ArrayField {
         util.setKoBinding(this.templateAccordionBodyContainer, 'attr',
             `{
                 'id': 'edit-${key}-' + $index() + '-body',
-                'aria-labelledby': '#edit-${key}-' + $index() + '-header',
-                'data-bs-parent': '#edit-${key}-' + $index() + '-header'
+                'aria-labelledby': 'edit-${key}-' + $index() + '-header',
+                'data-bs-parent': 'edit-${key}-' + $index() + '-header'
             }`
         );
 

@@ -174,7 +174,7 @@
             // #region File handling
 
 
-            $('#btnLoadFile').attr('accept', fileExtension);
+            $('#inputLoadFile').attr('accept', fileExtension);
 
 
             // Drag and Drop listener
@@ -201,7 +201,7 @@
 
 
             // Input listener
-            $('#btnLoadFile').on('input', function () {
+            $('#inputLoadFile').on('input', function () {
 
                 const file = $(this).prop('files')[0];
 
@@ -290,39 +290,34 @@
                 <div id="divToolbar" class="bg-info row g-0">
 
                     <!-- File name -->
-                    <div class="col p-2">
+                    <div class="col m-2">
                         <div>
                             <label class="visually-hidden" for="inputSaveName">Save File Name</label>
                             <input type="text" class="form-control form-control-sm" id="inputSaveName" disabled data-bind="textInput: saveName, enable: saveLoaded" />
                         </div>
                     </div>
 
-                    <!-- Info -->
-                    <div class="col-sm-auto py-2 text-center">
+                    <div class="col-sm-auto m-2 ms-0 text-center">
 
-                        <button id="btnOpenAbout" type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalInfo"
-                                title="View more info">
-                            <i class="fa-solid fa-circle-info"></i>
+                        <!-- Info -->
+                        <button type="button" class="btn btn-sm btn-primary mx-2 mx-sm-0" data-bs-toggle="modal" data-bs-target="#modalInfo" title="Menu">
+                            <i class="fa-solid fa-bars"></i>
                         </button>
 
-                    </div>
-
-                    <!-- Load / Save -->
-                    <div class="col-sm-auto p-2 text-center">
-
-                        <div id="divLoadFile" class="d-inline-block">
-                            <button type="button" class="btn btn-sm btn-primary" onclick="btnLoadFile.click()">
+                        <!-- Load -->
+                        <div class="d-inline-block">
+                            <button type="button" class="btn btn-sm btn-primary" onclick="inputLoadFile.click()">
                                 <i class="fa-solid fa-upload"></i>  Load file
                             </button>
-                            <label class="visually-hidden" for="btnLoadFile">Load File</label>
-                            <input class="form-control" type="file" id="btnLoadFile" hidden="hidden">
+                            <label class="visually-hidden" for="inputLoadFile">Load File</label>
+                            <input class="form-control" type="file" id="inputLoadFile" hidden="hidden">
                         </div>
 
+                        <!-- Save -->
                         <div class="d-inline-block">
                             <button id="btnSaveFile" type="button" class="btn btn-sm btn-primary" disabled data-bind="enable: saveLoaded">
                                 <i class="fa-solid fa-floppy-disk"></i>  Save file
                             </button>
-                            <label class="visually-hidden" for="btnSaveFile">Save File</label>
                         </div>
 
                     </div>

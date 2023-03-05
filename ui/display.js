@@ -369,12 +369,12 @@ const display = {
         divBody.appendChild(new TextField('', 'obj.tooltip', 'Tooltip', { koVisible: 'fields.includes("tooltip")' }).build());
 
         divBody.appendChild(new NestedGroup([
-            new FloatField('', 'obj.value1', 'Value 1', { koVisible: 'fields.includes("value1")' }),
-            new FloatField('', 'obj.value2', 'Value 2', { koVisible: 'fields.includes("value2")' })
+            new FloatField('', 'obj.value1', 'Value 1', { min: null, koVisible: 'fields.includes("value1")' }),
+            new FloatField('', 'obj.value2', 'Value 2', { min: null, koVisible: 'fields.includes("value2")' })
         ]).build());
         divBody.appendChild(new NestedGroup([
-            new FloatField('', 'obj.value3', 'Value 3', { koVisible: 'fields.includes("value3")' }),
-            new FloatField('', 'obj.value4', 'Value 4', { koVisible: 'fields.includes("value4")' })
+            new FloatField('', 'obj.value3', 'Value 3', { min: null, koVisible: 'fields.includes("value3")' }),
+            new FloatField('', 'obj.value4', 'Value 4', { min: null, koVisible: 'fields.includes("value4")' })
         ]).build());
 
         divBody.appendChild(new NestedGroup([
