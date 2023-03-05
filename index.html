@@ -45,6 +45,7 @@
     <script>
 
         const fileExtension = '.json';
+        const maxChangeLogs = 5;
 
 
         window.onerror = function (evt, src, ln, col, err) {
@@ -146,6 +147,9 @@
 
             // #region Menu content
 
+
+            // #region About
+
             await getRepoFile('versions.json', data => {
 
                 const versionData = JSON.parse(data ?? '');
@@ -155,7 +159,7 @@
 
                 if (!!gameVersion) {
 
-                    $('#modalInfoBody').append(`<p>Supported game version: <b>${gameVersion}</b></p>`);
+                    $('#tabEditorAbout').append(`<p>Supported game version: <b>${gameVersion}</b></p>`);
 
                     if (!!gameBreakingVersion) {
 
@@ -170,7 +174,7 @@
                             iconMenu.classList.remove('fa-bars');
                             iconMenu.classList.add('fa-triangle-exclamation');
 
-                            $('#modalInfoBody').append(`<div class='alert alert-danger'>Version <b>${gameBreakingVersion}</b> of the game introduced breaking changes for the editor. It is very likely that most, if not all, of the editor features won't work for the current version. Please stand by, the issue has been acknowledged and fixes are on the way.</div>`);
+                            $('#tabEditorAbout').append(`<div class='alert alert-danger'>Version <b>${gameBreakingVersion}</b> of the game introduced breaking changes for the editor. It is very likely that most, if not all, of the editor features won't work for the current version. Please stand by, the issue has been acknowledged and fixes are on the way.</div>`);
 
                         }
 
@@ -181,20 +185,90 @@
             });
 
             await getRepoFile('README_DEPLOY.md', data => {
-                $('#modalInfoBody').append(data);
+                $('#tabEditorAbout').append(data);
             });
 
+            // #endregion
 
-            const showAboutOnPageLoad = localStorage.getItem('showAboutOnPageLoad') === '1';
-            const checkShowAboutOnLoad = $('#checkShowAboutOnLoad');
 
-            checkShowAboutOnLoad.prop('checked', showAboutOnPageLoad);
-            checkShowAboutOnLoad.on('change', function () {
-                localStorage.setItem('showAboutOnPageLoad', this.checked ? '1' : '0');
+            // #region Changelog
+
+            await getRepoFile('CHANGELOG.md', data => {
+
+                if (data) {
+
+                    const tabEditorChangelog = $('#tabEditorChangelog');
+
+                    try {
+
+                        const logs = data.split('##');
+                        if (logs.length) {
+
+                            logs.splice(0, 1);
+
+                            const logCount = logs.length;
+
+                            if (logs.length > maxChangeLogs) {
+                                logs.splice(maxChangeLogs);
+                            }
+
+                            const remainingLogCount = logCount - logs.length;
+
+                            for (var i = 0; i < logs.length; i++) {
+
+                                if (i > 0) {
+                                    tabEditorChangelog.append('<br/>');
+                                }
+
+                                const changes = logs[i].split('\n');
+                                for (var j = 0; j < changes.length; j++) {
+
+                                    var change = changes[j];
+
+                                    if (j === 0) {
+                                        tabEditorChangelog.append(`<h5><b>${change}</b></h5>`);
+                                        continue;
+                                    }
+
+                                    //if (change.startsWith('- ')) {
+                                    //    change = change.substr(2);
+                                    //}
+
+                                    tabEditorChangelog.append(`<p class='my-1 mx-3'>${change}</p>`);
+
+                                }
+
+                            }
+
+                            if (remainingLogCount > 0) {
+
+                                tabEditorChangelog.append(`<br/>`);
+                                tabEditorChangelog.append(`<p class='p-sm'>Showing the last ${maxChangeLogs} of ${logCount} total, click <a href='https://github.com/start-5/TiTS.JS-Save-Editor/blob/main/CHANGELOG.md' target='_blank'>here</a> to view all.</p>`);
+
+                            }
+
+                        }
+                    } catch (e) {
+                        tabEditorChangelog.append(`Error obtaining changelog:<br/><br/>${e}`);
+                    }
+
+                }
+
+            });
+
+            // #endregion
+
+
+            const showMenuOnPageLoad = localStorage.getItem('showMenuOnPageLoad') === '1';
+            const checkShowMenuOnLoad = $('#checkShowMenuOnLoad');
+
+            checkShowMenuOnLoad.prop('checked', showMenuOnPageLoad);
+            checkShowMenuOnLoad.on('change', function () {
+                localStorage.setItem('showMenuOnPageLoad', this.checked ? '1' : '0');
             })
 
-            if (showAboutOnPageLoad) {
-                $('#modalInfo').modal('show');
+            if (showMenuOnPageLoad) {
+                $('#modalMenu').modal('show');
             }
 
 
@@ -330,7 +404,7 @@
                     <div class="col-sm-auto m-2 ms-0 text-center">
 
                         <!-- Info -->
-                        <button id="btnMenu" type="button" class="btn btn-sm btn-primary mx-2 mx-sm-0" data-bs-toggle="modal" data-bs-target="#modalInfo" title="Menu">
+                        <button id="btnMenu" type="button" class="btn btn-sm btn-primary mx-2 mx-sm-0" data-bs-toggle="modal" data-bs-target="#modalMenu" title="Menu">
                             <i id="iconMenu" class="fa-solid fa-bars"></i>
                         </button>
 
@@ -425,24 +499,45 @@
     </div>
 
 
-    <div class="modal fade" id="modalInfo" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal fade" id="modalMenu" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content bg-secondary">
 
                 <div class="modal-header">
-                    <h5 class="modal-title">About</h5>
+                    <h5 class="modal-title">Menu</h5>
                     <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <div id="modalInfoBody" class="modal-body fs-6">
+
+                <div class="modal-body">
+
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="navEditorAbout" data-bs-toggle="tab" data-bs-target="#tabEditorAbout" type="button" role="tab" aria-controls="tabEditorAbout" aria-selected="true">About</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="navEditorChangelog" data-bs-toggle="tab" data-bs-target="#tabEditorChangelog" type="button" role="tab" aria-controls="tabEditorChangelog" aria-selected="false">Changelog</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="navEditorSettings" data-bs-toggle="tab" data-bs-target="#tabEditorSettings" type="button" role="tab" aria-controls="tabEditorSettings" aria-selected="false">Settings</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content p-2">
+                        <div class="tab-pane fade show active" id="tabEditorAbout" role="tabpanel" aria-labelledby="navEditorAbout"></div>
+                        <div class="tab-pane fade my-3" id="tabEditorChangelog" role="tabpanel" aria-labelledby="navEditorChangelog"></div>
+                        <div class="tab-pane fade" id="tabEditorSettings" role="tabpanel" aria-labelledby="navEditorSettings">
+                            Coming soon
+                        </div>
+                    </div>
 
                 </div>
+
 
                 <div class="modal-footer">
 
                     <div class="form-check form-switch me-4">
-                        <input id="checkShowAboutOnLoad" type="checkbox" role="switch" class="form-check-input storage-switch" />
-                        <label class="form-check-label ps-1" for="checkShowAboutOnLoad">Show on page load</label>
+                        <input id="checkShowMenuOnLoad" type="checkbox" role="switch" class="form-check-input storage-switch" />
+                        <label class="form-check-label ps-1" for="checkShowMenuOnLoad">Show on page load</label>
                     </div>
 
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
