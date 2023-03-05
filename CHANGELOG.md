@@ -3,6 +3,10 @@ This project does not adhere to any specific versioning system, it will always b
 However, it does help to have a coherent, chronological change log.
 
 ## 3/5/2023
+- Remove unrelated properties from flags list
+- Set empty flags to <code>undefined</code> instead of <code>null</code>
+- Add background color when hovering over flags and a separator to improve readability
+- 
 - Implement change log view in editor
 - Rename 'about' modal to menu and separate data into tabs
 
