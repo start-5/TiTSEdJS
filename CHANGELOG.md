@@ -2,6 +2,10 @@
 This project does not adhere to any specific versioning system, it will always be deployed as a "latest" version.
 However, it does help to have a coherent, chronological change log.
 
+## 3/5/2023
+- Implement change log view in editor
+- Rename 'about' modal to menu and separate data into tabs
+
 ## 3/4/2023
 - Re-design the internals of the editor's input field systems
 - Add missing id attributes to as many fields as possible
