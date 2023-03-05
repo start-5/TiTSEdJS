@@ -406,14 +406,19 @@ const display = {
     getFlags: () => {
 
         const divRoot = document.createElement('div');
-        util.setKoBinding(divRoot, 'foreach', '$root.save.flags.items');
+        util.setKoBinding(divRoot, 'foreach', '$root.stateFlagList');
+
+
+        const templateRootContainer = document.createElement('div');
+        templateRootContainer.classList.add('state-flag-container');
+
 
         const templateFlagContainer = document.createElement('div');
-        templateFlagContainer.classList.add('row', 'g-0');
+        templateFlagContainer.classList.add('row', 'g-0', 'py-2');
 
 
         const templateFlagNameContainer = document.createElement('div');
-        templateFlagNameContainer.classList.add('col-6');
+        templateFlagNameContainer.classList.add('col-6', 'd-flex', 'align-items-center', 'pe-1');
 
         const templateFlagName = document.createElement('label');
         templateFlagName.classList.add('text-break');
@@ -424,7 +429,7 @@ const display = {
 
 
         const templateFlagValueContainer = document.createElement('div');
-        templateFlagValueContainer.classList.add('col-6');
+        templateFlagValueContainer.classList.add('col-6', 'd-flex', 'align-items-center', 'ps-1');
 
         const templateFlagValue = document.createElement('input');
         templateFlagValue.type = 'text';
@@ -435,10 +440,17 @@ const display = {
         templateFlagValueContainer.appendChild(templateFlagValue);
 
 
+        const templateHorizontalLine = document.createElement('hr');
+        templateHorizontalLine.classList.add('m-0');
+
+
         templateFlagContainer.appendChild(templateFlagNameContainer);
         templateFlagContainer.appendChild(templateFlagValueContainer);
 
-        divRoot.appendChild(templateFlagContainer);
+        templateRootContainer.appendChild(templateFlagContainer);
+        templateRootContainer.appendChild(templateHorizontalLine);
+
+        divRoot.appendChild(templateRootContainer);
 
         return divRoot;
 

@@ -220,6 +220,11 @@ hr {
 }
 
 
+.state-flag-container:hover {
+    background-color: #8D31B040;
+}
+
+
 /* Disable iOS auto-zooming on input fields, this might take a few tries... */
 @media screen and (-webkit-min-device-pixel-ratio:0) and (max-width:992px) {
     select, input {

@@ -154,10 +154,6 @@ class Group {
                 this.content.appendChild(field.build());
 
             }
-
-            this.fields.forEach(field => {
-                this.content.appendChild(field.build());
-            });
         }
 
         return this.content;
