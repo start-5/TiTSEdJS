@@ -46,10 +46,17 @@ const path = require('path');
         * Iterate through all contents using a regex
         * @param {RegExp} regex
         * @param {Function} callback
+        * @param {Array<string>} names
         */
-        execRegexOnContents: function (regex, callback) {
+        execRegexOnContents: function (regex, callback, names = []) {
             for (var index = 0; index < contents.length; ++index) {
                 var content = contents[index];
+
+                if (names.length) {
+                    if (!names.some(n => content.includes(n))) {
+                        continue;
+                    }
+                }
 
                 var m;
                 while ((m = regex.exec(content)) !== null) {
@@ -974,76 +981,38 @@ const path = require('path');
 
     // #region Hair Styles
 
-
-    // #region Data
-
-    class HairClass {
-        constructor() {
-            this.displayName = '';
-            this.name = '';
-            this.desc = '';
-            this.extra = '';
-        }
-    }
-
-    function getHairVal(str, num) {
-        var value = 0;
-        if (nthIndex(str, '",', num) > 0) {
-            if (nthIndex(str, '",', num + 1) > 0) {
-                value = str.slice(nthIndex(str, '",', num) + 3, nthIndex(str, '",', num + 1));
-            }
-            else {
-                value = str.slice(nthIndex(str, '",', num) + 3, nthIndex(str, '",', 1));
-            }
-        } else {
-            value = str.slice(nthIndex(str, '"', num) + 2, nthIndex(str, '","', 1));
-        }
-        return value;
-    }
-
-    // #endregion
-
-
     console.log('\ngetting hair styles');
     const hairStylesStart = Date.now();
 
+
     var hairStyles = [];
 
-    (function () {
-        for (var index = 0; index < contents.length; ++index) {
-            var content = contents[index];
+    util.execRegexOnContents(/\.push\(\["([\S ][^)]+)[0-9]+\]\)/g, (match, groupIndex) => {
+        if (groupIndex == 1) {
 
-            // Only check Tavros (Ceria is the only hairdresser)
-            if (!content.includes('sourceMappingURL=content_tavros')) {
-                continue;
-            }
-            const regex = /\.(push)\(\[([\S ][^)]+[\S ][^)])\]\)/g;
+            const texts = match.split('"');
 
-            var m;
-            while ((m = regex.exec(content)) !== null) {
-                if (m.index === regex.lastIndex) {
-                    regex.lastIndex++;
-                }
+            const hairName = texts[0];
+            const hairValue = texts[2];
 
-                m.forEach((match, groupIndex) => {
-                    var hair = new HairClass();
+            hairStyles.push({
+                name: hairName,
+                value: hairValue
+            });
 
-                    if (groupIndex == 2 && (match.match(/\"/g) || []).length == 8 && !match.includes('+') && (match.match(/\,/g) || []).length >= 5) {
-                        hair.name = getHairVal(match, 0);
-                        hair.value = getHairVal(match, 1);
-                        hair.desc = getHairVal(match, 2);
-                        hair.extra = getHairVal(match, 3);
-
-                        hairStyles.push(hair);
-                    }
-                });
-            }
         }
-    })();
+    }, ['sourceMappingURL=content_tavros']);
 
-    hairStyles = hairStyles.filter((v, i, a) => a.findIndex(v2 => (v2 === v)) === i).sort();
+    // Default hair style
+    hairStyles.push({
+        name: 'Unstyled',
+        value: 'null'
+    });
+
+    hairStyles = hairStyles.sort((l, r) => l.value.localeCompare(r.value));
 
     obj.HairStyle = hairStyles;
+
 
     const hairStylesEnd = Date.now();
     util.printOperationTime('hair styles', hairStylesStart, hairStylesEnd);
@@ -1081,7 +1050,6 @@ const path = require('path');
             keyitems.splice(index, 1);
         }
     });
-
 
     // #endregion
 

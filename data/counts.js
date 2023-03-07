@@ -10,7 +10,7 @@ const Counts = {
         Class: 4,
         FluidType: 31,
         GenitalSpot: 4,
-        HairStyle: 23,
+        HairStyle: 24,
         HairType: 7,
         ItemFlag: 58,
         NippleType: 7,
