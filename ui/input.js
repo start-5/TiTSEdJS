@@ -96,11 +96,10 @@ class Field {
 
     /**
     * Resolve editor label
-    * @param {string} key
     * @param {string} labelText
     */
-    resolveLabel(key, labelText) {
-        this.input.id = `edit-${key}`;
+    resolveLabel(labelText) {
+        this.input.id = `edit-${util.getFullKey(this.root, this.key)}`;
         this.label.innerText = labelText;
         this.label.htmlFor = this.input.id;
     }
@@ -150,7 +149,7 @@ class Field {
     */
     resolveOnChanged(koChanged) {
         if (koChanged) {
-            util.setKoBinding(this.input, 'event', `{ 'change': $root.${koChanged} }`); //todo fix the event with index shit
+            util.setKoBinding(this.input, 'event', `{ 'change': $root.${koChanged} }`);
         }
     }
 
@@ -189,7 +188,7 @@ class TextField extends Field {
 
         this.resolveOptions(options);
 
-        this.resolveLabel(key, labelText);
+        this.resolveLabel(labelText);
 
     }
 }
@@ -232,7 +231,7 @@ class NumericField extends Field {
 
         this.resolveOptions(options);
 
-        this.resolveLabel(key, labelText);
+        this.resolveLabel(labelText);
 
         if (!isNaN(parseFloat(options.min))) {
             this.input.min = options.min;
@@ -340,7 +339,7 @@ class SelectField extends Field {
     * @param {string} labelText
     */
     resolveSelectLabel(key, labelText) {
-        this.select.id = `edit-${key}`;
+        this.select.id = `edit-${util.getFullKey(this.root, this.key)}`;
         this.label.innerText = labelText;
         this.label.htmlFor = this.select.id;
     }
@@ -374,7 +373,7 @@ class SwitchField extends Field {
 
         this.resolveOptions(options);
 
-        this.resolveLabel(key, labelText);
+        this.resolveLabel(labelText);
 
         this.label.classList.add('form-check-label');
         this.inputWrapper.appendChild(this.label);
@@ -411,13 +410,16 @@ class FlagField {
         this.key = key;
 
 
+        const fullKey = util.getFullKey(this.root, this.key);
+
+
         /**
         * Contains all the field content
         * @type {HTMLDivElement}
         */
         this.content = document.createElement('div');
         this.content.classList.add('accordion', 'w-100', 'pt-2', 'my-3');
-        this.content.id = `edit-${key}`;
+        this.content.id = `edit-${fullKey}`;
 
 
         /**
@@ -492,7 +494,7 @@ class FlagField {
         util.setKoBinding(this.templateCheckbox, 'checked', `$parent.${util.getObjPath(root, key)}`);
         util.setKoBinding(this.templateCheckbox, 'checkedValue', 'value');
         util.setKoBinding(this.templateCheckbox, 'enable', '$root.saveLoaded');
-        util.setKoBinding(this.templateCheckbox, 'attr', `{ 'id': 'edit-${key}-' + $data.value }`);
+        util.setKoBinding(this.templateCheckbox, 'attr', `{ 'id': 'edit-${fullKey}-' + $data.value }`);
 
         if (options.koChanged) {
             util.setKoBinding(this.templateCheckbox, 'event', `{ change: ${options.koChanged} }`);
@@ -506,7 +508,7 @@ class FlagField {
         this.templateCheckboxLabel = document.createElement('label');
         this.templateCheckboxLabel.classList.add('form-check-label', 'label-sm');
         util.setKoBinding(this.templateCheckboxLabel, 'text', 'name');
-        util.setKoBinding(this.templateCheckboxLabel, 'attr', `{ 'for': 'edit-${key}-' + $data.value }`);
+        util.setKoBinding(this.templateCheckboxLabel, 'attr', `{ 'for': 'edit-${fullKey}-' + $data.value }`);
 
 
         this.templateContainer.appendChild(this.templateCheckbox);
@@ -561,6 +563,9 @@ class ArrayField {
         this.key = key;
 
 
+        const fullKey = util.getFullKey(this.root, this.key);
+
+
         /**
         * Contains all the field content
         * @type {HTMLDivElement}
@@ -584,7 +589,7 @@ class ArrayField {
         */
         this.templateAccordionHeader = document.createElement('h6');
         this.templateAccordionHeader.classList.add('accordion-header');
-        util.setKoBinding(this.templateAccordionHeader, 'attr', `{ id: 'edit-${key}-' + $index() + '-header' }`);
+        util.setKoBinding(this.templateAccordionHeader, 'attr', `{ id: 'edit-${fullKey}-' + $index() + '-header' }`);
 
 
         /**
@@ -599,8 +604,8 @@ class ArrayField {
         util.setKoBinding(this.templateAccordionButton, 'text', `$root.${koDescript}($index)`);
         util.setKoBinding(this.templateAccordionButton, 'attr',
             `{
-                'aria-controls': 'edit-${key}-' + $index() + '-body',
-                'data-bs-target': '#edit-${key}-' + $index() + '-body'
+                'aria-controls': 'edit-${fullKey}-' + $index() + '-body',
+                'data-bs-target': '#edit-${fullKey}-' + $index() + '-body'
              }`
         );
 
@@ -613,9 +618,9 @@ class ArrayField {
         this.templateAccordionBodyContainer.classList.add('accordion-collapse', 'collapse');
         util.setKoBinding(this.templateAccordionBodyContainer, 'attr',
             `{
-                'id': 'edit-${key}-' + $index() + '-body',
-                'aria-labelledby': 'edit-${key}-' + $index() + '-header',
-                'data-bs-parent': 'edit-${key}-' + $index() + '-header'
+                'id': 'edit-${fullKey}-' + $index() + '-body',
+                'aria-labelledby': 'edit-${fullKey}-' + $index() + '-header',
+                'data-bs-parent': 'edit-${fullKey}-' + $index() + '-header'
             }`
         );
 
@@ -654,11 +659,11 @@ class ArrayField {
 
             if (field instanceof NestedGroup) {
                 field.fields.forEach(nestedField => {
-                    this.resolveArrayFieldID(key, nestedField);
+                    this.resolveArrayFieldID(fullKey, nestedField);
                 });
             }
             else {
-                this.resolveArrayFieldID(key, field);
+                this.resolveArrayFieldID(fullKey, field);
             }
 
             const content = field.build();

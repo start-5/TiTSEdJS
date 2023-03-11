@@ -5,6 +5,8 @@
 
 const key_char = 'selectedCharacter().obj';
 const key_butt = key_char + '.ass';
+const key_tailP = key_char + '.tailCock';
+const key_tailV = key_char + '.tailCunt';
 
 const key_save = 'save';
 const key_flags = key_save + '.flags';
@@ -169,10 +171,6 @@ const display = {
                         new IntegerField(key_char, 'hipRatingMod', 'Hip Rating Modifier')
                     ]),
                     new NestedGroup([
-                        new IntegerField(key_char, 'buttRatingRaw', 'Butt Rating Raw'),
-                        new IntegerField(key_char, 'buttRatingMod', 'Butt Rating Modifier')
-                    ]),
-                    new NestedGroup([
                         new IntegerField(key_char, 'bellyRatingRaw', 'Belly Rating Raw'),
                         new IntegerField(key_char, 'bellyRatingMod', 'Belly Rating Modifier')
                     ]),
@@ -185,6 +183,24 @@ const display = {
                     new TextField(key_char, 'furColor', 'Fur Color'),
                     new TextField(key_char, 'scaleColor', 'Scale Color'),
                     new FlagField(key_char, 'skinFlags', 'ValidFlags.Skin', 'Skin Flags'),
+                ]),
+                new Group('Butt', [
+                    new SwitchField(key_char, 'analVirgin', 'Anal Virgin'),
+                    new NestedGroup([
+                        new IntegerField(key_char, 'buttRatingRaw', 'Butt Rating Raw'),
+                        new IntegerField(key_char, 'buttRatingMod', 'Butt Rating Modifier')
+                    ]),
+                    new IntegerField(key_butt, 'bonusCapacity', 'Bonus Capacity'),
+                    new IntegerField(key_butt, 'minLooseness', 'Minimum Looseness'),
+                    new NestedGroup([
+                        new IntegerField(key_butt, 'loosenessRaw', 'Looseness Raw'),
+                        new IntegerField(key_butt, 'loosenessMod', 'Looseness Modifier')
+                    ]),
+                    new NestedGroup([
+                        new IntegerField(key_butt, 'wetnessRaw', 'Wetness Raw'),
+                        new IntegerField(key_butt, 'wetnessMod', 'Wetness Modifier')
+                    ]),
+                    new FlagField(key_butt, 'flags', 'ValidFlags.Butt', 'Butt Flags')
                 ])
             ]),
             new Row([
@@ -200,27 +216,6 @@ const display = {
                     new SelectField(key_char, 'legType', 'ValidTypes.Leg', 'Leg Type'),
                     new IntegerField(key_char, 'legCount', 'Leg Count'),
                     new FlagField(key_char, 'legFlags', 'ValidFlags.Leg', 'Leg Flags')
-                ])
-            ]),
-            new Row([
-                new Group('Butt', [
-                    new SwitchField(key_char, 'analVirgin', 'Anal Virgin'),
-                    new IntegerField(key_butt, 'minLooseness', 'Minimum Looseness'),
-                    new IntegerField(key_butt, 'bonusCapacity', 'Bonus Capacity'),
-                    new FlagField(key_butt, 'flags', 'ValidFlags.Butt', 'Butt Flags'),
-                    new NestedGroup([
-                        new IntegerField(key_butt, 'loosenessRaw', 'Looseness Raw'),
-                        new IntegerField(key_butt, 'loosenessMod', 'Looseness Modifier')
-                    ]),
-                    new NestedGroup([
-                        new IntegerField(key_butt, 'wetnessRaw', 'Wetness Raw'),
-                        new IntegerField(key_butt, 'wetnessMod', 'Wetness Modifier')
-                    ])
-                ]),
-                new Group('Tail', [
-                    new SelectField(key_char, 'tailType', 'ValidTypes.Tail', 'Tail Type'),
-                    new IntegerField(key_char, 'tailCount', 'Tail Count'),
-                    new FlagField(key_char, 'tailFlags', 'ValidFlags.Tail', 'Tail Flags')
                 ])
             ]),
             new Row([
@@ -251,6 +246,50 @@ const display = {
                         new FlagField('', 'areolaFlags', 'ValidFlags.Areola', 'Areola Flags')
                     ])
                 ])
+            ]),
+            new Row([
+                new Group('Tail', [
+                    new SelectField(key_char, 'tailType', 'ValidTypes.Tail', 'Tail Type'),
+                    new IntegerField(key_char, 'tailCount', 'Tail Count'),
+                    new FlagField(key_char, 'tailFlags', 'ValidFlags.Tail', 'Tail Flags')
+                ]),
+                new Group('Tail Penis', [
+                    new SwitchField(key_tailP, 'virgin', 'Virgin'),
+                    new NestedGroup([
+                        new FloatField(key_tailP, 'cLengthRaw', 'Length Raw'),
+                        new FloatField(key_tailP, 'cLengthMod', 'Length Modifier'),
+                    ]),
+                    new NestedGroup([
+                        new FloatField(key_tailP, 'cThicknessRatioRaw', 'Thickness Ratio Raw'),
+                        new FloatField(key_tailP, 'cThicknessRatioMod', 'Thickness Ratio Modifier'),
+                    ]),
+                    new SelectField(key_tailP, 'cType', 'ValidTypes.Penis', 'Type'),
+                    new TextField(key_tailP, 'cockColor', 'Color'),
+                    new FloatField(key_tailP, 'knotMultiplier', 'Knot Multiplier'),
+                    new FloatField(key_tailP, 'flaccidMultiplier', 'Flaccid Multiplier'),
+                    new FlagField(key_tailP, 'flags', 'ValidFlags.Penis', 'Flags')
+                    //todo piercing
+                ]),
+                new Group('Tail Vagina', [
+                    new SwitchField(key_tailV, 'hymen', 'Hymen'),
+                    new IntegerField(key_tailV, 'minLooseness', 'Minimum Looseness'),
+                    new NestedGroup([
+                        new IntegerField(key_tailV, 'loosenessRaw', 'Looseness Raw'),
+                        new IntegerField(key_tailV, 'loosenessMod', 'Looseness Modifier')
+                    ]),
+                    new NestedGroup([
+                        new IntegerField(key_tailV, 'wetnessRaw', 'Wetness Raw'),
+                        new IntegerField(key_tailV, 'wetnessMod', 'Wetness Modifier')
+                    ]),
+                    new IntegerField(key_tailV, 'bonusCapacity', 'Bonus Capacity'),
+                    new SelectField(key_tailV, 'type', 'ValidTypes.Vagina', 'Type'),
+                    new TextField(key_tailV, 'vaginaColor', 'Color'),
+                    new IntegerField(key_tailV, 'clits', 'Clits', { min: 1 }),
+                    new FloatField(key_tailV, 'fullness', 'Fullness'),
+                    new IntegerField(key_tailV, 'shrinkCounter', 'Shrink Counter'),
+                    new FlagField(key_tailV, 'flags', 'ValidFlags.Vagina', 'Flags')
+                    //todo piercing
+                ])
             ])
         ]).build();
     },
@@ -259,6 +298,7 @@ const display = {
         return new Tab([
             new Row([
                 new Group('Male Organs', [
+                    new SwitchField(key_char, 'cockVirgin', 'Penis Virgin'),
                     new IntegerField(key_char, 'balls', 'Balls'),
                     new NestedGroup([
                         new FloatField(key_char, 'ballSizeRaw', 'Ball Size Raw'),
@@ -275,11 +315,11 @@ const display = {
                     new NestedGroup([
                         new FloatField(key_char, 'cumQualityRaw', 'Cum Quality Raw'),
                         new IntegerField(key_char, 'cumQualityMod', 'Cum Quality Modifier')
-                    ]),
-                    new SwitchField(key_char, 'cockVirgin', 'Penis Virgin')
+                    ])
                 ]),
                 new ArrayGroup('Penises', 'addPenis', [
                     new ArrayField(key_char, 'cocks', 'getPenisName', 'removePenis', [
+                        new SwitchField('', 'virgin', 'Virgin'),
                         new NestedGroup([
                             new FloatField('', 'cLengthRaw', 'Length Raw'),
                             new FloatField('', 'cLengthMod', 'Length Modifier'),
@@ -292,7 +332,6 @@ const display = {
                         new TextField('', 'cockColor', 'Color'),
                         new FloatField('', 'knotMultiplier', 'Knot Multiplier'),
                         new FloatField('', 'flaccidMultiplier', 'Flaccid Multiplier'),
-                        new SwitchField('', 'virgin', 'Virgin'),
                         new FlagField('', 'flags', 'ValidFlags.Penis', 'Flags')
                         //todo piercing
                     ])
@@ -300,6 +339,7 @@ const display = {
             ]),
             new Row([
                 new Group('Female Organs', [
+                    new SwitchField(key_char, 'vaginalVirgin', 'Vaginal Virgin'),
                     new NestedGroup([
                         new FloatField(key_char, 'fertilityRaw', 'Fertility Raw'),
                         new IntegerField(key_char, 'fertilityMod', 'Fertility Modifier')
@@ -309,11 +349,11 @@ const display = {
                         new FloatField(key_char, 'girlCumMultiplierRaw', 'Cum Multiplier Raw'),
                         new IntegerField(key_char, 'girlCumMultiplierMod', 'Cum Multiplier Modifier')
                     ]),
-                    new FloatField(key_char, 'clitLength', 'Clit Length'),
-                    new SwitchField(key_char, 'vaginalVirgin', 'Vaginal Virgin')
+                    new FloatField(key_char, 'clitLength', 'Clit Length')
                 ]),
                 new ArrayGroup('Vaginas', 'addVagina', [
                     new ArrayField(key_char, 'vaginas', 'getVaginaName', 'removeVagina', [
+                        new SwitchField('', 'hymen', 'Hymen'),
                         new IntegerField('', 'minLooseness', 'Minimum Looseness'),
                         new NestedGroup([
                             new IntegerField('', 'loosenessRaw', 'Looseness Raw'),
@@ -329,7 +369,6 @@ const display = {
                         new IntegerField('', 'clits', 'Clits', { min: 1 }),
                         new FloatField('', 'fullness', 'Fullness'),
                         new IntegerField('', 'shrinkCounter', 'Shrink Counter'),
-                        new SwitchField('', 'hymen', 'Hymen'),
                         new FlagField('', 'flags', 'ValidFlags.Vagina', 'Flags')
                         //todo piercing
                     ])

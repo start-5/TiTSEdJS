@@ -23,6 +23,10 @@
 </ol>
 
 <p>
+  For more in-depth information, please see the <a href="https://github.com/start-5/TiTS.JS-Save-Editor/wiki/How-to-use">wiki</a>.
+</p>
+
+<p>
   Since it’s hosted online, the page will always display the latest version of the editor.
 </p>
 
