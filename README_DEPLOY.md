@@ -17,6 +17,9 @@
   <li>Click the "Save File" button to save your changes, which will download another file with the modified data.</li>
   <li>In the game, use the "Load from File" option and select the modified file.</li>
 </ol>
+<p>
+  For more in-depth information, please see the <a href="https://github.com/start-5/TiTS.JS-Save-Editor/wiki/How-to-use" target="_blank">wiki</a>.
+</p>
 
 <h3 class="mt-4">Issues/Requests</h3>
 <p>

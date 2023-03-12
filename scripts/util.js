@@ -315,6 +315,21 @@ const util = {
     */
     getObjPath(root, key) {
         return root + (root ? '.' : '') + key;
+    },
+
+    /**
+    * Get a unique string representation of the game data key being modified
+    * @param {string} root
+    * @param {string} key
+    */
+    getFullKey(root, key) {
+
+        if (root) {
+            return root.split('.').slice(-1)[0] + '-' + key;
+        }
+
+        return key;
+
     }
 
 };
