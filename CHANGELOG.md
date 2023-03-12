@@ -2,6 +2,9 @@
 This project does not adhere to any specific versioning system, it will always be deployed as a "latest" version.
 However, it does help to have a coherent, chronological change log.
 
+## 3/12/2023
+- Add tooltip support to groups and labels
+
 ## 3/11/2023
 - Add more tail editing
 - Reorder some groups/fields to make flow more cohesive

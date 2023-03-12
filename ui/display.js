@@ -261,7 +261,7 @@ const display = {
                     ]),
                     new NestedGroup([
                         new FloatField(key_tailP, 'cThicknessRatioRaw', 'Thickness Ratio Raw'),
-                        new FloatField(key_tailP, 'cThicknessRatioMod', 'Thickness Ratio Modifier'),
+                        new FloatField(key_tailP, 'cThicknessRatioMod', 'Thickness Ratio Mod'),
                     ]),
                     new SelectField(key_tailP, 'cType', 'ValidTypes.Penis', 'Type'),
                     new TextField(key_tailP, 'cockColor', 'Color'),
@@ -269,7 +269,7 @@ const display = {
                     new FloatField(key_tailP, 'flaccidMultiplier', 'Flaccid Multiplier'),
                     new FlagField(key_tailP, 'flags', 'ValidFlags.Penis', 'Flags')
                     //todo piercing
-                ]),
+                ], { tooltipText: 'Must have at least 1 tail and the "Tailcock" tail flag set for this to have an effect.' }),
                 new Group('Tail Vagina', [
                     new SwitchField(key_tailV, 'hymen', 'Hymen'),
                     new IntegerField(key_tailV, 'minLooseness', 'Minimum Looseness'),
@@ -289,7 +289,7 @@ const display = {
                     new IntegerField(key_tailV, 'shrinkCounter', 'Shrink Counter'),
                     new FlagField(key_tailV, 'flags', 'ValidFlags.Vagina', 'Flags')
                     //todo piercing
-                ])
+                ], { tooltipText: 'Must have at least 1 tail and the "Tailcunt" tail flag set for this to have an effect.' })
             ])
         ]).build();
     },
@@ -326,7 +326,7 @@ const display = {
                         ]),
                         new NestedGroup([
                             new FloatField('', 'cThicknessRatioRaw', 'Thickness Ratio Raw'),
-                            new FloatField('', 'cThicknessRatioMod', 'Thickness Ratio Modifier'),
+                            new FloatField('', 'cThicknessRatioMod', 'Thickness Ratio Mod'),
                         ]),
                         new SelectField('', 'cType', 'ValidTypes.Penis', 'Type'),
                         new TextField('', 'cockColor', 'Color'),
