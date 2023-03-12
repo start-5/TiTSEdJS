@@ -1,12 +1,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 
+
 /**
  * @typedef {Object} FieldOptions
  * @property {string} [suffixText] Text to show in the input's suffix area
  * @property {boolean} [pcOnly] Whether this field should apply to the PC only
  * @property {string} [koChanged] KO func to run when the field's value changes
  * @property {string} [koVisible] KO func to run to determine whether the field should be visible
+ * @property {string} [tooltipText] Text to show as a tooltip
  */
 
 
@@ -16,6 +18,7 @@
  * @property {boolean} [pcOnly] Whether this field should apply to the PC only
  * @property {string} [koChanged] KO func to run when the field's value changes
  * @property {string} [koVisible] KO func to run to determine whether the field should be visible
+ * @property {string} [tooltipText] Text to show as a tooltip
  * @property {number} [min] The minimum value allowed for the field
  * @property {number} [max] The maximum value allowed for the field
  */
@@ -105,6 +108,29 @@ class Field {
     }
 
     /**
+    * Resolve editor tooltip
+    * @param {string} tooltipText
+    */
+    resolveTooltip(tooltipText) {
+
+        if (tooltipText) {
+
+            const btnTooltip = document.createElement('button');
+            btnTooltip.type = 'button';
+            btnTooltip.innerHTML = '<i class="fa-regular fa-circle-question"></i>';
+            btnTooltip.classList.add('btn', 'btn-sm', 'btn-secondary', 'ms-1', 'py-0', 'px-1');
+            btnTooltip.setAttribute('data-bs-toggle', 'tooltip');
+            btnTooltip.setAttribute('data-bs-placement', 'right');
+            btnTooltip.setAttribute('data-container', 'body');
+            btnTooltip.title = tooltipText;
+
+            this.content.insertBefore(btnTooltip, this.inputWrapper);
+
+        }
+
+    }
+
+    /**
     * Resolve editor suffix
     * @param {string} suffixText
     */
@@ -129,6 +155,7 @@ class Field {
             this.resolvePcOnly(options.pcOnly);
             this.resolveSuffix(options.suffixText);
             this.resolveOnChanged(options.koChanged);
+            this.resolveTooltip(options.tooltipText);
         }
     }
 

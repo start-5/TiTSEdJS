@@ -12,6 +12,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?">
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://kit.fontawesome.com/f5341e91eb.js"></script>
 
@@ -145,6 +146,108 @@
             });
 
 
+            // #region File handling
+
+
+            $('#inputLoadFile').attr('accept', fileExtension);
+
+
+            // Drag and Drop listener
+            $('body').on('dragenter dragleave dragover', e => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            $('body').on('drop', e => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (!e.dataTransfer) {
+                    e.dataTransfer = e.originalEvent.dataTransfer;
+                }
+
+                if (!e.dataTransfer || !e.dataTransfer.files || e.dataTransfer.files.length == 0) {
+                    alert('Error loading dropped file, please try again.');
+                }
+                else {
+                    const file = e.dataTransfer.files[0];
+                    loadFile(file);
+                }
+            });
+
+
+            // Input listener
+            $('#inputLoadFile').on('input', function () {
+
+                const file = $(this).prop('files')[0];
+
+                if (!file) {
+                    alert('Error loading the file, please try again.');
+                }
+                else {
+                    loadFile(file);
+                }
+
+            });
+
+
+            // Save
+            $('#btnSaveFile').on('click', () => {
+
+                var saveObj = ko.mapping.toJS(vm.save);
+                if (!saveObj.saveEdited) {
+                    saveObj.saveEdited = true;
+                }
+
+                const blob = new Blob([JSON.stringify(saveObj)], { type: 'text/json' });
+
+                var fileName = vm.saveName() || vm.originalSaveName();
+                if (!fileName) {
+                    fileName = "unnamed";
+                }
+
+                saveAs(blob, fileName + fileExtension);
+
+            });
+
+
+            // Prevent saving a file with an empty file name
+            $('#inputSaveName').on('change', function () {
+
+                const name = $(this).val();
+
+                if (name.length < 1) {
+                    vm.saveName(vm.originalSaveName());
+                }
+
+            });
+
+
+            // #endregion
+
+
+            // #region Display
+
+            $('#tabGame').append(display.getGame());
+            $('#tabStats').append(display.getStats());
+            $('#tabHead').append(display.getHead());
+            $('#tabBody').append(display.getBody());
+            $('#tabCrotch').append(display.getCrotch());
+            $('#tabPerks').append(display.getPerks());
+            $('#tabStatusEffects').append(display.getStatusEffects());
+            $('#tabFlags').append(display.getFlags());
+            $('#tabKeyItems').append(display.getKeyItems());
+
+            $('#modalStorageBody').append(display.getStoragePopup());
+
+            $('#tabInventory').append('<p>Low priority, this can be achieved through the game cheat menu.</p>');
+
+            $('[data-bs-toggle="tooltip"]').tooltip()
+
+            $('#content').show();
+
+            // #endregion
+
+
             // #region Menu content
 
 
@@ -159,7 +262,7 @@
 
                 if (!!gameVersion) {
 
-                    $('#tabEditorAbout').append(`<p>Supported game version: <b>${gameVersion}</b></p>`);
+                    $('#tabEditorAbout').append(`<p class="mt-4">Supported game version: <b>${gameVersion}</b></p>`);
 
                     if (!!gameBreakingVersion) {
 
@@ -271,107 +374,6 @@
                 $('#modalMenu').modal('show');
             }
 
-
-            // #endregion
-
-
-            // #region File handling
-
-
-            $('#inputLoadFile').attr('accept', fileExtension);
-
-
-            // Drag and Drop listener
-            $('body').on('dragenter dragleave dragover', e => {
-                e.preventDefault();
-                e.stopPropagation();
-            });
-            $('body').on('drop', e => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                if (!e.dataTransfer) {
-                    e.dataTransfer = e.originalEvent.dataTransfer;
-                }
-
-                if (!e.dataTransfer || !e.dataTransfer.files || e.dataTransfer.files.length == 0) {
-                    alert('Error loading dropped file, please try again.');
-                }
-                else {
-                    const file = e.dataTransfer.files[0];
-                    loadFile(file);
-                }
-            });
-
-
-            // Input listener
-            $('#inputLoadFile').on('input', function () {
-
-                const file = $(this).prop('files')[0];
-
-                if (!file) {
-                    alert('Error loading the file, please try again.');
-                }
-                else {
-                    loadFile(file);
-                }
-
-            });
-
-
-            // Save
-            $('#btnSaveFile').on('click', () => {
-
-                var saveObj = ko.mapping.toJS(vm.save);
-                if (!saveObj.saveEdited) {
-                    saveObj.saveEdited = true;
-                }
-
-                const blob = new Blob([JSON.stringify(saveObj)], { type: 'text/json' });
-
-                var fileName = vm.saveName() || vm.originalSaveName();
-                if (!fileName) {
-                    fileName = "unnamed";
-                }
-
-                saveAs(blob, fileName + fileExtension);
-
-            });
-
-
-            // Prevent saving a file with an empty file name
-            $('#inputSaveName').on('change', function () {
-
-                const name = $(this).val();
-
-                if (name.length < 1) {
-                    vm.saveName(vm.originalSaveName());
-                }
-
-            });
-
-
-            // #endregion
-
-
-            // #region Display
-
-            $('#tabGame').append(display.getGame());
-            $('#tabStats').append(display.getStats());
-            $('#tabHead').append(display.getHead());
-            $('#tabBody').append(display.getBody());
-            $('#tabCrotch').append(display.getCrotch());
-            $('#tabPerks').append(display.getPerks());
-            $('#tabStatusEffects').append(display.getStatusEffects());
-            $('#tabFlags').append(display.getFlags());
-            $('#tabKeyItems').append(display.getKeyItems());
-
-            $('#modalStorageBody').append(display.getStoragePopup());
-
-            $('#tabInventory').append('<p>Low priority, this can be achieved through the game cheat menu.</p>');
-
-
-            $('#content').show();
 
             // #endregion
 
@@ -509,7 +511,7 @@
                 </div>
 
 
-                <div class="modal-body">
+                <div class="modal-body p-0">
 
                     <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item" role="presentation">
@@ -522,7 +524,7 @@
                             <button class="nav-link" id="navEditorSettings" data-bs-toggle="tab" data-bs-target="#tabEditorSettings" type="button" role="tab" aria-controls="tabEditorSettings" aria-selected="false">Settings</button>
                         </li>
                     </ul>
-                    <div class="tab-content p-2">
+                    <div class="tab-content px-3">
                         <div class="tab-pane fade show active" id="tabEditorAbout" role="tabpanel" aria-labelledby="navEditorAbout"></div>
                         <div class="tab-pane fade my-3" id="tabEditorChangelog" role="tabpanel" aria-labelledby="navEditorChangelog"></div>
                         <div class="tab-pane fade" id="tabEditorSettings" role="tabpanel" aria-labelledby="navEditorSettings">

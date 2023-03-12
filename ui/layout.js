@@ -3,6 +3,12 @@
 
 
 /**
+ * @typedef {Object} GroupOptions
+ * @property {string} [tooltipText] Text to show as a tooltip
+*/
+
+
+/**
 * An editor tab 
 */
 class Tab {
@@ -104,8 +110,9 @@ class Group {
     * Creates an editor group with the specified title and fields
     * @param {string} titleText
     * @param {Array<Field>} fields
+    * @param {GroupOptions} options
     */
-    constructor(titleText, fields) {
+    constructor(titleText, fields, options = {}) {
 
         /**
         * Contains all the group content
@@ -120,6 +127,19 @@ class Group {
         */
         this.header = document.createElement('h3');
         this.header.textContent = titleText;
+
+        if (options.tooltipText) {
+
+            const btnTooltip = document.createElement('button');
+            btnTooltip.type = 'button';
+            btnTooltip.innerHTML = '<i class="fa-solid fa-question"></i>';
+            btnTooltip.classList.add('btn', 'btn-sm', 'btn-primary', 'ms-2', 'py-1');
+            btnTooltip.setAttribute('data-bs-toggle', 'tooltip');
+            btnTooltip.setAttribute('data-bs-placement', 'top');
+            btnTooltip.title = options.tooltipText;
+
+            this.header.appendChild(btnTooltip);
+        }
 
         /**
         * Contains all the group's fields
@@ -172,10 +192,11 @@ class ArrayGroup extends Group {
     * @param {string} titleText
     * @param {string} koAdd
     * @param {Array<Field>} fields
+    * @param {GroupOptions} options
     */
-    constructor(titleText, koAdd, fields) {
+    constructor(titleText, koAdd, fields, options = {}) {
 
-        super(titleText, fields);
+        super(titleText, fields, options);
 
         /**
         * The array group's add button
