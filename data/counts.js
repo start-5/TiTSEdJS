@@ -19,6 +19,7 @@ const Counts = {
         StatusEffectShades: 16,
         TailGenital: 4,
         Upbringing: 6,
+        ValidColors: { Skin: 66 },
         ValidFlags: {
             Areola: 4,
             Arm: 15,
