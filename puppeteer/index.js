@@ -14,7 +14,6 @@ const path = require('path');
 
 
 // Observations:
-
 // Perks are part of the StorageClass class, from what I saw, they are not globally defined, they are instantiated and added to characters on demand.
 // You could create a "custom" perk with whatever value and the game would count it as valid, but to actually have an effect it
 // would need to be checked at some point with this.hasPerk, otherwise it just sits there.
@@ -676,10 +675,8 @@ const path = require('path');
     * @param {RegExp} regex
     */
     function getValidBodyTypesDefault(regex) {
-        return getValidBodyParts('BodyType', regex, (match, groupIndex) => {
-            return groupIndex == 2 && match.toLocaleLowerCase() !== 'kaithrit';
-            // For whatever reason, the game sets the 'TYPE_KAITHRIT' type for the [Kui-Tan Lt, XO Defender, XO Gunner] creatures
-            // even though 'GLOBAL.TYPE_KAITHRIT' doesn't exist
+        return getValidBodyParts('BodyType', regex, (_, groupIndex) => {
+            return groupIndex == 2;
         });
     }
 
@@ -688,11 +685,8 @@ const path = require('path');
     * @param {RegExp} regex
     */
     function getValidBodyTypesForArray(regex) {
-        return getValidBodyParts('BodyType', regex, (match, groupIndex, matches) => {
-            return ((!matches[4] && groupIndex == 2) || (matches[4] && groupIndex == 4)) && match.toLocaleLowerCase() !== 'kaithrit';
-            // 2 => simple check, 4 => array check
-            // For whatever reason, the game sets the 'TYPE_KAITHRIT' type for the [Kui-Tan Lt, XO Defender, XO Gunner] creatures
-            // even though 'GLOBAL.TYPE_KAITHRIT' doesn't exist
+        return getValidBodyParts('BodyType', regex, (_, groupIndex, matches) => {
+            return ((!matches[4] && groupIndex == 2) || (matches[4] && groupIndex == 4)); // 2 => simple check, 4 => array check
         });
     }
 
@@ -734,12 +728,6 @@ const path = require('path');
     // Array assignment|equality checks
     obj.ValidTypes.Penis = getValidBodyTypesForArray(getTypeCheckForArrayRegex('Cock', 'cocks', 'cType'));
     obj.ValidTypes.Vagina = getValidBodyTypesForArray(getTypeCheckForArrayRegex('Vagina', 'vaginas'));
-
-    // Other
-
-
-    // TODO:
-    // dNip - should be the same as pen but should check to be sure
 
 
     const validBodyTypesEnd = Date.now();
@@ -1055,9 +1043,61 @@ const path = require('path');
 
     // haha, yet again another system that relies on string comparisons that aren't defined anywhere (except for skin)
 
+    /**
+    * Get valid colors, using regex and boolean callback
+    * @param {RegExp} regex
+    * @param {Function} callback
+    */
+    function getValidColors(regex, callback) {
+
+        var validColors = [];
+
+        util.execRegexOnContents(regex, (match, groupIndex, matches) => {
+            if (callback(match, groupIndex, matches)) {
+                validColors.push(match);
+            }
+        });
+
+        validColors = validColors
+            .filter((color, index, self) => self.findIndex(color2 => (color2 === color)) === index)
+            .sort((l, r) => l.localeCompare(r));
+
+        return validColors;
+
+    }
+
+    /**
+    * Get valid colors using the default implementation
+    * @param {string} name
+    * @param {string} type
+    */
+    function getValidColorsDefault(name, type) {
+        return getValidColors(getColorCheckRegex(name, type), (_, groupIndex, matches) => {
+            return (!matches[4] && groupIndex == 3) || (matches[4] && groupIndex == 4);
+        });
+    }
+
+    /**
+    * Get a regex that can be used to check for valid colors
+    * @param {string} name
+    * @param {string} type
+    */
+    function getColorCheckRegex(name, type = 'Color') {
+        return new RegExp(`(\\.${name}${type}(!|)={1,3}"([\\S ][^"),]+)"|"([\\S ][^"),]+)"(!|)={1,3}[\\w]+\\.${name}${type})`, 'g');
+    }
+
+
     console.log('\ngetting colors');
     const colorsStart = Date.now();
 
+
+    ['Hair', 'Lip', 'Eye', 'Fur', 'Scale', 'Nipple', 'Penis', 'Vagina'].forEach(name => {
+        obj.ValidColors[name] = getValidColorsDefault(name.toLocaleLowerCase());
+    });
+
+    obj.ValidColors.Penis = getValidColorsDefault('cock');
+
+    obj.ValidColors.SkinTone = getValidColorsDefault('skin', 'Tone');
 
 
     const colorsEnd = Date.now();
