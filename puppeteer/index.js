@@ -1128,6 +1128,21 @@ const path = require('path');
     // #region Manual clean
 
 
+    // #region Colors
+
+    ['FIXME', 'NOT SET', 'PLACEHOLDER', 'no', 'none', 'unknown'].forEach(name => {
+        for (const colorType in obj.ValidColors) {
+            const colors = obj.ValidColors[colorType];
+            const index = colors.findIndex(c => c === name);
+            if (index > -1) {
+                colors.splice(index, 1);
+            }
+        }
+    });
+
+    // #endregion
+
+
     // #region Key Items
 
     [''].forEach(name => {
