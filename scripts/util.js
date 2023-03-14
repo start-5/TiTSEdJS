@@ -330,6 +330,27 @@ const util = {
 
         return key;
 
+    },
+
+    /**
+    * Used for autocomplete
+    * @param {Array<string>} strings
+    */
+    substringMatcher(strings) {
+        return function findMatches(substr, callback) {
+
+            const matches = [];
+
+            const substrRegex = new RegExp(substr, 'i');
+
+            strings.forEach(str => {
+                if (substrRegex.test(str)) {
+                    matches.push(str);
+                }
+            });
+
+            callback(matches);
+        };
     }
 
 };
