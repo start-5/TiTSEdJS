@@ -41,14 +41,8 @@ var ViewModel = function (data) {
     ko.mapping.fromJS(data, loadMapping, self.save);
 
 
-    self.getGlobal = function (path) {
-        var obj = Globals;
-
-        for (var i = 0, path = path.split('.'), len = path.length; i < len; i++) {
-            obj = obj[path[i]];
-        }
-
-        return obj;
+    self.getGlobal = path => {
+        return util.getObjectByPath(Globals, path);
     };
 
 

@@ -330,6 +330,52 @@ const util = {
 
         return key;
 
+    },
+
+    /**
+    * Escape a RegExp string
+    * @param {string} str
+    */
+    escapeRegex(str) {
+        return str.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
+    },
+
+    /**
+    * Used for autocomplete
+    * @param {Array<string>} strings
+    */
+    substringMatcher(strings) {
+        return function findMatches(substr, callback) {
+
+            var matches = [];
+
+            const substrRegex = new RegExp(util.escapeRegex(substr), 'i');
+
+            strings.forEach(str => {
+                if (substrRegex.test(str)) {
+                    matches.push(str);
+                }
+            });
+
+            matches = matches.sort((l, r) => l.length - r.length);
+
+            callback(matches);
+        };
+    },
+
+    /**
+    * Get a nested object contained in root using a path to the property
+    * @param {any} root
+    * @param {string} path
+    */
+    getObjectByPath(root, path) {
+        var obj = root;
+
+        for (var i = 0, path = path.split('.'), len = path.length; i < len; i++) {
+            obj = obj[path[i]];
+        }
+
+        return obj;
     }
 
 };

@@ -11,6 +11,15 @@
  * @property {string} [tooltipText] Text to show as a tooltip
  */
 
+/**
+ * @typedef {Object} TextFieldOptions
+ * @property {string} [suffixText] Text to show in the input's suffix area
+ * @property {boolean} [pcOnly] Whether this field should apply to the PC only
+ * @property {string} [koChanged] KO func to run when the field's value changes
+ * @property {string} [koVisible] KO func to run to determine whether the field should be visible
+ * @property {string} [tooltipText] Text to show as a tooltip
+ * @property {string} [typeaheadSource] Convert input to typeahead input using this suggestion source (taken from Globals)
+ */
 
 /**
  * @typedef {Object} NumericFieldOptions
@@ -203,13 +212,27 @@ class TextField extends Field {
     * @param {string} root The root object to modify
     * @param {string} key The object key to modify
     * @param {string} labelText The editor's label
-    * @param {FieldOptions} options The editor options
+    * @param {TextFieldOptions} options The editor options
     */
     constructor(root, key, labelText, options = {}) {
 
         super(root, key);
 
         this.input.type = 'text';
+
+        if (options.typeaheadSource) {
+            $(this.input).typeahead(
+                {
+                    highlight: true,
+                    hint: true,
+                    minLength: 1
+                },
+                {
+                    limit: 10,
+                    source: util.substringMatcher(util.getObjectByPath(Globals, options.typeaheadSource))
+                }
+            );
+        }
 
         util.setKoBinding(this.input, 'textInput', util.getObjPath(root, key));
 

@@ -167,6 +167,66 @@ input[type=number] {
 /* #endregion */
 
 
+/* #region Typeahead */
+
+.twitter-typeahead, .tt-hint, .tt-input, .tt-menu {
+    width: 100%;
+}
+
+.tt-query, .tt-hint {
+    outline: none;
+}
+
+.tt-query {
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.tt-hint {
+    color: #ccc;
+}
+
+.tt-menu {
+    width: 100%;
+    margin-top: 6px;
+    background-color: #333E52;
+    border: 1px solid #777;
+    border-radius: 0 0 0.2rem 0.2rem;
+    box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+.tt-suggestion {
+    padding: 3px 10px;
+    font-size: .875rem;
+}
+
+    .tt-suggestion.tt-cursor {
+        background-color: #767676;
+        cursor: default !important;
+    }
+
+    .tt-suggestion p {
+        margin: 0;
+    }
+
+.tt-highlight {
+    color: #00F5EF;
+}
+
+.form-control.tt-input:focus {
+    background-color: transparent !important;
+}
+
+    .form-control.tt-input:focus ~ .input-group-text {
+        background-color: transparent !important;
+    }
+
+.form-control.tt-hint {
+    background-color: transparent !important;
+}
+
+/* #endregion */
+
+
 .hidden {
     display: none;
 }
