@@ -124,7 +124,7 @@ const display = {
                 new Group('Hair', [
                     new SelectField(key_char, 'hairType', 'HairType', 'Hair Type'),
                     new FloatField(key_char, 'hairLength', 'Hair Length', { suffixText: 'inches' }),
-                    new TextField(key_char, 'hairColor', 'Hair Color'),
+                    new TextField(key_char, 'hairColor', 'Hair Color', { typeaheadSource: 'ValidColors.Hair' }),
                     new SelectField(key_char, 'hairStyle', 'HairStyle', 'Hair Style'),
                     new FloatField(key_char, 'beardLength', 'Beard Length', { suffixText: 'inches' }),
                     new SelectField(key_char, 'beardType', 'HairType', 'Beard Type'),
@@ -143,7 +143,7 @@ const display = {
             ]),
             new Row([
                 new Group('Lips', [
-                    new TextField(key_char, 'lipColor', 'Lip Color'),
+                    new TextField(key_char, 'lipColor', 'Lip Color', { typeaheadSource: 'ValidColors.Lip' }),
                     new IntegerField(key_char, 'lipMod', 'Lip Modifier')
                 ]),
                 new Group('Ears', [
@@ -153,7 +153,7 @@ const display = {
                 ]),
                 new Group('Eyes', [
                     new SelectField(key_char, 'eyeType', 'ValidTypes.Eye', 'Eye Type'),
-                    new TextField(key_char, 'eyeColor', 'Eye Color')
+                    new TextField(key_char, 'eyeColor', 'Eye Color', { typeaheadSource: 'ValidColors.Eye' })
                 ])
             ])
         ]).build();
@@ -178,10 +178,10 @@ const display = {
                 ]),
                 new Group('Skin', [
                     new SelectField(key_char, 'skinType', 'SkinType', 'Skin Type'),
-                    new TextField(key_char, 'skinTone', 'Skin Tone'),
+                    new TextField(key_char, 'skinTone', 'Skin Tone', { typeaheadSource: 'ValidColors.SkinTone' }),
                     new TextField(key_char, 'skinAccent', 'Skin Accent'),
-                    new TextField(key_char, 'furColor', 'Fur Color'),
-                    new TextField(key_char, 'scaleColor', 'Scale Color'),
+                    new TextField(key_char, 'furColor', 'Fur Color', { typeaheadSource: 'ValidColors.Fur' }),
+                    new TextField(key_char, 'scaleColor', 'Scale Color', { typeaheadSource: 'ValidColors.Scale' }),
                     new FlagField(key_char, 'skinFlags', 'ValidFlags.Skin', 'Skin Flags'),
                 ]),
                 new Group('Butt', [
@@ -227,7 +227,7 @@ const display = {
                     new IntegerField(key_char, 'milkStorageMultiplier', 'Milk Storage Multiplier')
                 ]),
                 new Group('Nipples', [
-                    new TextField(key_char, 'nippleColor', 'Nipple Color'),
+                    new TextField(key_char, 'nippleColor', 'Nipple Color', { typeaheadSource: 'ValidColors.Nipple' }),
                     new IntegerField(key_char, 'nipplesPerBreast', 'Nipples Per Breast'),
                     new FloatField(key_char, 'nippleLengthRatio', 'Nipple Length Ratio'),
                     new FloatField(key_char, 'nippleWidthRatio', 'Nipple Width Ratio'),
@@ -264,7 +264,7 @@ const display = {
                         new FloatField(key_tailP, 'cThicknessRatioMod', 'Thickness Ratio Mod'),
                     ]),
                     new SelectField(key_tailP, 'cType', 'ValidTypes.Penis', 'Type'),
-                    new TextField(key_tailP, 'cockColor', 'Color'),
+                    new TextField(key_tailP, 'cockColor', 'Color', { typeaheadSource: 'ValidColors.Penis' }),
                     new FloatField(key_tailP, 'knotMultiplier', 'Knot Multiplier'),
                     new FloatField(key_tailP, 'flaccidMultiplier', 'Flaccid Multiplier'),
                     new FlagField(key_tailP, 'flags', 'ValidFlags.Penis', 'Flags')
@@ -283,7 +283,7 @@ const display = {
                     ]),
                     new IntegerField(key_tailV, 'bonusCapacity', 'Bonus Capacity'),
                     new SelectField(key_tailV, 'type', 'ValidTypes.Vagina', 'Type'),
-                    new TextField(key_tailV, 'vaginaColor', 'Color'),
+                    new TextField(key_tailV, 'vaginaColor', 'Color', { typeaheadSource: 'ValidColors.Vagina' }),
                     new IntegerField(key_tailV, 'clits', 'Clits', { min: 1 }),
                     new FloatField(key_tailV, 'fullness', 'Fullness'),
                     new IntegerField(key_tailV, 'shrinkCounter', 'Shrink Counter'),
@@ -329,7 +329,7 @@ const display = {
                             new FloatField('', 'cThicknessRatioMod', 'Thickness Ratio Mod'),
                         ]),
                         new SelectField('', 'cType', 'ValidTypes.Penis', 'Type'),
-                        new TextField('', 'cockColor', 'Color'),
+                        new TextField('', 'cockColor', 'Color', { typeaheadSource: 'ValidColors.Penis' }),
                         new FloatField('', 'knotMultiplier', 'Knot Multiplier'),
                         new FloatField('', 'flaccidMultiplier', 'Flaccid Multiplier'),
                         new FlagField('', 'flags', 'ValidFlags.Penis', 'Flags')
@@ -365,7 +365,7 @@ const display = {
                         ]),
                         new IntegerField('', 'bonusCapacity', 'Bonus Capacity'),
                         new SelectField('', 'type', 'ValidTypes.Vagina', 'Type'),
-                        new TextField('', 'vaginaColor', 'Color'),
+                        new TextField('', 'vaginaColor', 'Color', { typeaheadSource: 'ValidColors.Vagina' }),
                         new IntegerField('', 'clits', 'Clits', { min: 1 }),
                         new FloatField('', 'fullness', 'Fullness'),
                         new IntegerField('', 'shrinkCounter', 'Shrink Counter'),

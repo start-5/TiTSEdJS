@@ -378,28 +378,6 @@
 
             // #endregion
 
-
-            var a3d923eda_15e6_444d_9c52_06e050524a3d = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California',
-                'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii',
-                'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
-                'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
-                'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
-                'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota',
-                'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
-                'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
-                'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
-            ];
-
-            $('.typeahead').typeahead({
-                hint: true,
-                highlight: true,
-                minLength: 1
-            },
-                {
-                    name: 'states',
-                    source: util.substringMatcher(a3d923eda_15e6_444d_9c52_06e050524a3d)
-                });
-
         });
 
 
@@ -516,11 +494,7 @@
                 <div class="tab-pane fade" id="tabPerks" role="tabpanel" aria-labelledby="navPerks"></div>
                 <div class="tab-pane fade" id="tabStatusEffects" role="tabpanel" aria-labelledby="navStatusEffects"></div>
                 <div class="tab-pane fade" id="tabFlags" role="tabpanel" aria-labelledby="navFlags"></div>
-                <div class="tab-pane fade" id="tabInventory" role="tabpanel" aria-labelledby="navInventory">
-
-                    <input class="typeahead" type="text" placeholder="a3d923eda_15e6_444d_9c52_06e050524a3d">
-
-                </div>
+                <div class="tab-pane fade" id="tabInventory" role="tabpanel" aria-labelledby="navInventory"></div>
                 <div class="tab-pane fade" id="tabKeyItems" role="tabpanel" aria-labelledby="navKeyItems"></div>
             </div>
         </div>
