@@ -23,7 +23,7 @@
 
 <h3 class="mt-4">Issues/Requests</h3>
 <p>
-  Please post any issue, request, suggestion in the <a href="https://github.com/start-5/TiTS.JS-Save-Editor/issues" target="_blank">issues tab</a> of the <a href="https://github.com/start-5/TiTS.JS-Save-Editor" target="_blank">GitHub repo</a>.
+  Please post any issue, request, suggestion in the <a href="https://github.com/start-5/TiTS.JS-Save-Editor/issues" target="_blank">issues tab</a> of the <a href="https://github.com/start-5/TiTS.JS-Save-Editor" target="_blank">GitHub repo</a>. You might want to glance over the <a href="https://github.com/start-5/TiTS.JS-Save-Editor/wiki/Contributing#bugsissues" target="_blank">wiki</a> first.
 </p>
 
 <h3 class="mt-4">Contributing</h3>
