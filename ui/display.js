@@ -268,7 +268,6 @@ const display = {
                     new FloatField(key_tailP, 'knotMultiplier', 'Knot Multiplier'),
                     new FloatField(key_tailP, 'flaccidMultiplier', 'Flaccid Multiplier'),
                     new FlagField(key_tailP, 'flags', 'ValidFlags.Penis', 'Flags')
-                    //todo piercing
                 ], { tooltipText: 'Must have at least 1 tail and the "Tailcock" tail flag set for this to have an effect.' }),
                 new Group('Tail Vagina', [
                     new SwitchField(key_tailV, 'hymen', 'Hymen'),
@@ -288,7 +287,6 @@ const display = {
                     new FloatField(key_tailV, 'fullness', 'Fullness'),
                     new IntegerField(key_tailV, 'shrinkCounter', 'Shrink Counter'),
                     new FlagField(key_tailV, 'flags', 'ValidFlags.Vagina', 'Flags')
-                    //todo piercing
                 ], { tooltipText: 'Must have at least 1 tail and the "Tailcunt" tail flag set for this to have an effect.' })
             ])
         ]).build();
@@ -333,7 +331,6 @@ const display = {
                         new FloatField('', 'knotMultiplier', 'Knot Multiplier'),
                         new FloatField('', 'flaccidMultiplier', 'Flaccid Multiplier'),
                         new FlagField('', 'flags', 'ValidFlags.Penis', 'Flags')
-                        //todo piercing
                     ])
                 ])
             ]),
@@ -370,7 +367,6 @@ const display = {
                         new FloatField('', 'fullness', 'Fullness'),
                         new IntegerField('', 'shrinkCounter', 'Shrink Counter'),
                         new FlagField('', 'flags', 'ValidFlags.Vagina', 'Flags')
-                        //todo piercing
                     ])
                 ]),
             ])
