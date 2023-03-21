@@ -4,6 +4,7 @@ However, it does help to have a coherent, chronological change log.
 
 ## 3/21/2023
 - Fix an array description not accounting for some modifiers
+- Remove references of inventory editing (not planned)
 
 ## 3/14/2023
 - Add suggestions/autocomplete support, enabled for color fields
