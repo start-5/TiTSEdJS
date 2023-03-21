@@ -335,7 +335,7 @@ var ViewModel = function (data) {
 
         if (b) {
             const count = +b.breasts();
-            const rating = +b.breastRatingRaw() + +b.breastRatingMod();
+            const rating = +b.breastRatingRaw() + +b.breastRatingMod() + +b.breastRatingLactationMod() + +b.breastRatingHoneypotMod();
             return `${count} ${util.getCupSize(rating)} breast${(count > 1 ? 's' : '')}`;
         }
 
