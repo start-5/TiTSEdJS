@@ -115,6 +115,7 @@ const CodexEntries = [
     'Satyr Slave',
     'Saurmorians',
     'Scarlet Federation',
+    'Shalinae',
     'Siel',
     'Simii',
     'Sionach',
