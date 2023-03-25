@@ -107,6 +107,20 @@ const display = {
                     ]),
                     new IntegerField(key_char, 'shieldsRaw', 'Shields Raw')
                 ]),
+                new Group('Pregnancy', [
+                    new NestedGroup([
+                        new IntegerField(key_char, 'pregnancyMultiplierRaw', 'Quantity Multiplier Raw'),
+                        new IntegerField(key_char, 'pregnancyMultiplierMod', 'Quantity Multiplier Modifer')
+                    ]),
+                    new NestedGroup([
+                        new IntegerField(key_char, 'pregnancyIncubationBonusMotherRaw', 'Incubation Mother Raw'),
+                        new IntegerField(key_char, 'pregnancyIncubationBonusMotherMod', 'Incubation Mother Mod')
+                    ]),
+                    new NestedGroup([
+                        new IntegerField(key_char, 'pregnancyIncubationBonusFatherRaw', 'Incubation Father Raw'),
+                        new IntegerField(key_char, 'pregnancyIncubationBonusFatherMod', 'Incubation Father Mod')
+                    ])
+                ])
             ]),
         ]).build();
     },
