@@ -3167,6 +3167,8 @@ const Flags = {
     NALEEN_PREG_PC_KNOWS1: null,
     NALEEN_PREG_PC_KNOWS2: null,
     NALEEN_SNUGGLED: null,
+    NAOMI_COOLDOWN: null,
+    NAOMI_SEX: null,
     NARC_ANYTHING_NEW: null,
     NARC_BJ_INFLATION: null,
     NARC_CHIPPED: null,
