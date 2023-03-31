@@ -50,7 +50,7 @@ const display = {
                     new IntegerField(key_char, 'exhibitionismRaw', 'Exhibitionism', { max: 100 })
                 ]),
                 new Group('Advancement', [
-                    new IntegerField(key_char, 'level', 'Level', { max: 10 }),
+                    new IntegerField(key_char, 'level', 'Level', { max: 12 }),
                     new IntegerField(key_pc, 'XPRaw', 'XP', { pcOnly: true }),
                     new IntegerField(key_pc, 'unspentStatPoints', 'Stat Points', { pcOnly: true })
                 ]),
