@@ -2,7 +2,7 @@
 
 const Counts = {
     Codex: 157,
-    GameFlags: 5155,
+    GameFlags: 5158,
     Global: {
         BeardStyle: 12,
         BodyFlag: 65,
@@ -62,5 +62,5 @@ const Counts = {
     },
     KeyItems: 128,
     Perks: 212,
-    StatusEffects: 1191,
+    StatusEffects: 1190,
 };
