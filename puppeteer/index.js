@@ -755,12 +755,12 @@ const path = require('path');
                 gameFlags = gameFlags.concat(m.map((value) => value.substr(6)));
             }
 
-            m = content.match(/flags\[['"][\w_]+['"]\]/g);
+            m = content.match(/flags\["([\S ][^"]*)"\]/g);
             if (m && m.length > 0) {
-                gameFlags = gameFlags.concat(m.map((value) => value.substr(7, value.length - 2)));
+                gameFlags = gameFlags.concat(m.map((value) => value.substring(7, value.length - 2)));
             }
 
-            m = content.match(/IncrementFlag\("([\S][^"]+)"\)/g);
+            m = content.match(/IncrementFlag\("([\S ][^"]*)"\)/g);
             if (m && m.length > 0) {
                 gameFlags = gameFlags.concat(m.map((value) => value.substring(15, value.length - 2)));
             }
