@@ -759,6 +759,11 @@ const path = require('path');
             if (m && m.length > 0) {
                 gameFlags = gameFlags.concat(m.map((value) => value.substr(7, value.length - 2)));
             }
+
+            m = content.match(/IncrementFlag\("([\S][^"]+)"\)/g);
+            if (m && m.length > 0) {
+                gameFlags = gameFlags.concat(m.map((value) => value.substring(15, value.length - 2)));
+            }
         }
     })();
 
