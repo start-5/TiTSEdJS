@@ -2063,6 +2063,7 @@ const Flags = {
     INESSA_VIRGINITY: null,
     INFINITE_CREW: null,
     INFINITE_ITEMS: null,
+    INFINITE_SHIP_STORAGE_INVENTORY: null,
     INFLATED_VI: null,
     INSULTED_COUSIN_ON_MHENGA: null,
     IQBGONE_POLICED: null,
