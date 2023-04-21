@@ -20,7 +20,7 @@ const loadMapping = {
 };
 
 
-var ViewModel = function (data) {
+var ViewModel = function() {
 
     var self = this;
 
@@ -29,16 +29,13 @@ var ViewModel = function (data) {
     self.busy = ko.observable(false);
 
 
-    self.save = {};
+    self.save = ko.observable({});
 
-    self.saveLoaded = ko.observable(false);
+    self.saveLoaded = ko.computed(() => self.save != null && self.save() != null && Object.keys(self.save()).length > 0, self);
 
     self.saveName = ko.observable('');
 
     self.originalSaveName = ko.observable('');
-
-
-    ko.mapping.fromJS(data, loadMapping, self.save);
 
 
     self.getGlobal = path => {
@@ -62,10 +59,14 @@ var ViewModel = function (data) {
 
     self.characters = ko.computed(() => {
 
-        return Object.keys(self.save.characters).map(key => ({
-            name: key,
-            obj: self.save.characters[key]
-        }));
+        if (self.saveLoaded()) {
+            return Object.keys(self.save().characters).map(key => ({
+                name: key,
+                obj: self.save().characters[key]
+            }));
+        }
+
+        return [];
 
     }, self);
 
@@ -182,11 +183,11 @@ var ViewModel = function (data) {
 
     self.stateFlagList = ko.computed(() => {
 
-        if (self.save && self.save.flags) {
+        if (self.saveLoaded()) {
 
             const flags = [];
 
-            self.save.flags.items().forEach(dictionaryItem => {
+            self.save().flags.items().forEach(dictionaryItem => {
 
                 if (self.stateFlagUndesired.includes(dictionaryItem.key())) {
                     return;
@@ -199,6 +200,8 @@ var ViewModel = function (data) {
             return flags;
 
         }
+
+        return [];
 
     }, self);
 
@@ -354,6 +357,12 @@ var ViewModel = function (data) {
 
     // #endregion
 
+};
+
+
+var SaveViewModel = function (data) {
+    var self = this;
+    ko.mapping.fromJS(data, loadMapping, self);
 };
 
 

@@ -755,16 +755,29 @@ const path = require('path');
                 gameFlags = gameFlags.concat(m.map((value) => value.substr(6)));
             }
 
-            m = content.match(/flags\[['"][\w_]+['"]\]/g);
+            m = content.match(/flags\["([\S ][^"]*)"\]/g);
             if (m && m.length > 0) {
-                gameFlags = gameFlags.concat(m.map((value) => value.substr(7, value.length - 2)));
+                gameFlags = gameFlags.concat(m.map((value) => value.substring(7, value.length - 2)));
+            }
+
+            m = content.match(/IncrementFlag\("([\S ][^"]*)"\)/g);
+            if (m && m.length > 0) {
+                gameFlags = gameFlags.concat(m.map((value) => value.substring(15, value.length - 2)));
             }
         }
     })();
 
 
     // Format
-    gameFlags = gameFlags.filter((value, index, self) => self.indexOf(value) === index && value.toUpperCase() === value).sort();
+    gameFlags = gameFlags.filter((value, index, self) => self.indexOf(value) === index).sort();
+
+    // Clean
+    ['artistOverrides', 'pathOverrides', 'customMannequin', 'hasAphroTongue', 'includes', 'indexOf', 'length', 'map', 'push', 'splice'].forEach(name => {
+        const index = gameFlags.findIndex(f => f === name);
+        if (index > -1) {
+            gameFlags.splice(index, 1);
+        }
+    });
 
     // Convert to dictionary, set all values to null
     gameFlags = gameFlags.reduce((acc, curr) => (acc[curr] = null, acc), {});
