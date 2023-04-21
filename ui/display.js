@@ -8,7 +8,7 @@ const key_butt = key_char + '.ass';
 const key_tailP = key_char + '.tailCock';
 const key_tailV = key_char + '.tailCunt';
 
-const key_save = 'save';
+const key_save = 'save()';
 const key_flags = key_save + '.flags';
 const key_pc = key_save + '.characters.PC';
 const key_instance = key_save + '.gameInstanceInfo';

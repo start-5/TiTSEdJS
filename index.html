@@ -50,10 +50,19 @@
         const maxChangeLogs = 5;
 
 
-        window.onerror = function (evt, src, ln, col, err) {
+        window.onerror = async function (evt, src, ln, col, err) {
             if (err !== null) {
 
-                alert(`An unhandled exception ocurred! If you can, please open a GitHub issue so it can be fixed:\n\n${err}`);
+                const errorText = `Message: ${err.message}\nStacktrace: ${err.stack}`;
+
+                if (confirm(`An unhandled exception ocurred! If you can, please open a GitHub issue so it can be fixed. Select "OK" to copy the error to your clipboard:\n\n${errorText}`)) {
+                    try {
+                        await navigator.clipboard.writeText(errorText);
+                    } catch {
+
+                    }
+
+                }
 
             }
         }
@@ -89,18 +98,20 @@
                     }
 
 
+                    var isFirstLoad = false;
+
                     if (!vm) {
-                        vm = new ViewModel(json);
                         koInit();
+                        vm = new ViewModel(json);
+                        isFirstLoad = true;
                     }
 
-                    if (!vm.saveLoaded()) {
-                        vm.saveLoaded(true);
+                    vm.save(new SaveViewModel(json));
+
+                    if (isFirstLoad) {
                         ko.applyBindings(vm);
                     }
-                    else {
-                        ko.mapping.fromJS(json, loadMapping, vm.save);
-                    }
+
 
                     if (!vm.isPC()) {
                         vm.selectedCharacter(vm.characters().find(c => c.name == 'PC'));
