@@ -20,7 +20,7 @@ const loadMapping = {
 };
 
 
-var ViewModel = function (data) {
+var ViewModel = function() {
 
     var self = this;
 
