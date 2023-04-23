@@ -56,7 +56,7 @@ const display = {
                 ]),
                 new Group('Appearance', [
                     new IntegerField(key_char, 'tallness', 'Height', { suffixText: 'inches' }),
-                    new IntegerField(key_char, 'thickness', 'Height', { max: 100 }),
+                    new IntegerField(key_char, 'thickness', 'Thickness', { max: 100 }),
                     new IntegerField(key_char, 'tone', 'Tone', { max: 100 }),
                     new IntegerField(key_char, 'femininity', 'Femininity', { max: 100 })
                 ]),

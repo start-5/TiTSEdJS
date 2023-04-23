@@ -2,6 +2,9 @@
 This project does not adhere to any specific versioning system, it will always be deployed as a "latest" version.
 However, it does help to have a coherent, chronological change log.
 
+## 4/23/2023
+- Fix the label of the thickness field incorrectly displaying 'Height' instead of 'Thickness'
+
 ## 4/20/2023
 - Fix the editor not correctly clearing its state after loading a new save when one was already loaded. This was causing things like flags to incorrectly get copied from the first save to the new save.
 - Add tons of missing flags
