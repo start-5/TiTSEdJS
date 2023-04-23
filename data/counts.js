@@ -2,7 +2,7 @@
 
 const Counts = {
     Codex: 157,
-    GameFlags: 5341,
+    GameFlags: 5349,
     Global: {
         BeardStyle: 12,
         BodyFlag: 65,
@@ -21,8 +21,8 @@ const Counts = {
         Upbringing: 6,
         ValidColors: {
             Eye: 53,
-            Fur: 48,
-            Hair: 75,
+            Fur: 45,
+            Hair: 74,
             Lip: 35,
             Nipple: 45,
             Penis: 39,
@@ -52,15 +52,15 @@ const Counts = {
             Eye: 40,
             Face: 52,
             Horn: 18,
-            Leg: 62,
+            Leg: 61,
             Penis: 40,
-            Tail: 50,
+            Tail: 51,
             Tongue: 36,
-            Vagina: 38,
+            Vagina: 36,
             Wing: 18,
         },
     },
     KeyItems: 128,
-    Perks: 212,
-    StatusEffects: 1190,
+    Perks: 211,
+    StatusEffects: 1193,
 };
