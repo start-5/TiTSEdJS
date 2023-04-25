@@ -20,7 +20,7 @@ const Counts = {
         TailGenital: 4,
         Upbringing: 6,
         ValidColors: {
-            Eye: 53,
+            Eye: 54,
             Fur: 45,
             Hair: 74,
             Lip: 35,
@@ -51,7 +51,7 @@ const Counts = {
             Ear: 51,
             Eye: 40,
             Face: 52,
-            Horn: 18,
+            Horn: 19,
             Leg: 61,
             Penis: 40,
             Tail: 51,
