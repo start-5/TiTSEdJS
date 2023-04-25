@@ -437,6 +437,7 @@ const Globals = {
             'glowing amber',
             'glowing pink',
             'glowing red',
+            'glowing white',
             'gold',
             'gray',
             'green',
@@ -1342,6 +1343,7 @@ const Globals = {
             { name: 'Xhelarfog', value: 87 },
             { name: 'Saurmorian', value: 88 },
             { name: 'Dzaan', value: 90 },
+            { name: 'Moose', value: 94 },
             { name: 'Sionach', value: 95 },
         ],
         Leg: [
