@@ -772,7 +772,7 @@ const path = require('path');
     gameFlags = gameFlags.filter((value, index, self) => self.indexOf(value) === index).sort();
 
     // Clean
-    ['artistOverrides', 'pathOverrides', 'customMannequin', 'hasAphroTongue', 'includes', 'indexOf', 'length', 'map', 'push', 'splice'].forEach(name => {
+    ['artistOverrides', 'pathOverrides', 'customMannequin', 'includes', 'indexOf', 'length', 'map', 'push', 'splice'].forEach(name => {
         const index = gameFlags.findIndex(f => f === name);
         if (index > -1) {
             gameFlags.splice(index, 1);
