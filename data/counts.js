@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 
 const Counts = {
-    Codex: 157,
-    GameFlags: 5349,
+    Codex: 158,
+    GameFlags: 5351,
     Global: {
         BeardStyle: 12,
         BodyFlag: 65,
@@ -21,14 +21,14 @@ const Counts = {
         Upbringing: 6,
         ValidColors: {
             Eye: 54,
-            Fur: 45,
-            Hair: 74,
-            Lip: 35,
-            Nipple: 45,
-            Penis: 39,
-            Scale: 28,
+            Fur: 47,
+            Hair: 73,
+            Lip: 37,
+            Nipple: 46,
+            Penis: 40,
+            Scale: 29,
             Skin: 66,
-            SkinTone: 77,
+            SkinTone: 78,
             Vagina: 33,
         },
         ValidFlags: {
@@ -47,15 +47,15 @@ const Counts = {
         },
         ValidTypes: {
             Antennae: 9,
-            Arm: 46,
+            Arm: 47,
             Ear: 51,
             Eye: 40,
-            Face: 52,
+            Face: 53,
             Horn: 19,
-            Leg: 61,
+            Leg: 62,
             Penis: 40,
             Tail: 51,
-            Tongue: 36,
+            Tongue: 37,
             Vagina: 36,
             Wing: 18,
         },

@@ -29,6 +29,7 @@ const CodexEntries = [
     'Daynar',
     'Dildo Snakes',
     'Diverting Jokes',
+    'Divrani',
     'Dragon’s Hoard',
     'Dumbfuck',
     'Dzaan',
