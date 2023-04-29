@@ -9,6 +9,12 @@
   Don’t come to me, and especially don’t come to the maintainers of TiTS if you break your save using this tool!
 </p>
 
+<h3 class="mt-4"><a href="https://github.com/start-5/TiTS.JS-Save-Editor/wiki" target="_blank">Wiki</a></h3>
+<p>
+  The wiki contains a couple of pages with some information.
+  It may be useful to glance at it before even using the editor to know about possible caveats, FAQ, etc.
+</p>
+
 <h3 class="mt-4">How to Use</h3>
 <ol>
   <li>In the game, use the "Save to File" option when saving your game, which will download a file containing your data.</li>
