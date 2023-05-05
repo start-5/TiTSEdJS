@@ -17386,7 +17386,7 @@ const StatusEffects = [
         minutesLeft: 0,
         neverSerialize: false,
         storageName: "Tranq'd",
-        tooltip: 'The Queen is under the influence of the Myr Heavy Traquilizer Dart!\\nPhysique and reflexes significantly decreased.\\nLust vulnerability massively increased.',
+        tooltip: 'The Queen is under the influence of the Myr Heavy Tranquilizer Dart!\\nPhysique and reflexes significantly decreased.\\nLust vulnerability massively increased.',
         value1: 0,
         value2: 0,
         value3: 0,
