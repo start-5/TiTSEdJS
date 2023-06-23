@@ -277,9 +277,8 @@ const path = require('path');
         util.printOperationTime('game instance', gameLoadStart, gameLoadEnd, 'loaded ');
     }
     catch (e) {
-        console.log(e);
         await browser.close();
-        return 1;
+        throw e;
     }
 
 
@@ -463,17 +462,15 @@ const path = require('path');
         util.printOperationTime('game instance', evalGameStart, evalGameEnd, 'evaluated ');
     }
     catch (err) {
-        console.log(err);
         await browser.close();
-        return 1;
+        throw err;
     }
 
 
 
     if (evalResult.error) {
-        console.log(evalResult.error);
         await browser.close();
-        return 1;
+        throw new Error(evalResult.error);
     }
 
 
