@@ -279,7 +279,7 @@ const path = require('path');
     catch (e) {
         console.log(e);
         await browser.close();
-        return;
+        return 1;
     }
 
 
@@ -455,7 +455,7 @@ const path = require('path');
 
             }
             catch (e) {
-                return { error: e };
+                return { error: e.toString() };
             }
         });
 
@@ -465,15 +465,15 @@ const path = require('path');
     catch (err) {
         console.log(err);
         await browser.close();
-        return;
+        return 1;
     }
 
 
 
     if (evalResult.error) {
-        console.log('Error: ' + evalResult.error);
+        console.log(evalResult.error);
         await browser.close();
-        return;
+        return 1;
     }
 
 
