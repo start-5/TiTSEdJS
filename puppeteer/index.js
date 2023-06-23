@@ -348,19 +348,22 @@ const path = require('path');
                 const data = new DataTransfer();
                 data.items.add(file);
 
+                
+                await delay(2000);
+                window.pressAcceptCancel('no');
                 window.showSaveLoad();
-                await delay(500);
+                await delay(700);
 
                 const fileInput = document.getElementById('fileToLoad');
                 fileInput.files = data.files;
 
-                await delay(500);
+                await delay(700);
                 window.pressButton(3);
-                await delay(500);
+                await delay(700);
 
                 fileInput.dispatchEvent(new Event('change', { 'bubbles': true }));
 
-                await delay(5000);
+                await delay(6000);
 
                 // #endregion
 
