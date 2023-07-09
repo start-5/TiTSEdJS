@@ -89,6 +89,7 @@ const CodexEntries = [
     'Matisar',
     'Milodan',
     'Mimbranes',
+    'Mome',
     'Monster Threesome!',
     'Mothrine',
     'Muffstick',
