@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 
 const Counts = {
-    Codex: 158,
-    GameFlags: 5326,
+    Codex: 159,
+    GameFlags: 5336,
     Global: {
         BeardStyle: 12,
         BodyFlag: 65,
@@ -61,6 +61,6 @@ const Counts = {
         },
     },
     KeyItems: 131,
-    Perks: 208,
-    StatusEffects: 1212,
+    Perks: 217,
+    StatusEffects: 1219,
 };
