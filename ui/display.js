@@ -322,7 +322,7 @@ const display = {
                     new SelectField(key_char, 'cumType', 'FluidType', 'Cum Type'),
                     new NestedGroup([
                         new FloatField(key_char, 'cumMultiplierRaw', 'Cum Multiplier Raw'),
-                        new IntegerField(key_char, 'cumMultiplierMod', 'Cum Multiplier Raw')
+                        new IntegerField(key_char, 'cumMultiplierMod', 'Cum Multiplier Modifier')
                     ]),
                     new NestedGroup([
                         new FloatField(key_char, 'cumQualityRaw', 'Cum Quality Raw'),
