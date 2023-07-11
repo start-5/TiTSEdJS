@@ -207,10 +207,13 @@ class ArrayGroup extends Group {
         this.btnAdd.type = 'button';
         this.btnAdd.disabled = true;
         this.btnAdd.classList.add('btn', 'btn-success', 'btn-sm', 'float-end', 'text-white');
-        util.setKoBinding(this.btnAdd, 'click', `$root.${koAdd}`);
-        util.setKoBinding(this.btnAdd, 'enable', '$root.saveLoaded');
 
-        this.header.appendChild(this.btnAdd);
+        if (koAdd) {
+            util.setKoBinding(this.btnAdd, 'click', `$root.${koAdd}`);
+            util.setKoBinding(this.btnAdd, 'enable', '$root.saveLoaded');
+
+            this.header.appendChild(this.btnAdd);
+        }
     }
 
 }

@@ -387,6 +387,18 @@ const display = {
         ]).build();
     },
 
+    getShips: () => {
+        return new Tab([
+            new Row([
+                new ArrayGroup('', '', [
+                    new ArrayField(key_save, 'ships', '', '', [
+
+                    ])
+                ])
+            ])
+        ]).build();
+    },
+
 
     getStoragePopup: () => {
 
