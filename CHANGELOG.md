@@ -2,6 +2,10 @@
 This project does not adhere to any specific versioning system, it will always be deployed as a "latest" version.
 However, it does help to have a coherent, chronological change log.
 
+## 7/10/2023
+- Adjusted limits for some inputs. Most notably, removed the hard cap of 12 for level.
+- Fix typo
+
 ## 4/23/2023
 - Fix the label of the thickness field incorrectly displaying 'Height' instead of 'Thickness'
 
