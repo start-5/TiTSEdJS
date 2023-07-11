@@ -50,7 +50,7 @@ const display = {
                     new IntegerField(key_char, 'exhibitionismRaw', 'Exhibitionism', { max: 100 })
                 ]),
                 new Group('Advancement', [
-                    new IntegerField(key_char, 'level', 'Level', { max: 12 }),
+                    new IntegerField(key_char, 'level', 'Level'),
                     new IntegerField(key_pc, 'XPRaw', 'XP', { pcOnly: true }),
                     new IntegerField(key_pc, 'unspentStatPoints', 'Stat Points', { pcOnly: true })
                 ]),
@@ -58,7 +58,7 @@ const display = {
                     new IntegerField(key_char, 'tallness', 'Height', { suffixText: 'inches' }),
                     new IntegerField(key_char, 'thickness', 'Thickness', { max: 100 }),
                     new IntegerField(key_char, 'tone', 'Tone', { max: 100 }),
-                    new IntegerField(key_char, 'femininity', 'Femininity', { max: 100 })
+                    new IntegerField(key_char, 'femininity', 'Femininity', { min: null })
                 ]),
             ]),
             new Row([
@@ -316,7 +316,7 @@ const display = {
                         new FloatField(key_char, 'ballSizeRaw', 'Ball Size Raw'),
                         new IntegerField(key_char, 'ballSizeMod', 'Ball Size Modifier')
                     ]),
-                    new FloatField(key_char, 'Internal_ballFullness', 'Ball Fullness', { max: 100 }),
+                    new FloatField(key_char, 'Internal_ballFullness', 'Ball Fullness'),
                     new FloatField(key_char, 'Internal_ballEfficiency', 'Ball Efficiency'),
                     new FloatField(key_char, 'refractoryRate', 'Refractory Rate'),
                     new SelectField(key_char, 'cumType', 'FluidType', 'Cum Type'),
