@@ -325,6 +325,7 @@ const util = {
     getFullKey(root, key) {
 
         if (root) {
+            root = root.replaceAll('(', '').replaceAll(')', '');
             return root.split('.').slice(-1)[0] + '-' + key;
         }
 

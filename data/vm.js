@@ -392,4 +392,30 @@ function koInit() {
 
     };
 
+
+    // A 'foreach' handler that executes on objects instead of arrays
+    ko.bindingHandlers.foreachObj = {
+
+        init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+            const objAsArray = ko.pureComputed(function () {
+
+                const observable = ko.utils.unwrapObservable(valueAccessor());
+
+                const array = [];
+
+                for (const property in observable) {
+                    array.push(observable[property]);
+                }
+
+                return array;
+
+            });
+
+            ko.applyBindingsToNode(element, { foreach: objAsArray }, bindingContext);
+
+            return { controlsDescendantBindings: true };
+        }
+
+    };
+
 }

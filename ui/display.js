@@ -249,7 +249,7 @@ const display = {
                     new IntegerField(key_char, 'dickNippleMultiplier', 'Dicknipple Multiplier')
                 ]),
                 new ArrayGroup('Breasts', 'addBreastRow', [
-                    new ArrayField(key_char, 'breastRows', 'getBreastName', 'removeBreastRow', [
+                    new ArrayField(key_char, 'breastRows', [
                         new IntegerField('', 'breasts', 'Count'),
                         new IntegerField('', 'breastRatingRaw', 'Rating Raw'),
                         new IntegerField('', 'breastRatingMod', 'Rating Modifier'),
@@ -258,7 +258,7 @@ const display = {
                         new SelectField('', 'nippleType', 'NippleType', 'Nipple Type'),
                         new FloatField('', 'fullness', 'Fullness'),
                         new FlagField('', 'areolaFlags', 'ValidFlags.Areola', 'Areola Flags')
-                    ])
+                    ], { koDescript: 'getBreastName', koDelete: 'removeBreastRow' })
                 ])
             ]),
             new Row([
@@ -330,7 +330,7 @@ const display = {
                     ])
                 ]),
                 new ArrayGroup('Penises', 'addPenis', [
-                    new ArrayField(key_char, 'cocks', 'getPenisName', 'removePenis', [
+                    new ArrayField(key_char, 'cocks', [
                         new SwitchField('', 'virgin', 'Virgin'),
                         new NestedGroup([
                             new FloatField('', 'cLengthRaw', 'Length Raw'),
@@ -345,7 +345,7 @@ const display = {
                         new FloatField('', 'knotMultiplier', 'Knot Multiplier'),
                         new FloatField('', 'flaccidMultiplier', 'Flaccid Multiplier'),
                         new FlagField('', 'flags', 'ValidFlags.Penis', 'Flags')
-                    ])
+                    ], { koDescript: 'getPenisName', koDelete: 'removePenis' })
                 ])
             ]),
             new Row([
@@ -363,7 +363,7 @@ const display = {
                     new FloatField(key_char, 'clitLength', 'Clit Length')
                 ]),
                 new ArrayGroup('Vaginas', 'addVagina', [
-                    new ArrayField(key_char, 'vaginas', 'getVaginaName', 'removeVagina', [
+                    new ArrayField(key_char, 'vaginas', [
                         new SwitchField('', 'hymen', 'Hymen'),
                         new IntegerField('', 'minLooseness', 'Minimum Looseness'),
                         new NestedGroup([
@@ -381,7 +381,7 @@ const display = {
                         new FloatField('', 'fullness', 'Fullness'),
                         new IntegerField('', 'shrinkCounter', 'Shrink Counter'),
                         new FlagField('', 'flags', 'ValidFlags.Vagina', 'Flags')
-                    ])
+                    ], { koDescript: 'getVaginaName', koDelete: 'removeVagina' })
                 ]),
             ])
         ]).build();
@@ -390,10 +390,10 @@ const display = {
     getShips: () => {
         return new Tab([
             new Row([
-                new ArrayGroup('', '', [
-                    new ArrayField(key_save, 'ships', '', '', [
-
-                    ])
+                new ArrayGroup('a', '', [
+                    new ArrayField(key_save, 'ships', [
+                        new TextField('', 'short', 'Name')
+                    ], { isObj: true })
                 ])
             ])
         ]).build();

@@ -32,6 +32,12 @@
  * @property {number} [max] The maximum value allowed for the field
  */
 
+/**
+ * @typedef {Object} ArrayFieldOptions
+ * @property {string} koDescript The KO Func to use to describe items
+ * @property {string} koDelete The KO Func to remove an item from the array
+ * @property {boolean} isObj Whether the collection is an object instead of an array
+ */
 
 /**
  * The base for all editor fields
@@ -595,11 +601,10 @@ class ArrayField {
     * Creates an editor array field
     * @param {string} root The root object to modify
     * @param {string} key The object key to modify
-    * @param {string} koDescript The KO Func to use to describe items
-    * @param {string} koDelete The KO Func to remove an item from the array
     * @param {Array<Field>} fields The list of fields modifiable for each item
+    * @param {ArrayFieldOptions} options The editor options
     */
-    constructor(root, key, koDescript, koDelete, fields) {
+    constructor(root, key, fields, options = {}) {
 
         /**
         * The object being modified by this field
@@ -622,7 +627,7 @@ class ArrayField {
         */
         this.content = document.createElement('div');
         this.content.classList.add('my-3', 'w-100');
-        util.setKoBinding(this.content, 'foreach', util.getObjPath(root, key));
+        util.setKoBinding(this.content, options.isObj ? 'foreachObj' : 'foreach', util.getObjPath(root, key));
 
 
         /**
@@ -651,7 +656,7 @@ class ArrayField {
         this.templateAccordionButton.classList.add('accordion-button', 'collapsed');
         this.templateAccordionButton.setAttribute('data-bs-toggle', 'collapse');
         this.templateAccordionButton.setAttribute('aria-expanded', 'false');
-        util.setKoBinding(this.templateAccordionButton, 'text', `$root.${koDescript}($index)`);
+        util.setKoBinding(this.templateAccordionButton, 'text', options.koDescript ? `$root.${options.koDescript}($index)` : '$index()');
         util.setKoBinding(this.templateAccordionButton, 'attr',
             `{
                 'aria-controls': 'edit-${fullKey}-' + $index() + '-body',
@@ -695,12 +700,15 @@ class ArrayField {
         this.btnDelete.type = 'button';
         this.btnDelete.disabled = true;
         this.btnDelete.classList.add('btn', 'btn-danger', 'btn-sm');
-        util.setKoBinding(this.btnDelete, 'click', `$root.${koDelete}`);
-        util.setKoBinding(this.btnDelete, 'enable', '$root.saveLoaded');
 
         btnRemoveContainer.appendChild(this.btnDelete);
 
-        this.templateAccordionBody.appendChild(btnRemoveContainer);
+        if (options.koDelete) {
+            util.setKoBinding(this.btnDelete, 'click', `$root.${options.koDelete}`);
+            util.setKoBinding(this.btnDelete, 'enable', '$root.saveLoaded');
+
+            this.templateAccordionBody.appendChild(btnRemoveContainer);
+        }
 
 
         for (var i = 0; i < fields.length; i++) {
