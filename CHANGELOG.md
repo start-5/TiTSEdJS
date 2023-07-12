@@ -2,6 +2,13 @@
 This project does not adhere to any specific versioning system, it will always be deployed as a "latest" version.
 However, it does help to have a coherent, chronological change log.
 
+## 7/11/2023
+- Added ship editing.
+
+## 7/10/2023
+- Adjusted limits for some inputs. Most notably, removed the hard cap of 12 for level.
+- Fix typo
+
 ## 6/22/2023
 - Update to newest game version
 - Use local files instead of CDN files for scripts etc., which should minimize obscure network errors or random blocked scripts. Should also make it viable to run the editor offline as long as all the correct files are downloaded.
