@@ -390,11 +390,50 @@ const display = {
     getShips: () => {
         return new Tab([
             new Row([
-                new ArrayGroup('a', '', [
-                    new ArrayField(key_save, 'ships', [
-                        new TextField('', 'short', 'Name')
-                    ], { isObj: true })
-                ])
+                new ArrayField(key_save, 'ships', [
+                    new Group('About', [
+                        new NestedGroup([
+                            new TextField('', 'short', 'Name'),
+                            new TextField('', 'modelDisplay', 'Manufacturer/Model')
+                        ]),
+                        new TextField('', 'long', 'Description'),
+                    ]),
+                    new Group('Stats', [
+                        new IntegerField('', 'level', 'Level'),
+                        new IntegerField('', 'shieldsRaw', 'Shields Raw'),
+                        new NestedGroup([
+                            new IntegerField('', 'HPRaw', 'HP (Armor) Raw'),
+                            new IntegerField('', 'HPMod', 'HP (Armor) Modifier')
+                        ]),
+                        new NestedGroup([
+                            new IntegerField('', 'energyRaw', 'Energy Raw', { tooltipText: 'At the time of writing, max ship energy is hard-capped in-game on a ship-by-ship basis.' }),
+                            new IntegerField('', 'energyMod', 'Energy Modifier', { tooltipText: 'At the time of writing, max ship energy is hard-capped in-game on a ship-by-ship basis.' })
+                        ]),
+                        new IntegerField('', 'powerRaw', 'Power Generation Raw'),
+                        new IntegerField('', 'agilityRaw', 'Agility Raw'),
+                        new IntegerField('', 'sensorsRaw', 'Sensors Raw'),
+                        new IntegerField('', 'systemsRaw', 'Systems Raw'),
+                        new IntegerField('', 'speedRaw', 'Speed (Thrust) Raw')
+                    ]),
+                    new Group('Storage Capacity', [
+                        new IntegerField('', 'capacityRaw', 'Module/Crew Capacity'),
+                        new NestedGroup([
+                            new IntegerField('', 'wardrobeSizeRaw', 'Wardrobe Capacity'),
+                            new IntegerField('', 'equipmentSizeRaw', 'Equipment Capacity')
+                        ]),
+                        new NestedGroup([
+                            new IntegerField('', 'consumableSizeRaw', 'Consumables Capacity'),
+                            new IntegerField('', 'valuablesSizeRaw', 'Valuables Capacity')
+                        ]),
+                        new NestedGroup([
+                            new IntegerField('', 'toysSizeRaw', 'Toys Capacity'),
+                            new IntegerField('', 'gunCapacityRaw', 'Weapon Capacity')
+                        ])
+                    ]),
+                    new Group('Misc', [
+                        new SwitchField('', 'holodeck', 'Has Holodeck')
+                    ])
+                ], { koDescript: 'getShipName', isObj: true })
             ])
         ]).build();
     },

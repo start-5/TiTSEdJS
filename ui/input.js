@@ -715,14 +715,7 @@ class ArrayField {
 
             const field = fields[i];
 
-            if (field instanceof NestedGroup) {
-                field.fields.forEach(nestedField => {
-                    this.resolveArrayFieldID(fullKey, nestedField);
-                });
-            }
-            else {
-                this.resolveArrayFieldID(fullKey, field);
-            }
+            this.resolveArrayFieldID(fullKey, field);
 
             const content = field.build();
 
@@ -748,9 +741,15 @@ class ArrayField {
     * Resolve array IDs
     * @param {string} arrayKey
     * @param {Field} field
-    * @param {string} labelText
     */
     resolveArrayFieldID(arrayKey, field) {
+
+        if (field instanceof Group) {
+            field.fields.forEach(nestedField => {
+                this.resolveArrayFieldID(arrayKey, nestedField);
+            });
+            return;
+        }
 
         if (field instanceof FlagField) {
 

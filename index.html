@@ -111,6 +111,10 @@
                         ko.applyBindings(vm);
                     }
 
+                    // Ensure all tooltips are initialized
+                    setTimeout(() => {
+                        $('[data-bs-toggle="tooltip"]').tooltip();
+                    }, 2500);
 
                     if (!vm.isPC()) {
                         vm.selectedCharacter(vm.characters().find(c => c.name == 'PC'));

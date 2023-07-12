@@ -355,6 +355,25 @@ var ViewModel = function() {
     // #endregion
 
 
+    // #region Ships
+
+    self.getShipName = function (index) {
+
+        const ships = self.save().ships;
+
+        const s = ships[Object.keys(ships)[index()]];
+
+        if (s) {
+            return s.short();
+        }
+
+        return index;
+
+    };
+
+    // #endregion
+
+
     // #endregion
 
 };
