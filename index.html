@@ -111,6 +111,10 @@
                         ko.applyBindings(vm);
                     }
 
+                    // Ensure all tooltips are initialized
+                    setTimeout(() => {
+                        $('[data-bs-toggle="tooltip"]').tooltip();
+                    }, 2500);
 
                     if (!vm.isPC()) {
                         vm.selectedCharacter(vm.characters().find(c => c.name == 'PC'));
@@ -243,6 +247,7 @@
             $('#tabHead').append(display.getHead());
             $('#tabBody').append(display.getBody());
             $('#tabCrotch').append(display.getCrotch());
+            $('#tabShips').append(display.getShips());
             $('#tabPerks').append(display.getPerks());
             $('#tabStatusEffects').append(display.getStatusEffects());
             $('#tabFlags').append(display.getFlags());
@@ -478,6 +483,9 @@
                     <button class="nav-link" id="navCrotch" data-bs-toggle="tab" data-bs-target="#tabCrotch" type="button" role="tab" aria-controls="tabCrotch" aria-selected="false">Crotch</button>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="navShips" data-bs-toggle="tab" data-bs-target="#tabShips" type="button" role="tab" aria-controls="tabShips" aria-selected="false">Ships</button>
+                </li>
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="navPerks" data-bs-toggle="tab" data-bs-target="#tabPerks" type="button" role="tab" aria-controls="tabPerks" aria-selected="false">Perks</button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -496,6 +504,7 @@
                 <div class="tab-pane fade" id="tabHead" role="tabpanel" aria-labelledby="navHead"></div>
                 <div class="tab-pane fade" id="tabBody" role="tabpanel" aria-labelledby="navBody"></div>
                 <div class="tab-pane fade" id="tabCrotch" role="tabpanel" aria-labelledby="navCrotch"></div>
+                <div class="tab-pane fade" id="tabShips" role="tabpanel" aria-labelledby="navCrotch"></div>
                 <div class="tab-pane fade" id="tabPerks" role="tabpanel" aria-labelledby="navPerks"></div>
                 <div class="tab-pane fade" id="tabStatusEffects" role="tabpanel" aria-labelledby="navStatusEffects"></div>
                 <div class="tab-pane fade" id="tabFlags" role="tabpanel" aria-labelledby="navFlags"></div>

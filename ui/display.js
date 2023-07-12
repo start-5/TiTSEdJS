@@ -249,7 +249,7 @@ const display = {
                     new IntegerField(key_char, 'dickNippleMultiplier', 'Dicknipple Multiplier')
                 ]),
                 new ArrayGroup('Breasts', 'addBreastRow', [
-                    new ArrayField(key_char, 'breastRows', 'getBreastName', 'removeBreastRow', [
+                    new ArrayField(key_char, 'breastRows', [
                         new IntegerField('', 'breasts', 'Count'),
                         new IntegerField('', 'breastRatingRaw', 'Rating Raw'),
                         new IntegerField('', 'breastRatingMod', 'Rating Modifier'),
@@ -258,7 +258,7 @@ const display = {
                         new SelectField('', 'nippleType', 'NippleType', 'Nipple Type'),
                         new FloatField('', 'fullness', 'Fullness'),
                         new FlagField('', 'areolaFlags', 'ValidFlags.Areola', 'Areola Flags')
-                    ])
+                    ], { koDescript: 'getBreastName', koDelete: 'removeBreastRow' })
                 ])
             ]),
             new Row([
@@ -330,7 +330,7 @@ const display = {
                     ])
                 ]),
                 new ArrayGroup('Penises', 'addPenis', [
-                    new ArrayField(key_char, 'cocks', 'getPenisName', 'removePenis', [
+                    new ArrayField(key_char, 'cocks', [
                         new SwitchField('', 'virgin', 'Virgin'),
                         new NestedGroup([
                             new FloatField('', 'cLengthRaw', 'Length Raw'),
@@ -345,7 +345,7 @@ const display = {
                         new FloatField('', 'knotMultiplier', 'Knot Multiplier'),
                         new FloatField('', 'flaccidMultiplier', 'Flaccid Multiplier'),
                         new FlagField('', 'flags', 'ValidFlags.Penis', 'Flags')
-                    ])
+                    ], { koDescript: 'getPenisName', koDelete: 'removePenis' })
                 ])
             ]),
             new Row([
@@ -363,7 +363,7 @@ const display = {
                     new FloatField(key_char, 'clitLength', 'Clit Length')
                 ]),
                 new ArrayGroup('Vaginas', 'addVagina', [
-                    new ArrayField(key_char, 'vaginas', 'getVaginaName', 'removeVagina', [
+                    new ArrayField(key_char, 'vaginas', [
                         new SwitchField('', 'hymen', 'Hymen'),
                         new IntegerField('', 'minLooseness', 'Minimum Looseness'),
                         new NestedGroup([
@@ -381,8 +381,59 @@ const display = {
                         new FloatField('', 'fullness', 'Fullness'),
                         new IntegerField('', 'shrinkCounter', 'Shrink Counter'),
                         new FlagField('', 'flags', 'ValidFlags.Vagina', 'Flags')
-                    ])
+                    ], { koDescript: 'getVaginaName', koDelete: 'removeVagina' })
                 ]),
+            ])
+        ]).build();
+    },
+
+    getShips: () => {
+        return new Tab([
+            new Row([
+                new ArrayField(key_save, 'ships', [
+                    new Group('About', [
+                        new NestedGroup([
+                            new TextField('', 'short', 'Name'),
+                            new TextField('', 'modelDisplay', 'Manufacturer/Model')
+                        ]),
+                        new TextField('', 'long', 'Description'),
+                    ]),
+                    new Group('Stats', [
+                        new IntegerField('', 'level', 'Level'),
+                        new IntegerField('', 'shieldsRaw', 'Shields Raw'),
+                        new NestedGroup([
+                            new IntegerField('', 'HPRaw', 'HP (Armor) Raw'),
+                            new IntegerField('', 'HPMod', 'HP (Armor) Modifier')
+                        ]),
+                        new NestedGroup([
+                            new IntegerField('', 'energyRaw', 'Energy Raw', { tooltipText: 'At the time of writing, max ship energy is hard-capped in-game on a ship-by-ship basis.' }),
+                            new IntegerField('', 'energyMod', 'Energy Modifier', { tooltipText: 'At the time of writing, max ship energy is hard-capped in-game on a ship-by-ship basis.' })
+                        ]),
+                        new IntegerField('', 'powerRaw', 'Power Generation Raw'),
+                        new IntegerField('', 'agilityRaw', 'Agility Raw'),
+                        new IntegerField('', 'sensorsRaw', 'Sensors Raw'),
+                        new IntegerField('', 'systemsRaw', 'Systems Raw'),
+                        new IntegerField('', 'speedRaw', 'Speed (Thrust) Raw')
+                    ]),
+                    new Group('Storage Capacity', [
+                        new IntegerField('', 'capacityRaw', 'Module/Crew Capacity'),
+                        new NestedGroup([
+                            new IntegerField('', 'wardrobeSizeRaw', 'Wardrobe Capacity'),
+                            new IntegerField('', 'equipmentSizeRaw', 'Equipment Capacity')
+                        ]),
+                        new NestedGroup([
+                            new IntegerField('', 'consumableSizeRaw', 'Consumables Capacity'),
+                            new IntegerField('', 'valuablesSizeRaw', 'Valuables Capacity')
+                        ]),
+                        new NestedGroup([
+                            new IntegerField('', 'toysSizeRaw', 'Toys Capacity'),
+                            new IntegerField('', 'gunCapacityRaw', 'Weapon Capacity')
+                        ])
+                    ]),
+                    new Group('Misc', [
+                        new SwitchField('', 'holodeck', 'Has Holodeck')
+                    ])
+                ], { koDescript: 'getShipName', isObj: true })
             ])
         ]).build();
     },

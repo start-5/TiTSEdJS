@@ -355,6 +355,25 @@ var ViewModel = function() {
     // #endregion
 
 
+    // #region Ships
+
+    self.getShipName = function (index) {
+
+        const ships = self.save().ships;
+
+        const s = ships[Object.keys(ships)[index()]];
+
+        if (s) {
+            return s.short();
+        }
+
+        return index;
+
+    };
+
+    // #endregion
+
+
     // #endregion
 
 };
@@ -388,6 +407,32 @@ function koInit() {
 
         update: function (element, valueAccessor) {
             element.value = valueAccessor()();
+        }
+
+    };
+
+
+    // A 'foreach' handler that executes on objects instead of arrays
+    ko.bindingHandlers.foreachObj = {
+
+        init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+            const objAsArray = ko.pureComputed(function () {
+
+                const observable = ko.utils.unwrapObservable(valueAccessor());
+
+                const array = [];
+
+                for (const property in observable) {
+                    array.push(observable[property]);
+                }
+
+                return array;
+
+            });
+
+            ko.applyBindingsToNode(element, { foreach: objAsArray }, bindingContext);
+
+            return { controlsDescendantBindings: true };
         }
 
     };
