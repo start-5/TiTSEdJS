@@ -1,0 +1,14 @@
+name: Auto Bump
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  check-version:
+    name: Check latest version
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: No-op
+        run: echo "1"
