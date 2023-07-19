@@ -1,0 +1,37 @@
+﻿name: Auto Bump
+
+on:
+  workflow_dispatch:
+    
+  schedule:
+    - cron: '0 0 * * *'
+  
+concurrency:
+  group: "bump"
+  cancel-in-progress: true
+
+jobs:
+  check-version:
+    name: Check latest version
+
+    runs-on: ubuntu-latest
+
+    env:
+      working-directory: ./update_checker
+
+    defaults:
+      run:
+        working-directory: ${{ env.working-directory }}
+
+    steps:
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        
+      - name: Install packages
+        run: npm ci
+
+      - name: Run checker
+        run: node app
+
+      - name: Echo test
+        run: echo $?
