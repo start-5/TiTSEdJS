@@ -26,12 +26,11 @@ jobs:
       - name: Install packages
         run: npm ci
         working-directory: ./update_checker
-        #working-directory: update_checker
 
       - name: Run checker
         run: node app
         working-directory: ./update_checker
-        #working-directory: update_checker
+        continue-on-error: true
 
       - name: Echo test
         run: echo $?
