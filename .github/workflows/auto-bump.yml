@@ -14,7 +14,6 @@ jobs:
   check_version:
     name: Check latest version
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -32,11 +31,19 @@ jobs:
         continue-on-error: true
         run: node app
 
+      - name: Run bump
+        if: steps.checker.outcome == 'success'
+        run: echo "run the thing"
+
+      - name: Result
+        if: steps.checker.outcome != 'success'
+        run: echo "No update"
+
   trigger_bump:
     name: Trigger bump
     needs: check_version
     runs-on: ubuntu-latest
-    if: needs.check_version.outcome == success
+    if: needs.check_version.result == success
     steps:
       - run: echo "Run the thing"
 
@@ -44,6 +51,6 @@ jobs:
     name: No update
     needs: check_version
     runs-on: ubuntu-latest
-    if: needs.check_version.outcome != success
+    if: needs.check_version.result != success
     steps:
       - run: echo "Nothing to update"
