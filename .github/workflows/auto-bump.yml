@@ -15,23 +15,18 @@ jobs:
     name: Check latest version
 
     runs-on: ubuntu-latest
-
-    env:
-      working-directory: ./update_checker
-
-    defaults:
-      run:
-        working-directory: ${{ env.working-directory }}
-
+    
     steps:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         
       - name: Install packages
         run: npm ci
+        working-directory: ./update_checker
 
       - name: Run checker
         run: node app
+        working-directory: ./update_checker
 
       - name: Echo test
         run: echo $?
