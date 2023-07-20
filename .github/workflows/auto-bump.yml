@@ -24,13 +24,16 @@ jobs:
         uses: actions/setup-node@v3
         
       - name: Install packages
-        run: npm ci
         working-directory: ./update_checker
-
+        run: npm ci
+        
       - name: Run checker
-        run: node app
+        id: checker
         working-directory: ./update_checker
         continue-on-error: true
-
+        run: |
+          node app
+          echo $?
+        
       - name: Echo test
         run: echo $?
