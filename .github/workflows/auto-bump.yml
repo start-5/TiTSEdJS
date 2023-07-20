@@ -11,11 +11,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check-version:
+  check_version:
     name: Check latest version
-
     runs-on: ubuntu-latest
-    
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -31,9 +30,20 @@ jobs:
         id: checker
         working-directory: ./update_checker
         continue-on-error: true
-        run: |
-          node app
-          echo $?
-        
-      - name: Echo test
-        run: echo $?
+        run: node app
+
+  trigger_bump:
+    name: Trigger bump
+    needs: check_version
+    runs-on: ubuntu-latest
+    if: needs.check_version.outcome == success
+    steps:
+      - run: echo "Run the thing"
+
+  no_update:
+    name: No update
+    needs: check_version
+    runs-on: ubuntu-latest
+    if: needs.check_version.outcome != success
+    steps:
+      - run: echo "Nothing to update"
