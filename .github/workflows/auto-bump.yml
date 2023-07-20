@@ -43,7 +43,7 @@ jobs:
     name: Trigger bump
     needs: check_version
     runs-on: ubuntu-latest
-    if: needs.check_version.result == success
+    if: needs.check_version.result == 'success'
     steps:
       - run: echo "Run the thing"
 
@@ -51,6 +51,6 @@ jobs:
     name: No update
     needs: check_version
     runs-on: ubuntu-latest
-    if: needs.check_version.result != success
+    if: needs.check_version.result != 'success'
     steps:
       - run: echo "Nothing to update"
