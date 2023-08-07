@@ -79,6 +79,7 @@ const CodexEntries = [
     'Log: Myrellion',
     'Log: New Texas',
     'Log: Other Data',
+    'Log: Phaedra',
     'Log: Poe A',
     'Log: Tarkus',
     'Log: Tavros Station',
