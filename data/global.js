@@ -440,6 +440,7 @@ const Globals = {
             'electric blue',
             'emerald',
             'fiery orange',
+            'glowing ',
             'glowing amber',
             'glowing pink',
             'glowing red',

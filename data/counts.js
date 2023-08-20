@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 
 const Counts = {
-    Codex: 160,
-    GameFlags: 5339,
+    Codex: 161,
+    GameFlags: 5341,
     Global: {
         BeardStyle: 12,
         BodyFlag: 65,
@@ -20,7 +20,7 @@ const Counts = {
         TailGenital: 4,
         Upbringing: 6,
         ValidColors: {
-            Eye: 54,
+            Eye: 55,
             Fur: 48,
             Hair: 71,
             Lip: 37,
@@ -61,6 +61,6 @@ const Counts = {
         },
     },
     KeyItems: 131,
-    Perks: 223,
-    StatusEffects: 1225,
+    Perks: 224,
+    StatusEffects: 1224,
 };

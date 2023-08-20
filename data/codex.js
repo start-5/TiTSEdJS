@@ -145,6 +145,7 @@ const CodexEntries = [
     'Throbb',
     'Toves',
     'Tower of Trials',
+    'Twilit',
     'U.G.C.',
     'V-Ko',
     'V-Ko IVs',
