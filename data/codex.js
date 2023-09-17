@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 const CodexEntries = [
+    '.addCodexEntry(l.dI.CODEX_TYPE_LOG,t,"Log: ".concat(e.nameExternal',
     'AI Systems',
     'Aegis',
     'All Logs',
@@ -70,21 +71,6 @@ const CodexEntries = [
     'Leithans',
     'Leyak',
     'Locofever',
-    'Log: Breedwell Centre',
-    'Log: Canadia Station',
-    'Log: Dhaal',
-    'Log: FIRST-14',
-    'Log: Gastigoth',
-    'Log: Mhen’ga',
-    'Log: Myrellion',
-    'Log: New Texas',
-    'Log: Other Data',
-    'Log: Phaedra',
-    'Log: Poe A',
-    'Log: Tarkus',
-    'Log: Tavros Station',
-    'Log: Uveto VII',
-    'Log: Zhèng Shi Station',
     'Lurelings',
     'Maia Series AI',
     'Matisar',
@@ -161,5 +147,6 @@ const CodexEntries = [
     'Xhelarfog',
     'Zaika',
     'Zil',
+    'l.dI.CODEX_TYPE_LOG,t,"Log: ".concat(e.nameExterna',
     '||||||||',
 ];
