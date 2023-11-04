@@ -2,17 +2,17 @@
 
 const Counts = {
     Codex: 148,
-    GameFlags: 5365,
+    GameFlags: 5412,
     Global: {
         BeardStyle: 12,
         BodyFlag: 65,
         BodyType: 102,
         Class: 4,
-        FluidType: 31,
+        FluidType: 36,
         GenitalSpot: 4,
         HairStyle: 24,
         HairType: 7,
-        ItemFlag: 64,
+        ItemFlag: 73,
         NippleType: 7,
         SexPref: 33,
         SkinType: 10,
@@ -62,5 +62,5 @@ const Counts = {
     },
     KeyItems: 132,
     Perks: 226,
-    StatusEffects: 1230,
+    StatusEffects: 1236,
 };
