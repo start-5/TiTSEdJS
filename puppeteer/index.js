@@ -348,7 +348,7 @@ const path = require('path');
                 const data = new DataTransfer();
                 data.items.add(file);
 
-                
+
                 await delay(2000);
                 window.pressAcceptCancel('no');
                 window.showSaveLoad();
@@ -912,7 +912,21 @@ const path = require('path');
     console.log('\ngetting perks');
     const perksStart = Date.now();
 
-    const perks = getStorageClassData(/\.(create|has|remove)Perk\("([\S ][^)]+)\)*/g);
+    let perks = getStorageClassData(/\.(create|has|remove)Perk\("([\S ][^)]+)\)*/g);
+
+    // Handle some class perks that are defined statically.
+    const handleStaticClassPerk = (_, groupIndex, matches) => {
+        if (groupIndex == 0) {
+            const perk = new StorageClass();
+            perk.storageName = matches[1];
+            perk.tooltip = matches[2];
+            perks.push(perk);
+        }
+    };
+    util.execRegexOnContents(/\w\.perkName="([\w ][^"]+)[^,]?",\w\.perkDescription="([\w ][^"]+)[^,]?"/g, handleStaticClassPerk);
+    util.execRegexOnContents(/\w\.perkName="([\w ][^"]+)[^,]?",\w\.perkDescription='([\w ][^']+)[^,]?'/g, handleStaticClassPerk); // single/double quote shenanigans
+
+    perks = util.formatStorageClassArray(perks);
 
     const perksEnd = Date.now();
     util.printOperationTime('perks', perksStart, perksEnd);

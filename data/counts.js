@@ -61,6 +61,6 @@ const Counts = {
         },
     },
     KeyItems: 133,
-    Perks: 226,
+    Perks: 265,
     StatusEffects: 1239,
 };
