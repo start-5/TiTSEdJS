@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 
 const Counts = {
-    Codex: 148,
-    GameFlags: 5412,
+    Codex: 150,
+    GameFlags: 5493,
     Global: {
         BeardStyle: 12,
         BodyFlag: 65,
@@ -27,7 +27,7 @@ const Counts = {
             Nipple: 46,
             Penis: 42,
             Scale: 29,
-            Skin: 0,
+            Skin: 84,
             SkinTone: 79,
             Vagina: 34,
         },
@@ -60,7 +60,7 @@ const Counts = {
             Wing: 18,
         },
     },
-    KeyItems: 132,
+    KeyItems: 133,
     Perks: 226,
-    StatusEffects: 1236,
+    StatusEffects: 1239,
 };
