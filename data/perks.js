@@ -1226,7 +1226,7 @@ const Perks = [
         minutesLeft: 0,
         neverSerialize: false,
         storageName: 'Extra Ardor',
-        tooltip: 'Increases lust gain over time.',
+        tooltip: 'Increases minimum lust by 10 and lust gain over time, and reduces the potential energy loss from orgasms.',
         value1: 0,
         value2: 0,
         value3: 0,

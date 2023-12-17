@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 const CodexEntries = [
-    '.addCodexEntry(l.dI.CODEX_TYPE_LOG,t,"Log: ".concat(e.nameExternal',
+    '.addCodexEntry(c.dI.CODEX_TYPE_LOG,t,"Log: ".concat(e.nameExternal',
     'AI Systems',
     'Aegis',
     'All Logs',
@@ -36,6 +36,7 @@ const CodexEntries = [
     'Dzaan',
     'Essyras',
     'Fanfir',
+    'First Day on the Job',
     'FizzyFix',
     'Frostwyrm',
     'Fuck the System',
@@ -127,6 +128,7 @@ const CodexEntries = [
     'Tentacles & Tanukis',
     'Tentatool',
     'The Treatment',
+    'Thotocracy',
     'Thraggen',
     'Throbb',
     'Toves',
@@ -147,6 +149,6 @@ const CodexEntries = [
     'Xhelarfog',
     'Zaika',
     'Zil',
-    'l.dI.CODEX_TYPE_LOG,t,"Log: ".concat(e.nameExterna',
+    'c.dI.CODEX_TYPE_LOG,t,"Log: ".concat(e.nameExterna',
     '||||||||',
 ];
