@@ -396,7 +396,7 @@ const display = {
                             new TextField('', 'short', 'Name'),
                             new TextField('', 'modelDisplay', 'Manufacturer/Model')
                         ]),
-                        new TextField('', 'long', 'Description'),
+                        new TextField('', 'classInstance() !== "Sidewinder" ? long : ""', 'Description', { koVisible: 'classInstance() !== "Sidewinder"'  }),
                     ]),
                     new Group('Stats', [
                         new IntegerField('', 'level', 'Level'),
