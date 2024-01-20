@@ -2,7 +2,7 @@
 
 const Counts = {
     Codex: 150,
-    GameFlags: 5493,
+    GameFlags: 5536,
     Global: {
         BeardStyle: 12,
         BodyFlag: 65,
@@ -12,7 +12,7 @@ const Counts = {
         GenitalSpot: 4,
         HairStyle: 24,
         HairType: 7,
-        ItemFlag: 73,
+        ItemFlag: 76,
         NippleType: 7,
         SexPref: 33,
         SkinType: 10,
@@ -20,15 +20,15 @@ const Counts = {
         TailGenital: 4,
         Upbringing: 6,
         ValidColors: {
-            Eye: 56,
+            Eye: 57,
             Fur: 48,
             Hair: 71,
-            Lip: 37,
-            Nipple: 46,
+            Lip: 38,
+            Nipple: 49,
             Penis: 42,
             Scale: 29,
             Skin: 84,
-            SkinTone: 79,
+            SkinTone: 81,
             Vagina: 34,
         },
         ValidFlags: {
@@ -48,12 +48,12 @@ const Counts = {
         ValidTypes: {
             Antennae: 9,
             Arm: 47,
-            Ear: 51,
+            Ear: 50,
             Eye: 41,
             Face: 53,
             Horn: 19,
             Leg: 61,
-            Penis: 40,
+            Penis: 41,
             Tail: 51,
             Tongue: 38,
             Vagina: 36,
@@ -61,6 +61,6 @@ const Counts = {
         },
     },
     KeyItems: 133,
-    Perks: 265,
-    StatusEffects: 1239,
+    Perks: 264,
+    StatusEffects: 1255,
 };
